@@ -15,11 +15,12 @@
   évolis's own index.html for that note). A few things carried over from
   that adaptation still need Jaclyn's attention — search this file for
   "TODO(JBJ)" for the specific spots:
-    - SHEET_KEYWORD_STRATEGY, SHEET_UPLOADS, and the ASN Master Tracker
-      sheet have no per-brand tab/gid for just-bjorn yet (not in the
-      Dashboard Mapping sheet at all, for any brand) — these three
-      features will show empty/pending states until Jaclyn provisions
-      them and adds the keys to SHEET_CONFIG.
+    - SHEET_KEYWORD_STRATEGY and the ASN Master Tracker sheet have no
+      per-brand tab/gid for just-bjorn yet (not in the Dashboard Mapping
+      sheet at all, for any brand) — these two features will show
+      empty/pending states until Jaclyn provisions them and adds the
+      keys to SHEET_CONFIG. SHEET_UPLOADS is separately confirmed DEAD
+      (not pending) — see its own const declaration for detail.
     - Just Bjorn has one product line (Marine Collagen Peptides, a few
       pack sizes) rather than évolis's multiple hair-care categories, so
       the Listing Audit and Organic pages were flattened to a single
@@ -1149,7 +1150,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
   .asn-meta-form-grid{grid-template-columns:1fr;}
 }
 </style>
-<link rel="icon" type="image/png" href="/reports/evolis_favicon.png">
+<link rel="icon" type="image/png" href="just_bjorn_favicon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1163,7 +1164,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 <aside class="sidebar">
   <div class="sb-brand">
     <div class="sb-brand-logo" style="display:flex;align-items:center;gap:6px;">
-      <img src="just-bjorn-logo.svg" alt="Just Bjorn" style="height:18px;width:auto;filter:brightness(0) invert(1);">
+      <img src="just_bjorn_logo.svg" alt="Just Bjorn" style="height:18px;width:auto;filter:brightness(0) invert(1);">
       <span style="color:var(--green);">•</span>
       <img src="/reports/Medaltus_Typeface Logo_dark bground_RGB.svg" alt="Medaltus" style="height:18px;width:auto;">
     </div>
@@ -1280,7 +1281,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
     <!-- Hero -->
     <div class="home-hero">
-      <img class="home-hero-logo" src="just-bjorn-logo.svg" alt="Just Bjorn" style="filter:brightness(0) invert(1);">
+      <img class="home-hero-logo" src="just_bjorn_logo.svg" alt="Just Bjorn" style="filter:brightness(0) invert(1);">
       <div class="home-badges">
         <span class="home-badge">
           <svg viewBox="0 0 16 16"><path d="M8 1l6 2.5v4c0 4-2.6 6.8-6 7.5-3.4-.7-6-3.5-6-7.5v-4L8 1z"/></svg>
@@ -11507,8 +11508,8 @@ document.addEventListener('DOMContentLoaded', function() {
 const INSIGHTS_SHEET_ID = window.SHEET_CFG.SHEET_INSIGHTS.fileId;
 const INSIGHTS_EVOLIS_GID = window.SHEET_CFG.SHEET_INSIGHTS.gid;
 const PPC_STRATEGY_GID = '1273080018'; // "ppc_strategy" tab on the same SHEET_INSIGHTS workbook — shared across all brands, one row per SKU, written by run-ppc-strategy-analysis.js
-const UPLOADS_SHEET_ID = ''; // TODO(JBJ): no per-brand sheet/tab exists yet for this resource — confirm with Jaclyn before wiring (see build notes)
-const UPLOADS_EVOLIS_GID = ''; // TODO(JBJ): no per-brand sheet/tab exists yet for this resource — confirm with Jaclyn before wiring (see build notes)
+const UPLOADS_SHEET_ID = ''; // DEPRECATED — Jaclyn confirmed 2026-08-24 this sheet/feature is dead and no longer used. Left blank (safe no-op) rather than ripping out fetchHistoricalSummaries()/run-listing-audit's uploadsSheetId param, since removing an entire subsystem risks missing a dependency this session didn't fully trace.
+const UPLOADS_EVOLIS_GID = ''; // DEPRECATED — see UPLOADS_SHEET_ID comment above.
 const INSIGHTS_BRAND_TAB  = 'just-bjorn';
 const LISTING_AUDIT_SHEET_ID = window.SHEET_CFG.SHEET_LISTING_AUDIT.fileId;
 const SHEET_LISTINGS_ID       = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.fileId; // missed by the initial SHEET_ID/_GID sweep since this var name doesn't match either pattern literally — same workbook as SHEET_LISTINGS_GID below
