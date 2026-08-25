@@ -258,7 +258,7 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 
 /* ── Home page (adapted from Cosmette's dashboard) ── */
 .home-hero{background:linear-gradient(135deg,var(--navy) 0%,#0d3494 100%);border-radius:var(--radius);padding:32px 36px;margin-bottom:20px;position:relative;}
-.home-hero-logo{height:42px;width:auto;margin-left:-32px;display:block;}
+.home-hero-logo{height:126px;width:auto;margin-left:18px;display:block;}
 .home-badges{position:absolute;top:28px;right:32px;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
 .home-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(36,233,163,0.16);border:1px solid rgba(36,233,163,0.35);color:var(--green);font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 12px;border-radius:20px;}
 .home-badge svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:2;}
@@ -1164,7 +1164,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 <aside class="sidebar">
   <div class="sb-brand">
     <div class="sb-brand-logo" style="display:flex;align-items:center;gap:6px;">
-      <img src="just_bjorn_logo.svg" alt="Just Bjorn" style="height:18px;width:auto;filter:brightness(0) invert(1);">
+      <img src="just_bjorn_logo.svg" alt="Just Bjorn" style="height:54px;width:auto;filter:brightness(0) invert(1);"> <!-- 3x évolis-template height (18px) — Just Bjorn's logo is a much taller/narrower mark than other brands' at a fixed height, per Jaclyn 2026-08-25 -->
       <span style="color:var(--green);">•</span>
       <img src="/reports/Medaltus_Typeface Logo_dark bground_RGB.svg" alt="Medaltus" style="height:18px;width:auto;">
     </div>
@@ -1287,26 +1287,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <svg viewBox="0 0 16 16"><path d="M8 1l6 2.5v4c0 4-2.6 6.8-6 7.5-3.4-.7-6-3.5-6-7.5v-4L8 1z"/></svg>
           Brand Partner
         </span>
-        <span class="home-badge-channel">Amazon &middot; Website &middot; Walmart</span>
+        <span class="home-badge-channel">Amazon &middot; Walmart</span>
       </div>
       <div class="home-hero-title">Welcome to Your Medaltus Dashboard</div>
       <div class="home-hero-sub">Your real-time view into sales, inventory, and brand performance &mdash; powered by Medaltus.</div>
       <div class="home-hero-date" id="home-date"></div>
     </div>
 
-    <!-- KPI row -->
-    <div class="home-kpi-row">
-      <div class="home-kpi-card">
-        <div class="home-kpi-label">Total SKUs</div>
-        <div class="home-kpi-value" id="home-kpi-skus">&mdash;</div>
-        <div class="home-kpi-sub">In your catalog</div>
-      </div>
-      <div class="home-kpi-card">
-        <div class="home-kpi-label">Units On Hand</div>
-        <div class="home-kpi-value" id="home-kpi-units">&mdash;</div>
-        <div class="home-kpi-sub" id="home-kpi-units-sub">Consignment units</div>
-      </div>
-    </div>
+    <!-- Home page KPI row (Total SKUs, Units On Hand) removed 2026-08-25 per Jaclyn — Just Bjorn only. -->
 
     <!-- Team + Resources -->
     <div class="home-grid">
@@ -1401,12 +1389,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="brand-hero-right">
         <div class="hero-stat"><div class="hero-stat-val" id="ov-hero-revenue">$48.2K</div><div class="hero-stat-lbl">Month-to-Date Revenue</div></div>
-        <div class="hero-stat"><div class="hero-stat-val">3</div><div class="hero-stat-lbl">Channels</div></div>
+        <div class="hero-stat"><div class="hero-stat-val">2</div><div class="hero-stat-lbl">Channels</div></div>
         <div class="hero-stat"><div class="hero-stat-val" id="ov-hero-skus">19</div><div class="hero-stat-lbl">Active SKUs (with Sales)</div></div>
       </div>
     </div>
 
     <div class="kpi-row">
+      <div class="kpi-card" id="ov-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-units"><div class="kpi-label">Total Units Sold</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-aov"><div class="kpi-label">Blended AOV</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -1416,8 +1405,27 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
     <div class="kpi-row">
       <div class="kpi-card" id="ov-kpi-organic-orders"><div class="kpi-label">MTD Organic Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-      <div class="kpi-card" id="ov-kpi-ad-orders"><div class="kpi-label">MTD Ad-Driven Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+      <div class="kpi-card" id="ov-kpi-organic-sales"><div class="kpi-label">MTD Organic Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+      <div class="kpi-card" id="ov-kpi-ad-orders"><div class="kpi-label">MTD Ad-Driven Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+      <div class="kpi-card" id="ov-kpi-ad-sales"><div class="kpi-label">MTD Ad Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-pending"><div class="kpi-label">Pending Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+    </div>
+
+    <!-- Channel Breakdown — added 2026-08-25, replicated from Skinuva.
+         Amazon + Walmart only, positioned above the donut/trend row (not
+         replacing it) per the same layout used there. Built from figures
+         this page's own KPI computations already produce below — no new
+         data fetch. -->
+    <div class="card" style="margin-bottom:22px;">
+      <div class="card-title">Channel Breakdown — Month to Date</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead><tr><th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>Units</th><th>Orders</th><th>Revenue</th><th>AOV</th></tr></thead>
+          <tbody id="ov-channel-breakdown-tbody">
+            <tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <div class="two-col" style="margin-bottom:22px;">
@@ -1439,14 +1447,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <th style="text-align:left;padding:8px 10px;">#</th>
             <th style="text-align:left;padding:8px 10px;">Product</th>
             <th style="text-align:left;padding:8px 10px;">Amazon</th>
-            <th style="text-align:left;padding:8px 10px;">Website</th>
             <th style="text-align:left;padding:8px 10px;">Walmart</th>
             <th style="text-align:left;padding:8px 10px;">Total Units</th>
             <th style="text-align:left;padding:8px 10px;">Ads (Amazon)</th>
             <th style="text-align:left;padding:8px 10px;">Organic</th>
           </tr>
         </thead>
-        <tbody id="ov-products-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
+        <tbody id="ov-products-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
       </table>
     </div>
 
@@ -1628,7 +1635,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
     <div class="page-hd" style="display:flex;align-items:flex-start;justify-content:space-between;">
-      <div><div class="page-title">Sales</div><div class="page-sub" id="sales-page-sub">May 1 – May 31, 2026 · Last full month</div></div>
+      <div><div class="page-title">Sales</div><div class="page-sub" id="sales-page-sub">May 1 – May 31, 2026 · Last month</div></div>
       <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
         <span class="staging-note" id="sales-report-status">◎ Draft</span>
         <button class="btn-approve" id="sales-approve-btn" style="background:var(--green);border-color:var(--green);color:#fff;">✓ Approved &amp; Ready</button>
@@ -1717,14 +1724,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
+          <div class="card-title" style="margin-bottom:0;">Units Sold by Month</div>
           <div id="legend-amazon" style="display:flex;align-items:center;"></div>
         </div>
         <div style="position:relative;height:320px;"><canvas id="chart-amazon"></canvas></div>
       </div>
       <div class="card" id="top-products-card">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-          <span class="card-title" style="margin-bottom:0;">Top Selling Products <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
+          <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
           <span id="amazon-products-source" style="font-size:10px;color:var(--muted);"></span>
         </div>
         <!-- Added 2026-08-11 per Jaclyn — shown instead of the table only
@@ -1769,14 +1776,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
+          <div class="card-title" style="margin-bottom:0;">Units Sold by Month</div>
           <div id="legend-walmart" style="display:flex;align-items:center;"></div>
         </div>
         <div style="position:relative;height:320px;"><canvas id="chart-walmart"></canvas></div>
       </div>
       <div class="card" id="walmart-top-products-card">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-          <span class="card-title" style="margin-bottom:0;">Top Selling Products <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
+          <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
           <span id="walmart-products-source" style="font-size:10px;color:var(--muted);"></span>
         </div>
         <div id="walmart-top-sellers-unavailable" style="display:none;padding:20px;text-align:center;color:var(--muted);font-size:12.5px;font-style:italic;">SKU-specific data not available for Last Year.</div>
@@ -1858,14 +1865,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
+          <div class="card-title" style="margin-bottom:0;">Units Sold by Month</div>
           <div id="legend-x-amazon" style="display:flex;align-items:center;"></div>
         </div>
         <div style="position:relative;height:320px;"><canvas id="x-chart-amazon"></canvas></div>
       </div>
       <div class="card" id="x-top-products-card">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-          <span class="card-title" style="margin-bottom:0;">Top Selling Products <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
+          <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
           <span id="x-amazon-products-source" style="font-size:10px;color:var(--muted);"></span>
         </div>
         <table class="data-table" id="x-amazon-top-sellers">
@@ -1893,14 +1900,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
+          <div class="card-title" style="margin-bottom:0;">Units Sold by Month</div>
           <div id="legend-x-walmart" style="display:flex;align-items:center;"></div>
         </div>
         <div style="position:relative;height:320px;"><canvas id="x-chart-walmart"></canvas></div>
       </div>
       <div class="card" id="x-walmart-top-products-card">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-          <span class="card-title" style="margin-bottom:0;">Top Selling Products <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
+          <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
           <span id="x-walmart-products-source" style="font-size:10px;color:var(--muted);"></span>
         </div>
         <table class="data-table" id="x-walmart-top-sellers">
@@ -3319,17 +3326,17 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
         </div>
         <div class="kpi-row" id="ppc-blended-kpi-row">
-          <div class="kpi-card" id="pb-kpi-ad-spend"><div class="kpi-label">Ad Spend</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-ad-sales"><div class="kpi-label">Ad Sales</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-acos"><div class="kpi-label">ACOS</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-tacos"><div class="kpi-label">TACOS</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-impressions"><div class="kpi-label">Impressions</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-clicks"><div class="kpi-label">Clicks</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-ctr"><div class="kpi-label">CTR</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-cpc"><div class="kpi-label">CPC</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-orders"><div class="kpi-label">Orders</div><div class="kpi-value">—</div></div>
-          <div class="kpi-card" id="pb-kpi-aov"><div class="kpi-label">AOV</div><div class="kpi-value">—</div></div>
+          <div class="kpi-card" id="pb-kpi-ad-spend"><div class="kpi-label">Ad Spend</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-ad-sales"><div class="kpi-label">Ad Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-acos"><div class="kpi-label">ACOS</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-tacos"><div class="kpi-label">TACOS</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-impressions"><div class="kpi-label">Impressions</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-clicks"><div class="kpi-label">Clicks</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-ctr"><div class="kpi-label">CTR</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-cpc"><div class="kpi-label">CPC</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-orders"><div class="kpi-label">Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+          <div class="kpi-card" id="pb-kpi-aov"><div class="kpi-label">AOV</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
         </div>
         <div class="ppc-note" style="margin-top:12px;">
           ℹ Ad Spend/Ad Sales/Impressions/Clicks summed across Amazon + Walmart's own ad platforms. Total Sales/Orders are all-channel, organic + ads combined, using each channel's own order-validity rules (Amazon: excludes cancelled/pending + Vine; Walmart: excludes cancelled/canceled). ACOS/TACOS/CTR/CPC/AOV are recomputed from the summed totals, not averaged from each channel's own percentage — averaging percentages directly would be mathematically wrong. CVR is intentionally omitted — neither ad summary sheet has an orders/purchases column, only ad units, so there's no real conversion-rate denominator to compute from a proxy would be misleading.
@@ -3337,7 +3344,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
 
       <div class="ppc-card">
-        <div class="ppc-card-title">Product Performance — Last Full Month</div>
+        <div class="ppc-card-title">Product Performance — Last Month</div>
         <div style="overflow-x:auto;">
           <table class="data-table">
             <thead><tr><th>Product</th><th>Sessions</th><th>Units</th><th>Revenue</th><th>Conv%</th></tr></thead>
@@ -3388,7 +3395,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <!-- ── DATA-INFORMED OPPORTUNITIES ── -->
     <div class="channel-page" id="ppc-opportunities">
 
-      <div class="ppc-card-title" style="margin-bottom:2px;">Search Terms — Last Full Month</div>
+      <div class="ppc-card-title" style="margin-bottom:2px;">Search Terms — Last Month</div>
       <div class="ppc-note" style="margin-bottom:14px;">Pulled live from the Ad Search Terms sheet · up to 25 terms per panel, or fewer if fewer qualify</div>
 
       <div id="ppc-search-terms-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
@@ -4444,7 +4451,7 @@ async function initSns() {
   }
 
   // ── Period selector — added 2026-08-11 per Jaclyn ─────────────────────────
-  const AMZ_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Full Month', prior: 'Prior Month', lastYear: 'Last Year' };
+  const AMZ_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Month', prior: 'Prior Month', lastYear: 'Last Year' };
 
   function renderAmazonPeriodPills(activeKey) {
     const container = document.getElementById('amazon-period-pills');
@@ -4581,8 +4588,10 @@ async function initSns() {
     }
   }
 
-  // ── Revenue chart ─────────────────────────────────────────────────────────
-  // Reads from revenue history sheet. Columns: MONTH | YEAR | REVENUE | ...
+  // ── Units Sold chart ──────────────────────────────────────────────────────
+  // Reads from revenue history sheet, but plots the UNITS SOLD column, not
+  // REVENUE — per Jaclyn 2026-08-24, Sales pages report units for every
+  // brand except eraclea. Columns: MONTH | YEAR | REVENUE | ORDERS | UNITS SOLD | ...
   // Renders up to 4 years of data stopping at the last full calendar month.
   // Colors: current year green, prior navy, -2 sand, -3 grey.
   async function buildRevenueChart(currentYear) {
@@ -4596,16 +4605,19 @@ async function initSns() {
     const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim().toUpperCase());
     const monthIdx   = headers.indexOf('MONTH');
     const yearIdx    = headers.indexOf('YEAR');
-    const revenueIdx = headers.indexOf('REVENUE');
-    if (monthIdx < 0 || yearIdx < 0 || revenueIdx < 0) return;
+    const unitsIdx = headers.indexOf('UNITS SOLD');
+    if (monthIdx < 0 || yearIdx < 0 || unitsIdx < 0) return;
 
-    // Parse all rows into { year, month(1-12), revenue }
+    // Parse all rows into { year, month(1-12), unitsSold } — per Jaclyn
+    // 2026-08-24: Sales pages report Units Sold, not Revenue, for every
+    // brand except eraclea (that exception will be handled when eraclea's
+    // own dashboard is built).
     const parsed = [];
     for (let i = 1; i < lines.length; i++) {
       const cols    = parseCsvLine(lines[i]);
       const yr      = parseInt((cols[yearIdx]  || '').replace(/^"|"$/g,''), 10);
       const mo      = parseInt((cols[monthIdx] || '').replace(/^"|"$/g,''), 10);
-      const rev     = parseFloat((cols[revenueIdx] || '').replace(/^"|"$/g,'').replace(/[$,]/g,'')) || 0;
+      const units     = parseInt((cols[unitsIdx] || '').replace(/^"|"$/g,'').replace(/[$,]/g,''), 10) || 0;
       if (yr && mo >= 1 && mo <= 12) {
         // Defensive: guards against corrupted YEAR cells at the source
         // (confirmed 2026-07-14 — the most recent 3 rows in the Website
@@ -4614,9 +4626,9 @@ async function initSns() {
         // problem). A row this implausible is corrupted data, not a
         // legitimately old/future month — skip it and say so loudly.
         if (yr < 2015 || yr > 2035) {
-          console.warn('[revenue-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Revenue was:', rev);
+          console.warn('[units-sold-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Units sold was:', units);
         } else {
-          parsed.push({ year: yr, month: mo, revenue: rev });
+          parsed.push({ year: yr, month: mo, unitsSold: units });
         }
       }
     }
@@ -4642,7 +4654,11 @@ async function initSns() {
         // Don't plot future months for the current year
         if (yr === stopYear && mo > stopMonth) return null;
         const row = parsed.find(r => r.year === yr && r.month === mo);
-        return row ? row.revenue : null;
+        // A past/current month with no matching row is 0 units, not a gap
+        // in the data — only genuinely future months should break the
+        // line. Fixed 2026-08-25 per Jaclyn: the line was stopping dead
+        // at the last month with a sheet row instead of dropping to zero.
+        return row ? row.unitsSold : 0;
       });
       // Skip year if it has no data at all
       if (data.every(v => v === null)) continue;
@@ -4658,7 +4674,7 @@ async function initSns() {
 
     if (datasets.length === 0) return;
 
-    const fmtDollar = v => v == null ? '' : '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
+    const fmtUnits = v => v == null ? '' : (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
 
     if (window._amazonChart) window._amazonChart.destroy();
     window._amazonChart = new Chart(document.getElementById('chart-amazon'), {
@@ -4673,11 +4689,11 @@ async function initSns() {
           // the plot area — position/align could only move it within the
           // canvas, never up into the title's own row. Per Jaclyn 2026-07-15.
           legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtDollar(ctx.parsed.y)}` } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtUnits(ctx.parsed.y)}` } },
         },
         scales: {
           x: { grid: { color: 'rgba(0,0,0,0.04)' } },
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtDollar } },
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtUnits } },
         },
       },
     });
@@ -5040,7 +5056,7 @@ async function initSns() {
   // Simpler than Amazon: no separate historical sheet needed for Last Year —
   // Jaclyn confirmed the one orders sheet already retains enough history for
   // Website/Walmart, since order volume here is much lower than Amazon's.
-  const WEB_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Full Month', prior: 'Prior Month', lastYear: 'Last Year' };
+  const WEB_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Month', prior: 'Prior Month', lastYear: 'Last Year' };
 
   function renderWebPeriodPills(activeKey) {
     const container = document.getElementById('web-period-pills');
@@ -5620,11 +5636,18 @@ async function initSns() {
       impMonthNums.forEach(m => {
         if (m > month) { impCurr.push(null); }
         else {
+          // A past/current month with no row yet in the Stewardship Summary
+          // sheet is 0 impressions, not a gap — otherwise the line breaks
+          // dead at the last month a row happens to exist for instead of
+          // continuing at zero. Fixed 2026-08-25 per Jaclyn (same bug class
+          // as the Sales page Units Sold chart fixed the same day).
           const row = findRow(year, m);
-          impCurr.push(row ? (parseInt(row.impressions, 10) || 0) : null);
+          impCurr.push(row ? (parseInt(row.impressions, 10) || 0) : 0);
         }
+        // Prior-year line: every month of a fully-elapsed past year is
+        // "should have a row by now" too, so the same reasoning applies.
         const prevRow = findRow(year - 1, m);
-        impPrev.push(prevRow ? (parseInt(prevRow.impressions, 10) || 0) : null);
+        impPrev.push(prevRow ? (parseInt(prevRow.impressions, 10) || 0) : 0);
       });
 
       renderStewardshipCharts(
@@ -5935,7 +5958,7 @@ async function initSns() {
   // which skips the per-SKU table entirely (same reasoning as the other
   // two channels: no confirmed reliable per-SKU breakdown a full year
   // back), also can't populate those two KPIs and shows "—" for both.
-  const WMT_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Full Month', prior: 'Prior Month', lastYear: 'Last Year' };
+  const WMT_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Month', prior: 'Prior Month', lastYear: 'Last Year' };
 
   function renderWalmartPeriodPills(activeKey) {
     const container = document.getElementById('walmart-period-pills');
@@ -6050,9 +6073,10 @@ async function initSns() {
     }
   }
 
-  // ── Walmart Revenue chart ──────────────────────────────────────────────────
-  // Reads from Walmart revenue history sheet (WALMART_REVENUE_SHEET_ID).
-  // Mirrors buildRevenueChart on the Amazon page exactly.
+  // ── Walmart Units Sold chart ──────────────────────────────────────────────
+  // Reads from Walmart revenue history sheet (WALMART_REVENUE_SHEET_ID), but
+  // plots the UNITS SOLD column, not REVENUE — same 2026-08-24 change as
+  // the Amazon chart. Mirrors buildRevenueChart on the Amazon page exactly.
   // Renders up to 4 years of data stopping at the last full calendar month.
   async function buildWalmartChart(currentYear) {
     const revCsv = await fetch(sheetCsvUrl(WALMART_REVENUE_SHEET_ID, WALMART_REVENUE_GID) + `&_cb=${Date.now()}`)
@@ -6065,16 +6089,19 @@ async function initSns() {
     const headers = parseCsvLine(lines[0]).map(h => h.replace(/^\"|"$/g,'').trim().toUpperCase());
     const monthIdx   = headers.indexOf('MONTH');
     const yearIdx    = headers.indexOf('YEAR');
-    const revenueIdx = headers.indexOf('REVENUE');
-    if (monthIdx < 0 || yearIdx < 0 || revenueIdx < 0) return;
+    const unitsIdx = headers.indexOf('UNITS SOLD');
+    if (monthIdx < 0 || yearIdx < 0 || unitsIdx < 0) return;
 
-    // Parse all rows into { year, month(1-12), revenue }
+    // Parse all rows into { year, month(1-12), unitsSold } — per Jaclyn
+    // 2026-08-24: Sales pages report Units Sold, not Revenue, for every
+    // brand except eraclea (that exception will be handled when eraclea's
+    // own dashboard is built).
     const parsed = [];
     for (let i = 1; i < lines.length; i++) {
       const cols = parseCsvLine(lines[i]);
       const yr   = parseInt((cols[yearIdx]  || '').replace(/^\"|"$/g,''), 10);
       const mo   = parseInt((cols[monthIdx] || '').replace(/^\"|"$/g,''), 10);
-      const rev  = parseFloat((cols[revenueIdx] || '').replace(/^\"|"$/g,'').replace(/[$,]/g,'')) || 0;
+      const units = parseInt((cols[unitsIdx] || '').replace(/^\"|"$/g,'').replace(/[$,]/g,''), 10) || 0;
       if (yr && mo >= 1 && mo <= 12) {
         // Defensive: guards against corrupted YEAR cells at the source
         // (confirmed 2026-07-14 — the most recent 3 rows in the Website
@@ -6083,9 +6110,9 @@ async function initSns() {
         // problem). A row this implausible is corrupted data, not a
         // legitimately old/future month — skip it and say so loudly.
         if (yr < 2015 || yr > 2035) {
-          console.warn('[revenue-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Revenue was:', rev);
+          console.warn('[units-sold-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Units sold was:', units);
         } else {
-          parsed.push({ year: yr, month: mo, revenue: rev });
+          parsed.push({ year: yr, month: mo, unitsSold: units });
         }
       }
     }
@@ -6109,7 +6136,11 @@ async function initSns() {
         const mo = idx + 1;
         if (yr === stopYear && mo > stopMonth) return null;
         const row = parsed.find(r => r.year === yr && r.month === mo);
-        return row ? row.revenue : null;
+        // A past/current month with no matching row is 0 units, not a gap
+        // in the data — only genuinely future months should break the
+        // line. Fixed 2026-08-25 per Jaclyn: the line was stopping dead
+        // at the last month with a sheet row instead of dropping to zero.
+        return row ? row.unitsSold : 0;
       });
       if (data.every(v => v === null)) continue;
       datasets.push({
@@ -6124,7 +6155,7 @@ async function initSns() {
 
     if (datasets.length === 0) return;
 
-    const fmtDollar = v => v == null ? '' : '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
+    const fmtUnits = v => v == null ? '' : (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
 
     if (window._walmartChart) window._walmartChart.destroy();
     window._walmartChart = new Chart(document.getElementById('chart-walmart'), {
@@ -6135,11 +6166,11 @@ async function initSns() {
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false }, // moved to #legend-walmart header row — see renderExternalLegend, Jaclyn 2026-07-15
-          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtDollar(ctx.parsed.y)}` } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtUnits(ctx.parsed.y)}` } },
         },
         scales: {
           x: { grid: { color: 'rgba(0,0,0,0.04)' } },
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtDollar } },
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtUnits } },
         },
       },
     });
@@ -6632,8 +6663,10 @@ async function initSns() {
     return window._amazonExtPromise;
   };
 
-  // ── Revenue chart ─────────────────────────────────────────────────────────
-  // Reads from revenue history sheet. Columns: MONTH | YEAR | REVENUE | ...
+  // ── Units Sold chart ──────────────────────────────────────────────────────
+  // Reads from revenue history sheet, but plots the UNITS SOLD column, not
+  // REVENUE — per Jaclyn 2026-08-24, Sales pages report units for every
+  // brand except eraclea. Columns: MONTH | YEAR | REVENUE | ORDERS | UNITS SOLD | ...
   // Renders up to 4 years of data stopping at the last full calendar month.
   // Colors: current year green, prior navy, -2 sand, -3 grey.
   async function buildRevenueChart(currentYear) {
@@ -6647,16 +6680,19 @@ async function initSns() {
     const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim().toUpperCase());
     const monthIdx   = headers.indexOf('MONTH');
     const yearIdx    = headers.indexOf('YEAR');
-    const revenueIdx = headers.indexOf('REVENUE');
-    if (monthIdx < 0 || yearIdx < 0 || revenueIdx < 0) return;
+    const unitsIdx = headers.indexOf('UNITS SOLD');
+    if (monthIdx < 0 || yearIdx < 0 || unitsIdx < 0) return;
 
-    // Parse all rows into { year, month(1-12), revenue }
+    // Parse all rows into { year, month(1-12), unitsSold } — per Jaclyn
+    // 2026-08-24: Sales pages report Units Sold, not Revenue, for every
+    // brand except eraclea (that exception will be handled when eraclea's
+    // own dashboard is built).
     const parsed = [];
     for (let i = 1; i < lines.length; i++) {
       const cols    = parseCsvLine(lines[i]);
       const yr      = parseInt((cols[yearIdx]  || '').replace(/^"|"$/g,''), 10);
       const mo      = parseInt((cols[monthIdx] || '').replace(/^"|"$/g,''), 10);
-      const rev     = parseFloat((cols[revenueIdx] || '').replace(/^"|"$/g,'').replace(/[$,]/g,'')) || 0;
+      const units     = parseInt((cols[unitsIdx] || '').replace(/^"|"$/g,'').replace(/[$,]/g,''), 10) || 0;
       if (yr && mo >= 1 && mo <= 12) {
         // Defensive: guards against corrupted YEAR cells at the source
         // (confirmed 2026-07-14 — the most recent 3 rows in the Website
@@ -6665,9 +6701,9 @@ async function initSns() {
         // problem). A row this implausible is corrupted data, not a
         // legitimately old/future month — skip it and say so loudly.
         if (yr < 2015 || yr > 2035) {
-          console.warn('[revenue-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Revenue was:', rev);
+          console.warn('[units-sold-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Units sold was:', units);
         } else {
-          parsed.push({ year: yr, month: mo, revenue: rev });
+          parsed.push({ year: yr, month: mo, unitsSold: units });
         }
       }
     }
@@ -6693,7 +6729,11 @@ async function initSns() {
         // Don't plot future months for the current year
         if (yr === stopYear && mo > stopMonth) return null;
         const row = parsed.find(r => r.year === yr && r.month === mo);
-        return row ? row.revenue : null;
+        // A past/current month with no matching row is 0 units, not a gap
+        // in the data — only genuinely future months should break the
+        // line. Fixed 2026-08-25 per Jaclyn: the line was stopping dead
+        // at the last month with a sheet row instead of dropping to zero.
+        return row ? row.unitsSold : 0;
       });
       // Skip year if it has no data at all
       if (data.every(v => v === null)) continue;
@@ -6709,7 +6749,7 @@ async function initSns() {
 
     if (datasets.length === 0) return;
 
-    const fmtDollar = v => v == null ? '' : '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
+    const fmtUnits = v => v == null ? '' : (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
 
     if (window._amazonExtChart) window._amazonExtChart.destroy();
     window._amazonExtChart = new Chart(document.getElementById('x-chart-amazon'), {
@@ -6724,11 +6764,11 @@ async function initSns() {
           // the plot area — position/align could only move it within the
           // canvas, never up into the title's own row. Per Jaclyn 2026-07-15.
           legend: { display: false },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtDollar(ctx.parsed.y)}` } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtUnits(ctx.parsed.y)}` } },
         },
         scales: {
           x: { grid: { color: 'rgba(0,0,0,0.04)' } },
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtDollar } },
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtUnits } },
         },
       },
     });
@@ -7643,9 +7683,10 @@ async function initSns() {
     return window._walmartExtPromise;
   };
 
-  // ── Walmart Revenue chart ──────────────────────────────────────────────────
-  // Reads from Walmart revenue history sheet (WALMART_REVENUE_SHEET_ID).
-  // Mirrors buildRevenueChart on the Amazon page exactly.
+  // ── Walmart Units Sold chart ──────────────────────────────────────────────
+  // Reads from Walmart revenue history sheet (WALMART_REVENUE_SHEET_ID), but
+  // plots the UNITS SOLD column, not REVENUE — same 2026-08-24 change as
+  // the Amazon chart. Mirrors buildRevenueChart on the Amazon page exactly.
   // Renders up to 4 years of data stopping at the last full calendar month.
   async function buildWalmartChart(currentYear) {
     const revCsv = await fetch(sheetCsvUrl(WALMART_REVENUE_SHEET_ID, WALMART_REVENUE_GID) + `&_cb=${Date.now()}`)
@@ -7658,16 +7699,19 @@ async function initSns() {
     const headers = parseCsvLine(lines[0]).map(h => h.replace(/^\"|"$/g,'').trim().toUpperCase());
     const monthIdx   = headers.indexOf('MONTH');
     const yearIdx    = headers.indexOf('YEAR');
-    const revenueIdx = headers.indexOf('REVENUE');
-    if (monthIdx < 0 || yearIdx < 0 || revenueIdx < 0) return;
+    const unitsIdx = headers.indexOf('UNITS SOLD');
+    if (monthIdx < 0 || yearIdx < 0 || unitsIdx < 0) return;
 
-    // Parse all rows into { year, month(1-12), revenue }
+    // Parse all rows into { year, month(1-12), unitsSold } — per Jaclyn
+    // 2026-08-24: Sales pages report Units Sold, not Revenue, for every
+    // brand except eraclea (that exception will be handled when eraclea's
+    // own dashboard is built).
     const parsed = [];
     for (let i = 1; i < lines.length; i++) {
       const cols = parseCsvLine(lines[i]);
       const yr   = parseInt((cols[yearIdx]  || '').replace(/^\"|"$/g,''), 10);
       const mo   = parseInt((cols[monthIdx] || '').replace(/^\"|"$/g,''), 10);
-      const rev  = parseFloat((cols[revenueIdx] || '').replace(/^\"|"$/g,'').replace(/[$,]/g,'')) || 0;
+      const units = parseInt((cols[unitsIdx] || '').replace(/^\"|"$/g,'').replace(/[$,]/g,''), 10) || 0;
       if (yr && mo >= 1 && mo <= 12) {
         // Defensive: guards against corrupted YEAR cells at the source
         // (confirmed 2026-07-14 — the most recent 3 rows in the Website
@@ -7676,9 +7720,9 @@ async function initSns() {
         // problem). A row this implausible is corrupted data, not a
         // legitimately old/future month — skip it and say so loudly.
         if (yr < 2015 || yr > 2035) {
-          console.warn('[revenue-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Revenue was:', rev);
+          console.warn('[units-sold-history] implausible year', yr, 'for month', mo, '— skipping row (likely corrupted YEAR cell at the source, not a real historical month). Units sold was:', units);
         } else {
-          parsed.push({ year: yr, month: mo, revenue: rev });
+          parsed.push({ year: yr, month: mo, unitsSold: units });
         }
       }
     }
@@ -7702,7 +7746,11 @@ async function initSns() {
         const mo = idx + 1;
         if (yr === stopYear && mo > stopMonth) return null;
         const row = parsed.find(r => r.year === yr && r.month === mo);
-        return row ? row.revenue : null;
+        // A past/current month with no matching row is 0 units, not a gap
+        // in the data — only genuinely future months should break the
+        // line. Fixed 2026-08-25 per Jaclyn: the line was stopping dead
+        // at the last month with a sheet row instead of dropping to zero.
+        return row ? row.unitsSold : 0;
       });
       if (data.every(v => v === null)) continue;
       datasets.push({
@@ -7717,7 +7765,7 @@ async function initSns() {
 
     if (datasets.length === 0) return;
 
-    const fmtDollar = v => v == null ? '' : '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
+    const fmtUnits = v => v == null ? '' : (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : v.toFixed(0));
 
     if (window._walmartExtChart) window._walmartExtChart.destroy();
     window._walmartExtChart = new Chart(document.getElementById('x-chart-walmart'), {
@@ -7728,11 +7776,11 @@ async function initSns() {
         maintainAspectRatio: false,
         plugins: {
           legend: { display: false }, // moved to #legend-walmart header row — see renderExternalLegend, Jaclyn 2026-07-15
-          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtDollar(ctx.parsed.y)}` } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmtUnits(ctx.parsed.y)}` } },
         },
         scales: {
           x: { grid: { color: 'rgba(0,0,0,0.04)' } },
-          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtDollar } },
+          y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtUnits } },
         },
       },
     });
@@ -8365,11 +8413,18 @@ async function initSns() {
       impMonthNums.forEach(m => {
         if (m > month) { impCurr.push(null); }
         else {
+          // A past/current month with no row yet in the Stewardship Summary
+          // sheet is 0 impressions, not a gap — otherwise the line breaks
+          // dead at the last month a row happens to exist for instead of
+          // continuing at zero. Fixed 2026-08-25 per Jaclyn (same bug class
+          // as the Sales page Units Sold chart fixed the same day).
           const row = findRow(year, m);
-          impCurr.push(row ? (parseInt(row.impressions, 10) || 0) : null);
+          impCurr.push(row ? (parseInt(row.impressions, 10) || 0) : 0);
         }
+        // Prior-year line: every month of a fully-elapsed past year is
+        // "should have a row by now" too, so the same reasoning applies.
         const prevRow = findRow(year - 1, m);
-        impPrev.push(prevRow ? (parseInt(prevRow.impressions, 10) || 0) : null);
+        impPrev.push(prevRow ? (parseInt(prevRow.impressions, 10) || 0) : 0);
       });
 
       renderStewardshipChartsExternal(
@@ -12420,7 +12475,7 @@ async function renderBundlesInsightsTab() {
         <td>${subBsrText}</td>
         <td>${sessions !== undefined ? sessions.toLocaleString() : '—'}</td>
         <td>${sales.bundlesSold.toLocaleString()}</td>
-        <td>$${sales.totalSales.toFixed(2)}</td>
+        <td>$${sales.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
       </tr>`;
     }).join('');
 
@@ -12653,7 +12708,7 @@ window.loadActivatorsPerformanceTable = async function() {
       const wmtRevenue = wmtOrderRows.reduce((s, r) => s + parseAmt(r.item_price) * (parseInt(r.unit_count, 10) || 0), 0);
       const webRevenue = webOrderRows.reduce((s, r) => s + parseAmt(r.item_price) * (parseInt(r.unit_count, 10) || 0), 0);
       const totalRevenue = amzRevenue + wmtRevenue + webRevenue;
-      setPerfCellText(`perf-act-revenue-${suffix}`, '$' + totalRevenue.toFixed(2));
+      setPerfCellText(`perf-act-revenue-${suffix}`, '$' + totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
       // Conversion — recomputed from the live Sessions/Units above.
       const conv = sessions > 0 ? (totalUnits / sessions * 100) : null;
@@ -12778,7 +12833,7 @@ async function renderCategoryPerformanceTable(containerId, categoryLabel) {
       const amzRevenue = bizRow ? parseAmt(bizRow.ordered_product_sales) : 0;
       const wmtRevenue = wmtOrderRows.reduce((s, r) => s + parseAmt(r.item_price) * (parseInt(r.unit_count, 10) || 0), 0);
       const webRevenue = webOrderRows.reduce((s, r) => s + parseAmt(r.item_price) * (parseInt(r.unit_count, 10) || 0), 0);
-      rowsData.revenue.push('$' + (amzRevenue + wmtRevenue + webRevenue).toFixed(2));
+      rowsData.revenue.push('$' + (amzRevenue + wmtRevenue + webRevenue).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
 
       const conv = sessions > 0 ? (totalUnits / sessions * 100) : null;
       rowsData.conv.push(conv != null ? conv.toFixed(2) + '%' : '—');
@@ -13565,7 +13620,7 @@ const PB_SHOPIFY_ADS_GID = ''; // WEBSITE/DTC — Just Bjorn has no Website chan
 const PB_WALMART_ADS_SHEET_ID = window.SHEET_CFG.SHEET_WALMART_ADVERTISING.fileId;
 const PB_WALMART_ADS_GID = window.SHEET_CFG.SHEET_WALMART_ADVERTISING.gid;
 
-const PB_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Full Month' };
+const PB_PERIOD_LABELS = { mtd: 'Month to Date', lastFull: 'Last Month' };
 
 function pbRenderPeriodPills(activeKey) {
   const container = document.getElementById('ppc-blended-period-pills');
@@ -13654,7 +13709,31 @@ async function ppcLoadBlendedPerformance(periodKey) {
     if (v) v.textContent = val;
   };
 
-  try {
+  // MoM triangle — added 2026-08-25, replicated from Skinuva. Only ever
+  // shown for "Last Month" (a full month vs. a full prior month), never
+  // for "Month to Date": Amazon/Walmart's ad summary sheets are monthly-
+  // aggregated with no daily breakdown, so there's no way to fairly cap
+  // an MTD comparison at "through day N last month" the way order-level
+  // data allows elsewhere on this dashboard. Showing an MTD MoM against a
+  // full prior month would make every card read as artificially "down"
+  // early in the month regardless of real performance.
+  const pbSetKpiMom = (id, pctVal) => {
+    const card = document.getElementById(id);
+    const momEl = card ? card.querySelector('.kpi-mom') : null;
+    if (!momEl) return;
+    if (cfg.isPartial || pctVal == null) { momEl.className = 'kpi-mom flat'; momEl.textContent = ''; return; }
+    const cls = pctVal === 0 ? 'flat' : pctVal > 0 ? 'up' : 'dn';
+    const arrow = pctVal === 0 ? '' : pctVal > 0 ? '\u25b2 ' : '\u25bc ';
+    momEl.className = 'kpi-mom ' + cls;
+    momEl.textContent = `${arrow}${Math.abs(pctVal)}% vs prior month`;
+  };
+  const pbPct = (curr, prevVal) => (!prevVal ? null : Math.round(((curr - prevVal) / prevVal) * 100));
+
+  // Computes every Blended KPI for one given {year, month, throughDay}
+  // period — factored out 2026-08-25 so the exact same math can run once
+  // for the period being displayed and once for its prior-month comparison,
+  // rather than duplicating the whole calculation block.
+  async function computeBlended(periodCfg) {
     const [amzCsv, wmtCsv, webCsv, amzAdCsv, wmtAdCsv, webAdCsv] = await Promise.all([
       fetch(ovCsvUrl(PB_SYNC_SHEET_ID, PB_SYNC_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
       fetch(ovCsvUrl(PB_WALMART_SHEET_ID, PB_WALMART_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
@@ -13666,10 +13745,12 @@ async function ppcLoadBlendedPerformance(periodKey) {
 
     const amzRows   = parseCsvToRows(amzCsv);
     const wmtRows   = parseCsvToRows(wmtCsv);
-    const webRows   = parseCsvToRows(webCsv);
     const amzAdRows = parseCsvToRows(amzAdCsv);
     const wmtAdRows = parseCsvToRows(wmtAdCsv);
-    const webAdRows = parseCsvToRows(webAdCsv);
+    // webCsv/webAdRows parsed above only to keep the fetch/parse pattern
+    // identical to before — Website removed 2026-08-25 per Jaclyn (see
+    // note below), so they're never read past this point.
+    void webCsv; void webAdCsv;
 
     // Diagnostic — confirm real field names before trusting the guesses
     // below, same practice already established across this codebase.
@@ -13677,27 +13758,31 @@ async function ppcLoadBlendedPerformance(periodKey) {
     // ever fetch in this dashboard.
     console.log('[BlendedPerf][qa] Amazon ad summary sample row:', JSON.stringify(amzAdRows[0] || {}));
     console.log('[BlendedPerf][qa] Walmart ad summary (UNCONFIRMED, first use) sample row:', JSON.stringify(wmtAdRows[0] || {}));
-    console.log('[BlendedPerf][qa] Website ad summary sample row:', JSON.stringify(webAdRows[0] || {}));
 
     // Orders — day-level, each channel's own real validity rule
-    const amzOrders = pbAggregateOrders(amzRows, pbIsValidAmazonRow, cfg.year, cfg.month, cfg.throughDay);
-    const wmtOrders = pbAggregateOrders(wmtRows, pbIsValidWalmartRow, cfg.year, cfg.month, cfg.throughDay);
-    const webOrders = pbAggregateOrders(webRows, pbIsValidWebsiteRow, cfg.year, cfg.month, cfg.throughDay);
+    const amzOrders = pbAggregateOrders(amzRows, pbIsValidAmazonRow, periodCfg.year, periodCfg.month, periodCfg.throughDay);
+    const wmtOrders = pbAggregateOrders(wmtRows, pbIsValidWalmartRow, periodCfg.year, periodCfg.month, periodCfg.throughDay);
 
-    const totalSales  = amzOrders.totalSales + wmtOrders.totalSales + webOrders.totalSales;
-    const totalOrders = amzOrders.totalOrders + wmtOrders.totalOrders + webOrders.totalOrders;
+    // Website removed from every Blended KPI 2026-08-25 per Jaclyn: these
+    // are Medaltus-owned-metrics cards (Amazon + Walmart only), same scope
+    // change already applied to the Overview page. Website consignment
+    // inventory revenue isn't Medaltus's, and its ad spend comes from a
+    // separate budget — blending it in here would overstate/understate
+    // these cards in a way that doesn't reflect what Medaltus actually
+    // manages.
+    const totalSales  = amzOrders.totalSales + wmtOrders.totalSales;
+    const totalOrders = amzOrders.totalOrders + wmtOrders.totalOrders;
 
     // Ads — month-level, pre-aggregated one row per channel per month
-    const amzAd = pbFindAdRow(amzAdRows, cfg.year, cfg.month) || {};
-    const wmtAd = pbFindAdRow(wmtAdRows, cfg.year, cfg.month) || {};
-    const webAd = pbFindAdRow(webAdRows, cfg.year, cfg.month) || {};
+    const amzAd = pbFindAdRow(amzAdRows, periodCfg.year, periodCfg.month) || {};
+    const wmtAd = pbFindAdRow(wmtAdRows, periodCfg.year, periodCfg.month) || {};
 
     const numOr0 = v => parseFloat(String(v || '0').replace(/[$,]/g, '')) || 0;
 
-    const adSpend     = numOr0(amzAd.spend) + numOr0(wmtAd.spend) + numOr0(webAd.spend);
-    const adSales     = numOr0(amzAd.sales) + numOr0(wmtAd.sales) + numOr0(webAd.sales);
-    const impressions = numOr0(amzAd.impressions) + numOr0(wmtAd.impressions) + numOr0(webAd.impressions);
-    const clicks      = numOr0(amzAd.clicks) + numOr0(wmtAd.clicks) + numOr0(webAd.clicks);
+    const adSpend     = numOr0(amzAd.spend) + numOr0(wmtAd.spend);
+    const adSales     = numOr0(amzAd.sales) + numOr0(wmtAd.sales);
+    const impressions = numOr0(amzAd.impressions) + numOr0(wmtAd.impressions);
+    const clicks      = numOr0(amzAd.clicks) + numOr0(wmtAd.clicks);
 
     // Recomputed from summed totals, not averaged from each channel's
     // own percentage — averaging 3 ACOS percentages directly would be
@@ -13709,17 +13794,49 @@ async function ppcLoadBlendedPerformance(periodKey) {
     const cpc   = clicks > 0 ? (adSpend / clicks) : 0;
     const aov   = totalOrders > 0 ? (totalSales / totalOrders) : 0;
 
-    setVal('pb-kpi-ad-spend',    '$' + adSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    setVal('pb-kpi-ad-sales',    '$' + adSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    setVal('pb-kpi-acos',        acos.toFixed(1) + '%');
-    setVal('pb-kpi-total-sales', '$' + totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-    setVal('pb-kpi-tacos',       tacos.toFixed(1) + '%');
-    setVal('pb-kpi-impressions', Math.round(impressions).toLocaleString());
-    setVal('pb-kpi-clicks',      Math.round(clicks).toLocaleString());
-    setVal('pb-kpi-ctr',         ctr.toFixed(2) + '%');
-    setVal('pb-kpi-cpc',         '$' + cpc.toFixed(2));
-    setVal('pb-kpi-orders',      totalOrders.toLocaleString());
-    setVal('pb-kpi-aov',         '$' + aov.toFixed(2));
+    return { adSpend, adSales, acos, totalSales, tacos, impressions, clicks, ctr, cpc, totalOrders, aov };
+  }
+
+  try {
+    const curr = await computeBlended(cfg);
+
+    setVal('pb-kpi-ad-spend',    '$' + curr.adSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setVal('pb-kpi-ad-sales',    '$' + curr.adSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setVal('pb-kpi-acos',        curr.acos.toFixed(1) + '%');
+    setVal('pb-kpi-total-sales', '$' + curr.totalSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+    setVal('pb-kpi-tacos',       curr.tacos.toFixed(1) + '%');
+    setVal('pb-kpi-impressions', Math.round(curr.impressions).toLocaleString());
+    setVal('pb-kpi-clicks',      Math.round(curr.clicks).toLocaleString());
+    setVal('pb-kpi-ctr',         curr.ctr.toFixed(2) + '%');
+    setVal('pb-kpi-cpc',         '$' + curr.cpc.toFixed(2));
+    setVal('pb-kpi-orders',      curr.totalOrders.toLocaleString());
+    setVal('pb-kpi-aov',         '$' + curr.aov.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+    if (cfg.isPartial) {
+      // Month to Date — no MoM badge, per the note above. Clear any
+      // triangle left over from a previous "Last Month" view.
+      ['pb-kpi-ad-spend','pb-kpi-ad-sales','pb-kpi-acos','pb-kpi-total-sales','pb-kpi-tacos',
+       'pb-kpi-impressions','pb-kpi-clicks','pb-kpi-ctr','pb-kpi-cpc','pb-kpi-orders','pb-kpi-aov']
+        .forEach(id => pbSetKpiMom(id, null));
+    } else {
+      // Last Month — fetch the prior full month for a real month-over-
+      // month comparison.
+      let prevYear = cfg.year, prevMonth = cfg.month - 1;
+      if (prevMonth === 0) { prevMonth = 12; prevYear--; }
+      const prev = await computeBlended({ year: prevYear, month: prevMonth, throughDay: null });
+
+      pbSetKpiMom('pb-kpi-ad-spend',    pbPct(curr.adSpend, prev.adSpend));
+      pbSetKpiMom('pb-kpi-ad-sales',    pbPct(curr.adSales, prev.adSales));
+      pbSetKpiMom('pb-kpi-acos',        pbPct(Math.round(curr.acos * 10), Math.round(prev.acos * 10)));
+      pbSetKpiMom('pb-kpi-total-sales', pbPct(curr.totalSales, prev.totalSales));
+      pbSetKpiMom('pb-kpi-tacos',       pbPct(Math.round(curr.tacos * 10), Math.round(prev.tacos * 10)));
+      pbSetKpiMom('pb-kpi-impressions', pbPct(curr.impressions, prev.impressions));
+      pbSetKpiMom('pb-kpi-clicks',      pbPct(curr.clicks, prev.clicks));
+      pbSetKpiMom('pb-kpi-ctr',         pbPct(Math.round(curr.ctr * 100), Math.round(prev.ctr * 100)));
+      pbSetKpiMom('pb-kpi-cpc',         pbPct(Math.round(curr.cpc * 100), Math.round(prev.cpc * 100)));
+      pbSetKpiMom('pb-kpi-orders',      pbPct(curr.totalOrders, prev.totalOrders));
+      pbSetKpiMom('pb-kpi-aov',         pbPct(Math.round(curr.aov * 100), Math.round(prev.aov * 100)));
+    }
 
   } catch (err) {
     console.warn('[BlendedPerf] failed:', err.message);
@@ -13808,7 +13925,7 @@ async function ppcLoadSearchTermPanels() {
     }));
 
     const N = 25;
-    const money = v => '$' + v.toFixed(2);
+    const money = v => '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const pct   = v => v.toFixed(0) + '%';
 
     // Top Performing — has sales, ACOS < 40%, sorted by sales desc
@@ -13950,7 +14067,7 @@ async function ppcLoadProductPerformance() {
       const convClass  = conv >= 15 ? 'rank-top' : (conv > 0 ? 'rank-low' : 'rank-none');
       return `<tr>
         <td><strong>${name}</strong> <span style="font-family:var(--mono);font-size:10px;color:var(--muted);">${r.sku || ''}</span></td>
-        <td>${sessions.toLocaleString()}</td><td>${units}</td><td>$${revenue.toFixed(2)}</td>
+        <td>${sessions.toLocaleString()}</td><td>${units}</td><td>$${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td><span class="rank-pill ${convClass}">${conv.toFixed(2)}%</span></td>
       </tr>`;
     }).join('');
@@ -14052,15 +14169,15 @@ async function ppcLoadKeywordCoverage() {
       const whereStyle = where === 'Not Found' ? ' style="color:var(--danger);font-weight:600;"' : '';
       return `<tr>
         <td>${escapeHtmlOrg(kw)}</td>
-        <td>$${info.sales.toFixed(2)}</td>
+        <td>$${info.sales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
         <td style="font-family:var(--mono);font-size:10px;">${asinList.map(a => escapeHtmlOrg(a)).join(', ')}</td>
         <td${whereStyle}>${escapeHtmlOrg(where)}</td>
       </tr>`;
     }).join('');
 
-    container.innerHTML = `<div style="overflow-x:auto;">
-      <table class="data-table">
-        <thead><tr><th>Keyword</th><th>Sales (60d)</th><th>ASIN</th><th>Where in Listing</th></tr></thead>
+    container.innerHTML = `<div style="overflow-x:auto;overflow-y:auto;max-height:760px;border:1px solid var(--border);border-radius:var(--radius-sm);">
+      <table class="data-table" style="margin:0;">
+        <thead style="position:sticky;top:0;z-index:1;background:var(--white);"><tr><th>Keyword</th><th>Sales (60d)</th><th>ASIN</th><th>Where in Listing</th></tr></thead>
         <tbody>${rowsHtml}</tbody>
       </table>
     </div>`;
@@ -14200,13 +14317,29 @@ async function ppcLoadStrategyByProduct() {
       if (!bySku[sku] || (isValidDateStr(r.date) && (!isValidDateStr(bySku[sku].date) || r.date > bySku[sku].date))) bySku[sku] = r;
     });
 
+    // Root-SKU fallback — added 2026-08-25, replicated from a fix found on
+    // Skinuva's dashboard. REVIEW_CATEGORY_PRODUCTS holds each product's
+    // bare SKU (e.g. "JBJ0001"), but a real ppc_strategy row could exist
+    // under a suffixed variant (e.g. "JBJ0001-SF" for the seller-fulfilled
+    // listing — see the codebase-wide "-SF" convention). An exact-match-only
+    // lookup would silently show "no analysis yet" for a SKU that does have
+    // a row, just under a suffixed key. This only fills in gaps the exact
+    // match left — it never overrides a real exact match, and a suffixed
+    // SKU that ALSO has its own separate exact row keeps that own row.
+    const bySkuRoot = {};
+    Object.keys(bySku).forEach(sku => {
+      const root = sku.replace(/-[A-Z0-9]+$/, '');
+      if (root !== sku && !(root in bySkuRoot)) bySkuRoot[root] = bySku[sku];
+    });
+    const lookupSku = sku => bySku[sku] || bySkuRoot[sku];
+
     // Extracted 2026-08-10 so the same rendering logic can drive both the
     // 5 hardcoded categories below AND the new dynamic Bundles tab.
     const renderIntoContainer = (containerId, products) => {
       const container = document.getElementById(`${containerId}-container`);
       if (!container) return;
       const cardsHtml = products.map(p => {
-        const row = bySku[p.sku];
+        const row = lookupSku(p.sku);
         if (!row) return `<div class="ppc-strategy-card"><div class="ppc-strategy-hd"><div><div class="ppc-strategy-sku">${escapeHtmlOrg(p.sku)} · ${escapeHtmlOrg(p.asin)}</div><div class="ppc-strategy-name">${escapeHtmlOrg(p.label)}</div></div></div><div class="ppc-strategy-body"><div style="color:var(--muted);font-size:12px;">No PPC analysis run yet for this SKU — click "Run PPC Analysis" on the Insights Log page.</div></div></div>`;
         return ppcRenderStrategyCard(row, p.label);
       }).join('');
@@ -15037,7 +15170,7 @@ async function mfcLoadKpis() {
     if (subEl) {
       const monthNamesShort = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
       const lastDay = new Date(year, month, 0).getDate();
-      subEl.textContent = `${monthNamesShort[month-1]} 1 – ${monthNamesShort[month-1]} ${lastDay}, ${year} · Last full month`;
+      subEl.textContent = `${monthNamesShort[month-1]} 1 – ${monthNamesShort[month-1]} ${lastDay}, ${year} · Last month`;
     }
 
     // Shipped Website Orders is recomputed from the daily raw data (same
@@ -17413,7 +17546,7 @@ async function loadAuditResultsFromSheet() {
           '<div class="pdfx-chlabel">Channel Performance</div>' +
           '<div class="pdfx-chrow"><span class="pdfx-chname">Amazon</span><span class="pdfx-chdate">' + pdfxEscape(dateRange) + '</span></div>' +
           '<div class="pdfx-kpis">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Sales Revenue by Month</div><div>' + pdfxLegendHtml('legend-amazon') + '</div></div>' + pdfxChartBlock('_amazonChart') + '</div>' +
+          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Units Sold by Month</div><div>' + pdfxLegendHtml('legend-amazon') + '</div></div>' + pdfxChartBlock('_amazonChart') + '</div>' +
           '<div class="pdfx-card"><div class="pdfx-card-title">Top Selling Products <span style="font-weight:400;color:var(--muted);">(by Units)</span></div>' +
             pdfxTableHtml(['#', 'Product', 'Units', 'Units (Ads)', 'Units (Organic)'], rows) +
           '</div>' +
@@ -17434,7 +17567,7 @@ async function loadAuditResultsFromSheet() {
           '<div class="pdfx-chlabel">Channel Performance</div>' +
           '<div class="pdfx-chrow"><span class="pdfx-chname">Web — evolisproducts.com</span><span class="pdfx-chdate">' + pdfxEscape(dateRange) + '</span></div>' +
           '<div class="pdfx-kpis">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Sales by Month</div><div>' + pdfxLegendHtml('legend-web') + '</div></div>' + pdfxChartBlock('_webChart') + '</div>' +
+          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Units Sold by Month</div><div>' + pdfxLegendHtml('legend-web') + '</div></div>' + pdfxChartBlock('_webChart') + '</div>' +
           '<div class="pdfx-card"><div class="pdfx-card-title">Top Selling Products <span style="font-weight:400;color:var(--muted);">(by Units)</span></div>' +
             pdfxTableHtml(['#', 'Product', 'Units', 'Units (Ads)', 'Units (Organic)'], rows) +
           '</div>' +
@@ -17455,7 +17588,7 @@ async function loadAuditResultsFromSheet() {
           '<div class="pdfx-chlabel">Channel Performance</div>' +
           '<div class="pdfx-chrow"><span class="pdfx-chname">Walmart</span><span class="pdfx-chdate">' + pdfxEscape(dateRange) + '</span></div>' +
           '<div class="pdfx-kpis n3">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Sales by Month</div><div>' + pdfxLegendHtml('legend-walmart') + '</div></div>' + pdfxChartBlock('_walmartChart') + '</div>' +
+          '<div class="pdfx-card"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="pdfx-card-title" style="margin-bottom:0;">Units Sold by Month</div><div>' + pdfxLegendHtml('legend-walmart') + '</div></div>' + pdfxChartBlock('_walmartChart') + '</div>' +
           '<div class="pdfx-card"><div class="pdfx-card-title">Top Selling Products <span style="font-weight:400;color:var(--muted);">(by Units)</span></div>' +
             pdfxTableHtml(['#', 'Product', 'Units'], rows.map(function (r) { return r.slice(0, 3); })) +
           '</div>' +
@@ -18518,14 +18651,18 @@ async function loadAuditResultsFromSheet() {
       const webPrevNetUnits = Math.max(0, webPrev.totalUnits - webReturnsPrev.totalQty);
       const wmtPrevNetUnits = Math.max(0, wmtPrev.totalUnits - wmtReturnsPrev.totalQty);
 
-      const mtd  = { units: amzMtdNetUnits + webMtdNetUnits + wmtMtdNetUnits, orders: amzMtd.totalOrders + webMtd.totalOrders + wmtMtd.totalOrders, revenue: amzMtdNetRevenue + webMtdNetRevenue + wmtMtdNetRevenue };
-      const prev = { units: amzPrevNetUnits + webPrevNetUnits + wmtPrevNetUnits, orders: amzPrev.totalOrders + webPrev.totalOrders + wmtPrev.totalOrders, revenue: amzPrevNetRevenue + webPrevNetRevenue + wmtPrevNetRevenue };
+      // Website removed from these blended totals 2026-08-25 per Jaclyn —
+      // Amazon + Walmart only, same scope as every other blended metric
+      // on this page.
+      const mtd  = { units: amzMtdNetUnits + wmtMtdNetUnits, orders: amzMtd.totalOrders + wmtMtd.totalOrders, revenue: amzMtdNetRevenue + wmtMtdNetRevenue };
+      const prev = { units: amzPrevNetUnits + wmtPrevNetUnits, orders: amzPrev.totalOrders + wmtPrev.totalOrders, revenue: amzPrevNetRevenue + wmtPrevNetRevenue };
       const aov = mtd.orders ? mtd.revenue / mtd.orders : 0;
       const aovPrev = prev.orders ? prev.revenue / prev.orders : 0;
 
+      setKpi('ov-kpi-total-sales', '$' + mtd.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), pctChange(mtd.revenue, prev.revenue));
       setKpi('ov-kpi-units',  mtd.units.toLocaleString(),  pctChange(mtd.units, prev.units));
       setKpi('ov-kpi-orders', mtd.orders.toLocaleString(), pctChange(mtd.orders, prev.orders));
-      setKpi('ov-kpi-aov',    '$' + aov.toFixed(2),        pctChange(Math.round(aov * 100), Math.round(aovPrev * 100)));
+      setKpi('ov-kpi-aov',    '$' + aov.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),        pctChange(Math.round(aov * 100), Math.round(aovPrev * 100)));
 
       // -- MTD Ad-Driven Orders / Pending Orders --
       // Amazon: per Jaclyn (2026-07-24), the ad orders cron runs daily and
@@ -18582,7 +18719,7 @@ async function loadAuditResultsFromSheet() {
         }
       } catch (e) { console.warn('[Evolis][overview] Walmart ad units (for Ad-Driven Orders) lookup failed:', e.message); }
 
-      setKpiPlain('ov-kpi-ad-orders', (adDrivenOrders + Math.round(webAdsMtd.conversions) + walmartAdUnitsThisMonth).toLocaleString(), 'This month (Amazon orders + Google Ads + Walmart ad units)');
+      setKpiPlain('ov-kpi-ad-orders', (adDrivenOrders + walmartAdUnitsThisMonth).toLocaleString(), 'This month (Amazon orders + Walmart ad units)'); // Website removed 2026-08-25 per Jaclyn — Amazon + Walmart only
       // NOTE: this card's own MOM/"Organic Orders" companion logic moved
       // further down — see "MTD Organic Units" below, after per-ASIN net
       // units and ad-attributed units are available. Per Jaclyn
@@ -18629,14 +18766,19 @@ async function loadAuditResultsFromSheet() {
       const amzPrevUnitsByAsin = netByAsin(unitsByAsin(amzPrev.filteredRows, skuToAsinMap), amzReturnsPrev.byAsin);
       const webPrevUnitsByAsin = netByAsin(unitsByAsin(webPrev.filteredRows, skuToAsinMap), webReturnsPrev.byAsin);
       const wmtPrevUnitsByAsin = netByAsin(unitsByAsin(wmtPrev.filteredRows, skuToAsinMap), wmtReturnsPrev.byAsin);
-      const allAsins = new Set([...Object.keys(amzUnitsByAsin), ...Object.keys(webUnitsByAsin), ...Object.keys(wmtUnitsByAsin)]);
+      // Website removed from Active SKUs 2026-08-25 per Jaclyn — Amazon +
+      // Walmart only. (webUnitsByAsin/webPrevUnitsByAsin above are left in
+      // place as harmless dead code — they're empty for Just Bjorn since
+      // there's no Website channel — rather than risk breaking anything
+      // else in this large shared function that might still reference them.)
+      const allAsins = new Set([...Object.keys(amzUnitsByAsin), ...Object.keys(wmtUnitsByAsin)]);
 
       // Active SKUs (hero stat) — count of ASINs with net units > 0 across
-      // all three channels combined, MTD. Replaces the old gross-SKU-set
+      // Amazon + Walmart, MTD. Replaces the old gross-SKU-set
       // count (which counted any ASIN with an order line at all, even if
       // every unit sold was later returned).
       const activeSkuCount = Array.from(allAsins).filter(asin =>
-        (amzUnitsByAsin[asin] || 0) + (webUnitsByAsin[asin] || 0) + (wmtUnitsByAsin[asin] || 0) > 0
+        (amzUnitsByAsin[asin] || 0) + (wmtUnitsByAsin[asin] || 0) > 0
       ).length;
       const heroSkuEl = document.getElementById('ov-hero-skus');
       if (heroSkuEl && activeSkuCount > 0) heroSkuEl.textContent = String(activeSkuCount);
@@ -18711,14 +18853,14 @@ async function loadAuditResultsFromSheet() {
       // other Google campaign type; best available source per Jaclyn).
       const webShopUnitsByAsin = webShoppingUnitsByAsin(webShoppingRows, mtdStartStr, mtdEndStr, skuToAsinMap);
       const webShopUnitsByAsinPrev = webShoppingUnitsByAsin(webShoppingRows, prevStartStr, prevEndStr, skuToAsinMap);
+      // Website removed from Organic Units 2026-08-25 per Jaclyn — Amazon +
+      // Walmart only.
       const totalAdUnitsCurr = Array.from(allAsins).reduce((s, asin) =>
         s + Math.min(adUnitsByAsin[asin] || 0, amzUnitsByAsin[asin] || 0)
-          + Math.min(webShopUnitsByAsin[asin] || 0, webUnitsByAsin[asin] || 0)
           + Math.min(wmtAdUnitsByAsin[asin] || 0, wmtUnitsByAsin[asin] || 0), 0);
-      const allAsinsPrev = new Set([...Object.keys(amzPrevUnitsByAsin), ...Object.keys(webPrevUnitsByAsin), ...Object.keys(wmtPrevUnitsByAsin)]);
+      const allAsinsPrev = new Set([...Object.keys(amzPrevUnitsByAsin), ...Object.keys(wmtPrevUnitsByAsin)]);
       const totalAdUnitsPrev = Array.from(allAsinsPrev).reduce((s, asin) =>
         s + Math.min(adUnitsByAsinPrev[asin] || 0, amzPrevUnitsByAsin[asin] || 0)
-          + Math.min(webShopUnitsByAsinPrev[asin] || 0, webPrevUnitsByAsin[asin] || 0)
           + Math.min(wmtAdUnitsByAsinPrev[asin] || 0, wmtPrevUnitsByAsin[asin] || 0), 0);
       const organicUnits = Math.max(0, mtd.units - totalAdUnitsCurr);
       const organicUnitsPrev = Math.max(0, prev.units - totalAdUnitsPrev);
@@ -18737,29 +18879,33 @@ async function loadAuditResultsFromSheet() {
       }
 
       const productRows = Array.from(allAsins).map(asin => {
-        const a = amzUnitsByAsin[asin] || 0, w = webUnitsByAsin[asin] || 0, m = wmtUnitsByAsin[asin] || 0;
-        const aPrev = amzPrevUnitsByAsin[asin] || 0, wPrev = webPrevUnitsByAsin[asin] || 0, mPrev = wmtPrevUnitsByAsin[asin] || 0;
-        const total = a + w + m, totalPrev = aPrev + wPrev + mPrev;
-        // Ad units = Amazon Ads (capped at Amazon's own net units) + Google
-        // Ads via the "shopping" tab (capped at Website's own net units)
-        // + Walmart Ads (capped at Walmart's own net units, added
+        // Website removed from this sum 2026-08-25 per Jaclyn — Amazon +
+        // Walmart only, same scope as every other blended metric on this
+        // page (webUnitsByAsin/webPrevUnitsByAsin are already effectively
+        // 0 for Just Bjorn since there's no Website channel, but dropping
+        // the terms entirely matches every other fix in this pass rather
+        // than relying on them evaluating to zero).
+        const a = amzUnitsByAsin[asin] || 0, m = wmtUnitsByAsin[asin] || 0;
+        const aPrev = amzPrevUnitsByAsin[asin] || 0, mPrev = wmtPrevUnitsByAsin[asin] || 0;
+        const total = a + m, totalPrev = aPrev + mPrev;
+        // Ad units = Amazon Ads (capped at Amazon's own net units) +
+        // Walmart Ads (capped at Walmart's own net units, added
         // 2026-08-06 per Jaclyn).
-        const adUnits = Math.min(adUnitsByAsin[asin] || 0, a) + Math.min(webShopUnitsByAsin[asin] || 0, w) + Math.min(wmtAdUnitsByAsin[asin] || 0, m);
+        const adUnits = Math.min(adUnitsByAsin[asin] || 0, a) + Math.min(wmtAdUnitsByAsin[asin] || 0, m);
         const orgUnits = total - adUnits;
-        return { asin, name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, website: w, websitePrev: wPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits };
+        return { asin, name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits };
       }).sort((x, y) => y.total - x.total).slice(0, 15);
 
       const tbody = document.getElementById('ov-products-tbody');
       if (tbody) {
         if (!productRows.length) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
         } else {
           tbody.innerHTML = productRows.map((r, i) => `
             <tr>
               <td style="padding:7px 10px;">${i + 1}.</td>
               <td style="padding:7px 10px;">${r.name}</td>
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.amazon, r.amazonPrev)}</div></td>
-              <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.website, r.websitePrev)}</div></td>
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.walmart, r.walmartPrev)}</div></td>
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.total, r.totalPrev)}</div></td>
               <td style="padding:7px 10px;">${r.adUnits > 0 ? `<span class="tp-units">${r.adUnits.toLocaleString()}</span>` : '<span class="tp-dash">—</span>'}</td>
@@ -18772,13 +18918,15 @@ async function loadAuditResultsFromSheet() {
       // Switched to the net figures 2026-08-03 — using gross here while the
       // hero KPI above uses net would make the donut's total silently not
       // match the hero number, which is worse than either being wrong alone.
-      const donutTotal = amzMtdNetRevenue + webMtdNetRevenue + wmtMtdNetRevenue;
+      // Website removed from this donut 2026-08-25 per Jaclyn — Amazon +
+      // Walmart only, same scope as every other blended metric on this page.
+      const donutTotal = amzMtdNetRevenue + wmtMtdNetRevenue;
       if (donutTotal > 0) {
         window._ovDonutChart = new Chart(document.getElementById('chart-ov-donut'), {
           type: 'doughnut',
           data: {
-            labels: ['Amazon', 'Website', 'Walmart'],
-            datasets: [{ data: [amzMtdNetRevenue, webMtdNetRevenue, wmtMtdNetRevenue], backgroundColor: ['#001f60', '#24e9a3', '#6b7ba2'], borderWidth: 0 }]
+            labels: ['Amazon', 'Walmart'],
+            datasets: [{ data: [amzMtdNetRevenue, wmtMtdNetRevenue], backgroundColor: ['#001f60', '#6b7ba2'], borderWidth: 0 }]
           },
           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } } } } }
         });
@@ -18848,15 +18996,58 @@ async function loadAuditResultsFromSheet() {
         }
       } catch (e) { console.warn('[Evolis][overview] Walmart Advertising Cache lookup failed:', e.message); }
 
-      const blendedSpend = proratedSpend + webAdsMtd.spend + walmartSpendThisMonth;
-      const blendedSpendPrev = proratedSpendPrev + webAdsPrevMtd.spend + walmartSpendLastMonth;
-      const blendedSales = proratedSales + webAdsMtd.revenue + walmartSalesThisMonth;
-      const blendedSalesPrev = proratedSalesPrev + webAdsPrevMtd.revenue + walmartSalesLastMonth;
+      const blendedSpend = proratedSpend + walmartSpendThisMonth; // Website removed 2026-08-25 per Jaclyn — Ad Spend/ACOS are Amazon + Walmart only
+      const blendedSpendPrev = proratedSpendPrev + walmartSpendLastMonth;
+      const blendedSales = proratedSales + walmartSalesThisMonth;
+      const blendedSalesPrev = proratedSalesPrev + walmartSalesLastMonth;
       const acos = blendedSales > 0 ? (blendedSpend / blendedSales) * 100 : 0;
       const acosPrev = blendedSalesPrev > 0 ? (blendedSpendPrev / blendedSalesPrev) * 100 : 0;
 
       setKpi('ov-kpi-adspend', '$' + blendedSpend.toLocaleString(undefined, { maximumFractionDigits: 0 }), pctChange(blendedSpend, blendedSpendPrev), ' vs MTD last month (Est.)');
       setKpi('ov-kpi-acos', acos.toFixed(1) + '%', pctChange(Math.round(acos * 10), Math.round(acosPrev * 10)), ' vs MTD last month (Est.)');
+
+      // MTD Ad Sales / MTD Organic Sales — added 2026-08-25, replicated
+      // from Skinuva. Ad Sales reuses the same blendedSales figure the
+      // Ad Spend/ACOS calc above already produces (Amazon prorated ad
+      // sales + Walmart ad sales, Amazon + Walmart only). Organic Sales =
+      // Total Sales (mtd.revenue, computed earlier) minus Ad Sales,
+      // floored at 0 — same pattern as the existing Organic Units KPI.
+      const organicSales = Math.max(0, mtd.revenue - blendedSales);
+      const organicSalesPrev = Math.max(0, prev.revenue - blendedSalesPrev);
+      setKpi('ov-kpi-ad-sales', '$' + blendedSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), pctChange(blendedSales, blendedSalesPrev), ' vs MTD last month (Est.)');
+      setKpi('ov-kpi-organic-sales', '$' + organicSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), pctChange(organicSales, organicSalesPrev), ' vs MTD last month (Est.)');
+
+      // Channel Breakdown table — added 2026-08-25, replicated from
+      // Skinuva. Amazon + Walmart rows only, built entirely from figures
+      // already computed above for the KPI cards (no new data fetch):
+      // Amazon's prorated MTD ad spend/sales estimate (proratedSpend/
+      // proratedSales) and Walmart's real ad-summary-row spend/sales
+      // (walmartSpendThisMonth/walmartSalesThisMonth), plus each
+      // channel's own net units/orders/revenue from the Top Selling
+      // Products / mtd computations above.
+      (function renderChannelBreakdown() {
+        const tbody = document.getElementById('ov-channel-breakdown-tbody');
+        if (!tbody) return;
+        const amzUnits = Object.values(amzUnitsByAsin).reduce((s, v) => s + v, 0);
+        const wmtUnits = Object.values(wmtUnitsByAsin).reduce((s, v) => s + v, 0);
+        const rows = [
+          { channel: 'Amazon',  adSpend: proratedSpend,          adSales: proratedSales,          units: amzUnits, orders: amzMtd.totalOrders, revenue: amzMtdNetRevenue },
+          { channel: 'Walmart', adSpend: walmartSpendThisMonth,  adSales: walmartSalesThisMonth,  units: wmtUnits, orders: wmtMtd.totalOrders, revenue: wmtMtdNetRevenue },
+        ];
+        const money = v => '$' + (v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        tbody.innerHTML = rows.map(r => {
+          const aov = r.orders > 0 ? r.revenue / r.orders : 0;
+          return `<tr>
+            <td>${r.channel}</td>
+            <td>${money(r.adSpend)}</td>
+            <td>${money(r.adSales)}</td>
+            <td>${(r.units || 0).toLocaleString()}</td>
+            <td>${(r.orders || 0).toLocaleString()}</td>
+            <td>${money(r.revenue)}</td>
+            <td>${money(aov)}</td>
+          </tr>`;
+        }).join('');
+      })();
 
       // -- Trend: trailing 6 COMPLETED months, blended revenue across channels --
       // ROOT CAUSE of the blank chart: these revenue-history sheets use
@@ -18917,17 +19108,18 @@ async function loadAuditResultsFromSheet() {
         tm -= 1; if (tm === 0) { tm = 12; ty--; }
         trendLabels.unshift(`${monthNames[tm - 1]} '${String(ty).slice(2)}`);
         amzTrend.unshift(monthlyRevenue(amzRevRows, ty, tm));
-        webTrend.unshift(monthlyRevenue(webRevRows, ty, tm));
         wmtTrend.unshift(monthlyRevenue(wmtRevRows, ty, tm));
       }
-      if ([...amzTrend, ...webTrend, ...wmtTrend].some(v => v > 0)) {
+      // Website removed from this trend chart 2026-08-25 per Jaclyn —
+      // Amazon + Walmart lines only, same scope as every other blended
+      // metric on this page.
+      if ([...amzTrend, ...wmtTrend].some(v => v > 0)) {
         window._ovTrendChart = new Chart(document.getElementById('chart-ov-trend'), {
           type: 'line',
           data: {
             labels: trendLabels,
             datasets: [
               { label: 'Amazon', data: amzTrend, borderColor: '#001f60', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, tension: 0.3 },
-              { label: 'Website', data: webTrend, borderColor: '#24e9a3', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, tension: 0.3 },
               { label: 'Walmart', data: wmtTrend, borderColor: '#6b7ba2', backgroundColor: 'transparent', borderWidth: 2.5, pointRadius: 3, tension: 0.3 },
             ]
           },
@@ -19150,4 +19342,4 @@ window.addEventListener('load', async () => {
 });
 </script>
 </body>
-</html> 
+</html>
