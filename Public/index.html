@@ -8638,7 +8638,7 @@ async function mxMfcLoadKpis() {
 async function mxMfcLoadShippedChart() {
   const footer = document.getElementById('mx-mfc-chart-footer');
   try {
-    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, '356984145')).then(r => r.ok ? r.text() : '').catch(() => '');
+    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_DAILY_SHIPMENTS.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv).filter(r => {
       const day = new Date((r.date || '') + 'T12:00:00').getDay();
       return day !== 0 && day !== 6;
@@ -8695,7 +8695,7 @@ async function mxMfcLoadShippedChart() {
 }
 
 async function mxMfcLoadStates() {
-  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, '402779529', 'mx-mfc-us-svg', 'mx-mfc-map-tip', 'mx-mfc-state-table-body', 'mx-mfc-map-footer');
+  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_STATES.gid, 'mx-mfc-us-svg', 'mx-mfc-map-tip', 'mx-mfc-state-table-body', 'mx-mfc-map-footer');
 }
 
 async function mxMfcLoadComplianceCases() {
@@ -10962,9 +10962,14 @@ async function initSnsExternal() {
   const TOP_SELLERS_COUNT = 7;
 
   // Per-event config — gids per Jaclyn 2026-07-20. Orders sheet is the same
-  // "Newderm - Amazon Orders" sheet as Prime Day (1SiYu8e2...); ad sheet is
-  // the same ad-orders sheet as Prime Day (1N30haUFZ...) — only the gids
-  // (i.e. which tab) differ per event.
+  // "Newderm - Amazon Orders" sheet as Prime Day (1SiYu8e2...) for Big
+  // Spring Sale and Prime Big Deal Days; ad sheet is the same ad-orders
+  // sheet as Prime Day (1N30haUFZ...) — only the gids (i.e. which tab)
+  // differ per event. BFCM's orders sheet is a genuinely different file
+  // (confirmed against Dashboard Mapping 2026-08-26) — évolis's own
+  // source had this pointed at the wrong file (reusing the Newderm
+  // Orders fileId with BFCM's gid, which doesn't exist there), inherited
+  // into this build and now fixed rather than carried forward.
   const EVENTS = {
     bss: {
       eventName: 'Big Spring Sale',
@@ -10980,7 +10985,7 @@ async function initSnsExternal() {
     },
     bfcm: {
       eventName: 'Black Friday & Cyber Monday',
-      ordersSheetId: '1SiYu8e2-Pfi14Aiuf6SAFytWVXb4_dtdNFT6wvLFPok', ordersGid: '942023472',
+      ordersSheetId: window.SHEET_CFG.SHEET_BFCM_ORDERS.fileId, ordersGid: '942023472',
       adOrdersSheetId: AD_ORDERS_SHEET_ID, adOrdersGid: '23521749',
       prefix: 'bfcm',
     },
@@ -11375,11 +11380,9 @@ document.addEventListener('DOMContentLoaded', function() {
     fields: [{ key: 'amazon_key_insight', displayId: 'tp-insight-text', textareaId: 'tp-insight-textarea', placeholder: 'No insight added yet — click Edit to add one.' }],
     editBtnId: 'tp-insight-edit-btn', saveBtnId: 'tp-insight-save', cancelBtnId: 'tp-insight-cancel', editorId: 'tp-insight-editor',
   });
-  window.wireInsightBlock({
-    scope: 'monthly',
-    fields: [{ key: 'website_key_insight', displayId: 'web-insight-text', textareaId: 'web-insight-textarea', placeholder: 'No insight added yet — click Edit to add one.' }],
-    editBtnId: 'web-insight-edit-btn', saveBtnId: 'web-insight-save', cancelBtnId: 'web-insight-cancel', editorId: 'web-insight-editor',
-  });
+  // Website's insight block removed 2026-08-26 — Just Bjorn has no Website
+  // channel/page, so 'web-insight-edit-btn' etc. don't exist in the DOM;
+  // this was harmlessly warning on every page load ("missing elements").
   window.wireInsightBlock({
     scope: 'monthly',
     fields: [{ key: 'walmart_key_insight', displayId: 'wtp-insight-text', textareaId: 'wtp-insight-textarea', placeholder: 'No insight added yet — click Edit to add one.' }],
@@ -11693,7 +11696,7 @@ async function ovLoadUnitsAndPeakMonth() {
     const data = months.map(({ year: yy, month: mm }) =>
       sumUnitsForMonth(amzRows, yy, mm) + sumUnitsForMonth(wmtRows, yy, mm) + sumUnitsForMonth(webRows, yy, mm)
     );
-    console.log('[InsightsOverview][qa] units chart (Amazon+Walmart+Website) — trailing 12mo:', JSON.stringify(months.map((mo, i) => ({ label: labels[i], total: data[i] }))));
+    console.log('[InsightsOverview][qa] units chart (Amazon+Walmart) — trailing 12mo:', JSON.stringify(months.map((mo, i) => ({ label: labels[i], total: data[i] }))));
 
     const ctx = document.getElementById('chart-ins-units');
     if (ctx) {
@@ -13799,6 +13802,7 @@ async function ppcLoadBlendedPerformance(periodKey) {
 
   try {
     const curr = await computeBlended(cfg);
+    console.log('[BlendedPerf][qa] period:', JSON.stringify(cfg), '— totalSales:', curr.totalSales, 'totalOrders:', curr.totalOrders);
 
     setVal('pb-kpi-ad-spend',    '$' + curr.adSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     setVal('pb-kpi-ad-sales',    '$' + curr.adSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
@@ -13824,6 +13828,7 @@ async function ppcLoadBlendedPerformance(periodKey) {
       let prevYear = cfg.year, prevMonth = cfg.month - 1;
       if (prevMonth === 0) { prevMonth = 12; prevYear--; }
       const prev = await computeBlended({ year: prevYear, month: prevMonth, throughDay: null });
+      console.log('[BlendedPerf][qa] prior month:', prevYear + '-' + prevMonth, '— totalSales:', prev.totalSales, 'totalOrders:', prev.totalOrders, '(if this looks too low/zero, the orders cache may be missing coverage for that month rather than this being a real swing)');
 
       pbSetKpiMom('pb-kpi-ad-spend',    pbPct(curr.adSpend, prev.adSpend));
       pbSetKpiMom('pb-kpi-ad-sales',    pbPct(curr.adSales, prev.adSales));
@@ -14424,7 +14429,7 @@ async function loadInventoryPage() {
       // 'just-bjorn' tab doesn't exist in this sheet yet (Cin7 pipeline not
       // built) — this will just fail quietly and consignmentMap stays
       // empty, which is exactly the honest "no data yet" state.
-      fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, '505131584')).then(r => r.ok ? r.text() : '').catch(() => ''),
+      fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid)).then(r => r.ok ? r.text() : '').catch(() => ''),
       // Master Product Short Name sheet's own Status column (LIVE/DELETED)
       // — same sheet/gid as the name lookups used elsewhere, col B=SKU,
       // col H=Status. Used to grey out + sort discontinued SKUs to the
@@ -14910,7 +14915,7 @@ async function ffLoadKpis() {
 async function ffLoadShippedChart() {
   const footer = document.getElementById('ff-chart-footer');
   try {
-    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, '356984145')).then(r => r.ok ? r.text() : '').catch(() => '');
+    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_DAILY_SHIPMENTS.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv).filter(r => {
       const day = new Date((r.date || '') + 'T12:00:00').getDay();
       return day !== 0 && day !== 6; // weekends filtered defensively — the cron no longer writes them going forward, but old rows may still exist
@@ -15084,7 +15089,7 @@ async function ffLoadStatesGeneric(sheetId, gid, svgId, tipId, tbodyId, footerId
 }
 
 async function ffLoadStates() {
-  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, '402779529', 'ff-us-svg', 'ff-map-tip', 'ff-state-table-body', 'ff-map-footer');
+  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_STATES.gid, 'ff-us-svg', 'ff-map-tip', 'ff-state-table-body', 'ff-map-footer');
 }
 
 window.initFulfillmentPage = async function() {
@@ -15178,7 +15183,7 @@ async function mfcLoadKpis() {
     // than read from the _kpis tab's shipped_orders_30d — that figure is a
     // rolling 30-day aggregate, not a calendar-month one, and doesn't line
     // up with the rest of this report's fixed month.
-    const dailyCsv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, '356984145')).then(r => r.ok ? r.text() : '').catch(() => '');
+    const dailyCsv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_DAILY_SHIPMENTS.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
     const dailyRows = parseCsvToRows(dailyCsv).filter(r => {
       const d = new Date((r.date || '') + 'T12:00:00');
       if (isNaN(d)) return false;
@@ -15217,7 +15222,7 @@ async function mfcLoadShippedChart() {
     const lblChart = document.getElementById('mfc-lbl-chart');
     if (lblChart) lblChart.textContent = `Website Orders Shipped by Date • ${monthLabel}`;
 
-    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, '356984145')).then(r => r.ok ? r.text() : '').catch(() => '');
+    const csv = await fetch(ovCsvUrl(OV_FULFILLMENT_DAILY_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_DAILY_SHIPMENTS.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv).filter(r => {
       const d = new Date((r.date || '') + 'T12:00:00');
       if (isNaN(d)) return false;
@@ -15289,7 +15294,7 @@ async function mfcLoadShippedChart() {
 }
 
 async function mfcLoadStates() {
-  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, '402779529', 'mfc-us-svg', 'mfc-map-tip', 'mfc-state-table-body', 'mfc-map-footer');
+  await ffLoadStatesGeneric(OV_FULFILLMENT_STATES_SHEET_ID, window.SHEET_CFG.SHEET_FULFILLMENT_STATES.gid, 'mfc-us-svg', 'mfc-map-tip', 'mfc-state-table-body', 'mfc-map-footer');
 }
 
 // Returns Processed + return rate. Rate = returns in the last 30 days ÷
@@ -18385,7 +18390,17 @@ async function loadAuditResultsFromSheet() {
     console.log('[Evolis] initOverviewLive() called');
 
     const AMAZON_SHEET_ID = window.SHEET_CFG.SHEET_ORDERS.fileId; const AMAZON_GID = window.SHEET_CFG.SHEET_ORDERS.gid;
-    const WEB_SHEET_ID = ''; // WEBSITE/DTC — Just Bjorn has no Website channel; this const's usages should be removed const WEB_GID = ''; // WEBSITE/DTC — Just Bjorn has no Website channel; this const's usages should be removed
+    const WEB_SHEET_ID = ''; // WEBSITE/DTC — Just Bjorn has no Website channel; this const's usages should be removed
+    const WEB_GID = ''; // WEBSITE/DTC — Just Bjorn has no Website channel; this const's usages should be removed
+    // FOUND 2026-08-26: these two used to be one line (`const WEB_SHEET_ID = '...'; const WEB_GID = '...';`)
+    // and my original neutralization script's replacement text ended in a
+    // bare `//` comment with no trailing newline, so it swallowed the
+    // second `const WEB_GID = ...` into the first one's comment — WEB_GID
+    // was never actually declared as a real variable, hence "WEB_GID is
+    // not defined" breaking the whole Overview page. Confirmed via a full
+    // regex sweep that this was the only place in the file where this
+    // happened — every other multi-const-per-line case used the normal
+    // (safe, semicolon-terminated) SHEET_CFG resolution branch.
     const WMT_SHEET_ID = window.SHEET_CFG.SHEET_WALMART_ORDERS.fileId; const WMT_GID = window.SHEET_CFG.SHEET_WALMART_ORDERS.gid;
     const AD_ORDERS_SHEET_ID = window.SHEET_CFG.SHEET_AD_ORDERS.fileId; const AD_ORDERS_GID = window.SHEET_CFG.SHEET_AD_ORDERS.gid;
     // Added 2026-08-06 per Jaclyn — Walmart's ad data sheets.
@@ -18791,7 +18806,7 @@ async function loadAuditResultsFromSheet() {
       let adUnitsByAsin = {};
       let adUnitsByAsinPrev = {};
       try {
-        const adOrdersCsv2 = await fetch(sheetCsvUrl('1N30haUFZkdv9rrvYuWwUhxEm0z7MGp1bz9F462aF-QI', '158578426') + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        const adOrdersCsv2 = await fetch(sheetCsvUrl(window.SHEET_CFG.SHEET_AD_ORDERS.fileId, window.SHEET_CFG.SHEET_AD_ORDERS.gid) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
         if (isCsv(adOrdersCsv2)) {
           const adRows2All = parseCsv(adOrdersCsv2);
           adRows2All.filter(r => parseInt(r.year, 10) === now.getFullYear() && parseInt(r.month, 10) === now.getMonth() + 1)
@@ -19167,7 +19182,7 @@ async function loadHomeConsignmentKpi() {
   const subEl = document.getElementById('home-kpi-units-sub');
   if (!valEl) return;
   try {
-    const csv = await fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, '505131584')).then(r => r.ok ? r.text() : '').catch(() => '');
+    const csv = await fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv);
     if (!rows.length) { valEl.textContent = '—'; if (subEl) subEl.textContent = 'No consignment data yet'; return; }
     const total = rows.reduce((sum, r) => sum + (parseFloat(r.available) || 0), 0);
