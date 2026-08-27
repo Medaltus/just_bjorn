@@ -12894,13 +12894,16 @@ window.initInsightsOverview = async function() {
 // ═══════════════════════════════════════════════════════════════════
 
 const SHEET_COMPETITOR_ID = window.SHEET_CFG.SHEET_COMPETITOR.fileId;
-// Just Bjorn has one product line, not évolis's 5 hair-care categories, so
-// this collapses to a single 'products' key. No gid exists yet — SHEET_COMPETITOR
-// has no just-bjorn row at all in Dashboard Mapping (see build notes) — so this
-// renders an empty state until Jaclyn adds a "JBJ • Products" competitor tab and
-// its gid here.
+// Just Bjorn has one product line today, not évolis's 5 hair-care
+// categories, so this collapses to a single 'products' key — kept generic
+// ('products', not 'collagen') since the underlying data spans whatever
+// category Just Bjorn is selling, and a second category is expected to
+// launch next year. The competitor tab itself is scoped by name only
+// ("JBJ • Collagen", gid confirmed 2026-08-26) — if/when a second
+// category launches, this will need its own key + gid + tab, same
+// pattern évolis uses for its own multiple categories.
 const COMPETITOR_GID_BY_PRODUCT_TYPE = {
-  products: '', // TODO(JBJ): no competitor-research tab/gid exists yet for just-bjorn
+  products: window.SHEET_CFG.SHEET_COMPETITOR.gid,
 };
 
 function clFindSectionRow(rows, needle) {
