@@ -11612,6 +11612,12 @@ const OV_SUMMARY_SHEET_ID = window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.fileId;
 const OV_SUMMARY_GID = window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid;  // evolis tab
 const OV_PRODUCTS_CACHE_SHEET_ID = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.fileId;
 const OV_PRODUCTS_CACHE_GID = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.gid;  // evolis tab
+// OOS History — added 2026-09-01, ported from évolis's sync-oos-history.js
+// switch (same day). Routed through window.SHEET_CFG like every other
+// sheet in this file, rather than hardcoded literals as in évolis's own
+// reference version, for consistency with the rest of this build.
+const OV_OOS_HISTORY_SHEET_ID = window.SHEET_CFG.SHEET_OOS_HISTORY.fileId;
+const OV_OOS_HISTORY_GID = window.SHEET_CFG.SHEET_OOS_HISTORY.gid;  // just-bjorn tab, confirmed 2026-09-01
 // Consignment Inventory sheet — ShipStation-sourced brands (miguard,
 // prohibition, high-on-love) have real tabs today. Évolis's own
 // consignment inventory is on Cin7 Core, not yet built (email-based
@@ -14698,58 +14704,109 @@ window.initInventoryPage = async function() {
 // claim OOS without it.
 // ═══════════════════════════════════════════════════════════════════
 
+// ═══════════════════════════════════════════════════════════════════
+// OOS Log — switched 2026-09-01 to read pre-computed incidents from
+// sync-oos-history.js's cache sheet, ported from évolis's same-day switch.
+// Previously derived OOS streaks client-side by scanning the daily
+// Products Cache snapshot for consecutive total_quantity===0 days — that
+// logic is now owned by the cron; this just fetches, groups by SKU, and
+// renders one row per pre-computed incident.
+//
+// I don't have évolis's actual new file to copy from directly (only the
+// migration doc describing it) — this is a from-spec reconstruction, not
+// a verified port. Per that doc, none of the below has been checked
+// against real cron output yet even on évolis, so these three are
+// explicitly unconfirmed assumptions carried forward, not settled facts:
+//   - `status` spelling: assumed case-insensitive "ongoing" match, with a
+//     fallback (blank status + blank end_date = ongoing) in case the cron
+//     spells it differently.
+//   - `type` spelling ("out of FBA" vs "out of all inventory"): displayed
+//     as-is (underscores -> spaces, title-cased) rather than mapped to
+//     fixed labels, since the literal values the cron writes aren't
+//     confirmed.
+//   - `brand` column casing: matched case-insensitively against
+//     'just-bjorn' rather than assuming exact-lowercase, since the doc
+//     flags this as unverified per brand.
+// Worth a spot-check against one known recent Just Bjorn OOS incident
+// once the cron is confirmed live (see the gid note above) before
+// treating any of this as settled.
+// ═══════════════════════════════════════════════════════════════════
+
 let _oosLogLoaded = false;
+
+function oosFormatType(raw) {
+  if (!raw) return '';
+  return String(raw).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
 
 async function loadOosLog() {
   const body = document.getElementById('oos-log-body');
   if (!body) return;
   try {
-    const csv = await fetch(ovCsvUrl(OV_PRODUCTS_CACHE_SHEET_ID, OV_PRODUCTS_CACHE_GID)).then(r => r.ok ? r.text() : '').catch(() => '');
-    const rows = parseCsvToRows(csv);
+    const [historyCsv, namesCsv] = await Promise.all([
+      fetch(ovCsvUrl(OV_OOS_HISTORY_SHEET_ID, OV_OOS_HISTORY_GID)).then(r => r.ok ? r.text() : '').catch(() => ''),
+      // Local SKU→product-name lookup — the OOS History sheet has no name
+      // column (brand, sku, asin, type, start_date, end_date, status,
+      // last_updated only). Points at the same Master SKU List every
+      // other SKU→name lookup on this dashboard already uses (this
+      // happens to be one shared sheet/tab across every brand, not a
+      // per-brand one — don't assume that generally, per the migration
+      // doc's own warning not to copy évolis's ids blindly).
+      fetch(ovCsvUrl(window.SHEET_CFG.SHEET_MASTER_SKU_LIST.fileId, window.SHEET_CFG.SHEET_MASTER_SKU_LIST.gid)).then(r => r.ok ? r.text() : '').catch(() => ''),
+    ]);
+    const rows = parseCsvToRows(historyCsv);
     if (!rows.length) { body.innerHTML = '<div class="ppc-card" style="color:var(--muted);">No data</div>'; return; }
 
-    const todayStr = rows.reduce((max, r) => ((r.date || '') > max ? r.date : max), '');
+    const nameBySku = {};
+    parseCsvToRows(namesCsv).forEach(r => {
+      const sku = (r.sku || '').trim().toUpperCase();
+      if (sku && r.name) nameBySku[sku] = r.name;
+    });
 
-    // Group by SKU, sort each group's rows by date ascending
+    // Defensive brand filter — case-insensitive, since the migration doc
+    // flags brand-column casing as unconfirmed per brand.
+    const brandRows = rows.filter(r => (r.brand || '').trim().toLowerCase() === 'just-bjorn');
+
+    const todayStr = fmtDateStr(new Date());
+    const isOngoing = r => {
+      const status = (r.status || '').trim().toLowerCase();
+      if (status.includes('ongoing')) return true;
+      if (!status && !(r.end_date || '').trim()) return true; // fallback per migration doc
+      return false;
+    };
+    const dayCount = (start, end) => Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+
+    // Group by SKU into the same {sku, name, periods, totalDays, isOngoing}
+    // shape the existing render code below already expects — this is a
+    // data-source swap, not a redesign, so that part is untouched.
     const bySku = {};
-    rows.forEach(r => {
+    brandRows.forEach(r => {
       const sku = (r.sku || '').trim();
       if (!sku) return;
-      if (!bySku[sku]) bySku[sku] = { name: r.name || sku, rows: [] };
+      if (!bySku[sku]) bySku[sku] = { name: nameBySku[sku.toUpperCase()] || sku, rows: [] };
       bySku[sku].rows.push(r);
-      if (r.name) bySku[sku].name = r.name; // keep the most recently seen name
     });
 
     const skuLogs = [];
     Object.entries(bySku).forEach(([sku, data]) => {
-      const sorted = [...data.rows].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-      const periods = [];
-      let streakStart = null, streakLastDate = null;
-
-      sorted.forEach(r => {
-        const avail = r.total_quantity === '' || r.total_quantity === null || r.total_quantity === undefined
-          ? NaN : parseFloat(r.total_quantity);
-        const isOos = avail === 0;
-
-        if (isOos) {
-          if (!streakStart) streakStart = r.date;
-          streakLastDate = r.date;
-        } else if (streakStart) {
-          periods.push({ start: streakStart, end: streakLastDate, ongoing: false });
-          streakStart = null; streakLastDate = null;
-        }
+      const sorted = [...data.rows].sort((a, b) => (a.start_date || '').localeCompare(b.start_date || ''));
+      const periods = sorted.map(r => {
+        const ongoing = isOngoing(r);
+        const end = ongoing ? (r.last_updated || todayStr).slice(0, 10) : r.end_date;
+        return {
+          start: r.start_date,
+          end: r.end_date,
+          ongoing,
+          type: oosFormatType(r.type),
+          days: dayCount(r.start_date, end),
+        };
       });
-      if (streakStart) periods.push({ start: streakStart, end: streakLastDate, ongoing: streakLastDate === todayStr });
-
-      if (!periods.length) return; // never OOS — not part of this log
-
-      const dayCount = (start, end) => Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
-      periods.forEach(p => { p.days = dayCount(p.start, p.ongoing ? todayStr : p.end); });
+      if (!periods.length) return;
 
       const totalDays = periods.reduce((s, p) => s + p.days, 0);
-      const isOngoing = periods.some(p => p.ongoing);
+      const groupOngoing = periods.some(p => p.ongoing);
 
-      skuLogs.push({ sku, name: data.name, periods: periods.reverse(), totalDays, isOngoing });
+      skuLogs.push({ sku, name: data.name, periods: periods.reverse(), totalDays, isOngoing: groupOngoing });
     });
 
     // Ongoing (worst first by days) surface above fully-resolved history
@@ -14779,7 +14836,7 @@ async function loadOosLog() {
           </div>
         </div>
         <div class="oos-sku-periods">
-          ${log.periods.map(p => `<div class="oos-period-row"><span>${p.start} → ${p.ongoing ? 'today' : p.end}</span><span>${p.days} day${p.days === 1 ? '' : 's'}${p.ongoing ? ' <span class="oos-pill ongoing" style="margin-left:6px;">Ongoing</span>' : ''}</span></div>`).join('')}
+          ${log.periods.map(p => `<div class="oos-period-row"><span>${p.start} → ${p.ongoing ? 'today' : p.end}${p.type ? ` <span class="oos-pill" style="margin-left:6px;font-size:10px;">${p.type}</span>` : ''}</span><span>${p.days} day${p.days === 1 ? '' : 's'}${p.ongoing ? ' <span class="oos-pill ongoing" style="margin-left:6px;">Ongoing</span>' : ''}</span></div>`).join('')}
         </div>
       </div>
     `).join('');
