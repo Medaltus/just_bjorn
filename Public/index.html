@@ -933,6 +933,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .la-audit-note strong{color:var(--danger);}
 .la-audit-rewrite{padding:10px 14px 12px;font-size:12.5px;color:var(--navy);line-height:1.65;background:rgba(36,233,163,.05);border-top:1px solid rgba(36,233,163,.15);position:relative;}
 .la-audit-rewrite-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#1db88a;margin-bottom:4px;}
+.la-audit-rewrite.optimized{background:var(--bg);border-top:1px solid var(--border);}
+.la-audit-rewrite.optimized .la-audit-rewrite-label{color:var(--muted);}
 .la-audit-copy-btn{position:absolute;top:10px;right:12px;background:none;border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;color:var(--muted);}
 .la-audit-copy-btn:hover{background:var(--white);}
 .la-audit-chars{font-size:10px;color:var(--muted);margin-top:5px;}
@@ -16632,27 +16634,47 @@ function injectAuditResults(results) {
         nb.textContent = note;
         zone.appendChild(nb);
       }
-      // Rewrite section
+      // Rewrite section — FIXED 2026-09-04 per Jaclyn: this always showed
+      // a green "Suggested Rewrite" whenever the AI returned any rewrite
+      // text at all, even when that text was identical to what's already
+      // live — which undercuts the whole point of the hold-steady
+      // philosophy elsewhere in this audit (don't push a change just
+      // because an audit ran; only push one if something's actually
+      // different). Now compares the rewrite against the current live
+      // text already sitting in this same card's .la-copy-block (or
+      // .la-backend-block for the Backend Keywords card) and, when they
+      // match (whitespace-normalized — not chasing a false "different"
+      // over spacing alone), shows a grey "Optimized" state instead: no
+      // "Suggested Rewrite" label, no Copy button, nothing implying a
+      // change is needed.
       if (rewrite) {
+        const currentEl = card.querySelector('.la-copy-block') || card.querySelector('.la-backend-block');
+        const normalize = s => (s || '').replace(/\s+/g, ' ').trim();
+        const isSameAsLive = currentEl && normalize(currentEl.textContent) === normalize(rewrite);
+
         const rw = document.createElement('div');
-        rw.className = 'la-audit-rewrite';
+        rw.className = 'la-audit-rewrite' + (isSameAsLive ? ' optimized' : '');
         const rl = document.createElement('div');
         rl.className = 'la-audit-rewrite-label';
-        rl.textContent = '\u2192 Suggested Rewrite';
+        rl.textContent = isSameAsLive
+          ? '\u2714 ' + fieldLabel + (/s$/i.test(fieldLabel) ? ' are' : ' is') + ' Optimized'
+          : '\u2192 Suggested Rewrite';
         rw.appendChild(rl);
-        const cp = document.createElement('button');
-        cp.className = 'la-audit-copy-btn';
-        cp.textContent = 'Copy';
-        cp.addEventListener('click', function() { navigator.clipboard.writeText(rewrite); });
-        rw.appendChild(cp);
-        const p = document.createElement('p');
-        p.style.margin = '0';
-        p.textContent = rewrite;
-        rw.appendChild(p);
-        if (charInfo) {
-          const ci = document.createElement('div');
-          ci.innerHTML = charInfo;
-          rw.appendChild(ci);
+        if (!isSameAsLive) {
+          const cp = document.createElement('button');
+          cp.className = 'la-audit-copy-btn';
+          cp.textContent = 'Copy';
+          cp.addEventListener('click', function() { navigator.clipboard.writeText(rewrite); });
+          rw.appendChild(cp);
+          const p = document.createElement('p');
+          p.style.margin = '0';
+          p.textContent = rewrite;
+          rw.appendChild(p);
+          if (charInfo) {
+            const ci = document.createElement('div');
+            ci.innerHTML = charInfo;
+            rw.appendChild(ci);
+          }
         }
         zone.appendChild(rw);
       }
