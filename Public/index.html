@@ -16454,21 +16454,40 @@ async function runListingAudit() {
     const srcRows = parseCsvToRows(await srcRes.text());
 
     // Group SKUs by item_type_keyword (col 14 = index 14, 0-based)
+    // FIXED 2026-09-04 per Jaclyn — srcRows is a DAILY snapshot sheet (one
+    // row per SKU per day), and this loop was iterating every row with no
+    // dedup, so the same handful of real SKUs got queued for audit dozens
+    // of times over (matching however many days of history exist) instead
+    // of once each. That's what produced "92 batches" for one product
+    // type and "13" for another on a brand with only 5 real catalog SKUs.
+    // Deduplicated to each SKU's single latest-dated row first.
+    const latestRowBySku = {};
+    for (const row of srcRows) {
+      const sku = (row['sku'] || '').trim();
+      if (!sku) continue;
+      const date = row['date'] || '';
+      if (!latestRowBySku[sku] || date > (latestRowBySku[sku]['date'] || '')) {
+        latestRowBySku[sku] = row;
+      }
+    }
+
     // Travel SKUs grouped with their parent type by stripping "travel" from name
     const groups = {};
-    for (const row of srcRows) {
-      const sku  = (row['sku'] || '').trim();
+    for (const sku of Object.keys(latestRowBySku)) {
+      const row  = latestRowBySku[sku];
       const name = (row['name'] || '').trim().toLowerCase();
-      if (!sku) continue;
       // Determine group key — use item_type_keyword, fall back to name-based guess
       let groupKey = (row['item_type_keyword'] || '').trim();
       if (!groupKey) {
-        // Fallback: derive from name
-        if (name.includes('shampoo'))     groupKey = 'shampoo';
-        else if (name.includes('conditioner')) groupKey = 'conditioner';
-        else if (name.includes('mask'))   groupKey = 'mask';
-        else if (name.includes('dry'))    groupKey = 'dry-shampoo';
-        else                              groupKey = 'activator';
+        // FIXED 2026-09-04 — this fallback chain was évolis's own hair-care
+        // taxonomy (shampoo/conditioner/mask/dry-shampoo), defaulting to
+        // "activator" for anything that matched none of those. For a
+        // brand with none of those product types, EVERY SKU with a blank
+        // item_type_keyword silently landed in a meaningless "activator"
+        // bucket. Falls back to the SKU itself now — still groups nothing
+        // together falsely, and is honest about not having a real
+        // classification for that row.
+        groupKey = sku;
       }
       // Normalize travel SKUs to same group as full size
       groupKey = groupKey.replace(/[-_\s]?(travel|size|mini)/gi, '').trim() || groupKey;
