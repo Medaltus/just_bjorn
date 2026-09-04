@@ -3458,38 +3458,45 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div><div class="page-title">Organic</div><div class="page-sub">Keyword rank tracking · Fastest path to page 1</div></div>
     </div>
 
-    <!-- Just Bjorn has one product line, not évolis's 5 hair-care categories
-         (Activators/Shampoos/Conditioners/Hair Masks/Dry Shampoo), so this
-         page is a single Products tab instead of category channel-tabs. The
-         warning callout and Action/Opportunity cards below were hardcoded,
-         brand-specific keyword-rank claims for évolis — removed rather than
-         reused, since there's no real Just Bjorn keyword-rank analysis yet
-         to back an equivalent claim. The Fastest Path to Page 1 list and
-         Rank Tracker table are genuinely live/data-driven and carried over
-         as-is, just re-keyed to Just Bjorn's SKUs. -->
-    <div class="channel-page active" id="org-products">
+    <!-- Split into one tab per real Just Bjorn SKU — added 2026-09-04 per
+         Jaclyn. Each tab's Rank Tracker is scoped to that SKU's own ASIN
+         only (via ORG_PRODUCT_CATEGORIES + buildAsinMap). The Summary/
+         Win/Action/Opportunity cards on each tab's Insights sub-page show
+         the same brand-wide Run Analysis result on every tab (that data
+         is genuinely brand-wide, not per-SKU, in the underlying sheet) —
+         only Fastest Path to Page 1 and the Rank Tracker table below it
+         are actually product-scoped. -->
+    <div class="channel-tabs">
+      <button class="ch-tab active" onclick="showChannel('organic','org-jbj0001',this)">Stick Packs (10 Count)</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-jbj0002',this)">45 Serving Pouch</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-jbj0003',this)">Starter Kit</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-jbj0004',this)">30 Serving Pouch</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-jbj0021',this)">Stick Pack Sample Set (3 Count)</button>
+    </div>
 
+    <div class="channel-page active" id="org-jbj0001">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-products','prod-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-products','prod-ranktracker',this); window.initRankTracker('products');">Rank Tracker</button>
+        <button class="sub-tab active" onclick="showSubTab('org-jbj0001','jbj1-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-jbj0001','jbj1-ranktracker',this); window.initRankTracker('jbj0001');">Rank Tracker</button>
       </div>
 
-      <div class="sub-page active" id="prod-insights">
-        <div class="org-section-title">Fastest Path to Page 1</div>
-        <div class="p1-list" id="prod-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page active" id="jbj1-insights">
+        <div id="jbj1-insight-cards"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 — Stick Packs (10 Count)</div>
+        <div class="p1-list" id="jbj1-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
 
-      <div class="sub-page" id="prod-ranktracker">
-        <div class="org-sqp-alert" id="prod-rt-banner">
+      <div class="sub-page" id="jbj1-ranktracker">
+        <div class="org-sqp-alert" id="jbj1-rt-banner">
           <span>📈</span>
-          <span id="prod-rt-banner-text">Loading…</span>
+          <span id="jbj1-rt-banner-text">Loading…</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="prod-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="jbj1-rt-daterange">Loading…</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="prod-rt-window" onchange="window.renderRankTracker('products')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="jbj1-rt-window" onchange="window.renderRankTracker('jbj0001')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -3501,10 +3508,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="prod-rt-col-older">Earlier</th><th id="prod-rt-col-newer">Latest</th>
+                <th id="jbj1-rt-col-older">Earlier</th><th id="jbj1-rt-col-newer">Latest</th>
                 <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="prod-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="jbj1-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
@@ -3515,8 +3522,207 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
         </div>
       </div>
+    </div><!-- /org-jbj0001 -->
 
-    </div><!-- /org-products -->
+    <div class="channel-page" id="org-jbj0002">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showSubTab('org-jbj0002','jbj2-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-jbj0002','jbj2-ranktracker',this); window.initRankTracker('jbj0002');">Rank Tracker</button>
+      </div>
+
+      <div class="sub-page active" id="jbj2-insights">
+        <div id="jbj2-insight-cards"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 — 45 Serving Pouch</div>
+        <div class="p1-list" id="jbj2-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      </div>
+
+      <div class="sub-page" id="jbj2-ranktracker">
+        <div class="org-sqp-alert" id="jbj2-rt-banner">
+          <span>📈</span>
+          <span id="jbj2-rt-banner-text">Loading…</span>
+        </div>
+        <div class="org-sqp-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="jbj2-rt-daterange">Loading…</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:11px;color:var(--muted);">Compare to:</label>
+              <select id="jbj2-rt-window" onchange="window.renderRankTracker('jbj0002')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+                <option value="7">1 week ago</option>
+                <option value="28" selected>~4 weeks ago</option>
+                <option value="84">~12 weeks ago</option>
+                <option value="9999">Earliest available</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr>
+                <th>Product</th><th>Keyword</th><th>Vol/mo</th>
+                <th id="jbj2-rt-col-older">Earlier</th><th id="jbj2-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+              </tr></thead>
+              <tbody id="jbj2-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
+            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as "hair growth serum" won't catch spend under "hair growth serums") — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+          </div>
+        </div>
+      </div>
+    </div><!-- /org-jbj0002 -->
+
+    <div class="channel-page" id="org-jbj0003">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showSubTab('org-jbj0003','jbj3-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-jbj0003','jbj3-ranktracker',this); window.initRankTracker('jbj0003');">Rank Tracker</button>
+      </div>
+
+      <div class="sub-page active" id="jbj3-insights">
+        <div id="jbj3-insight-cards"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 — Starter Kit</div>
+        <div class="p1-list" id="jbj3-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      </div>
+
+      <div class="sub-page" id="jbj3-ranktracker">
+        <div class="org-sqp-alert" id="jbj3-rt-banner">
+          <span>📈</span>
+          <span id="jbj3-rt-banner-text">Loading…</span>
+        </div>
+        <div class="org-sqp-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="jbj3-rt-daterange">Loading…</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:11px;color:var(--muted);">Compare to:</label>
+              <select id="jbj3-rt-window" onchange="window.renderRankTracker('jbj0003')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+                <option value="7">1 week ago</option>
+                <option value="28" selected>~4 weeks ago</option>
+                <option value="84">~12 weeks ago</option>
+                <option value="9999">Earliest available</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr>
+                <th>Product</th><th>Keyword</th><th>Vol/mo</th>
+                <th id="jbj3-rt-col-older">Earlier</th><th id="jbj3-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+              </tr></thead>
+              <tbody id="jbj3-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
+            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as "hair growth serum" won't catch spend under "hair growth serums") — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+          </div>
+        </div>
+      </div>
+    </div><!-- /org-jbj0003 -->
+
+    <div class="channel-page" id="org-jbj0004">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showSubTab('org-jbj0004','jbj4-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-jbj0004','jbj4-ranktracker',this); window.initRankTracker('jbj0004');">Rank Tracker</button>
+      </div>
+
+      <div class="sub-page active" id="jbj4-insights">
+        <div id="jbj4-insight-cards"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 — 30 Serving Pouch</div>
+        <div class="p1-list" id="jbj4-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      </div>
+
+      <div class="sub-page" id="jbj4-ranktracker">
+        <div class="org-sqp-alert" id="jbj4-rt-banner">
+          <span>📈</span>
+          <span id="jbj4-rt-banner-text">Loading…</span>
+        </div>
+        <div class="org-sqp-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="jbj4-rt-daterange">Loading…</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:11px;color:var(--muted);">Compare to:</label>
+              <select id="jbj4-rt-window" onchange="window.renderRankTracker('jbj0004')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+                <option value="7">1 week ago</option>
+                <option value="28" selected>~4 weeks ago</option>
+                <option value="84">~12 weeks ago</option>
+                <option value="9999">Earliest available</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr>
+                <th>Product</th><th>Keyword</th><th>Vol/mo</th>
+                <th id="jbj4-rt-col-older">Earlier</th><th id="jbj4-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+              </tr></thead>
+              <tbody id="jbj4-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
+            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as "hair growth serum" won't catch spend under "hair growth serums") — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+          </div>
+        </div>
+      </div>
+    </div><!-- /org-jbj0004 -->
+
+    <div class="channel-page" id="org-jbj0021">
+      <div class="sub-tabs">
+        <button class="sub-tab active" onclick="showSubTab('org-jbj0021','jbj21-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-jbj0021','jbj21-ranktracker',this); window.initRankTracker('jbj0021');">Rank Tracker</button>
+      </div>
+
+      <div class="sub-page active" id="jbj21-insights">
+        <div id="jbj21-insight-cards"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 — Stick Pack Sample Set (3 Count)</div>
+        <div class="p1-list" id="jbj21-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      </div>
+
+      <div class="sub-page" id="jbj21-ranktracker">
+        <div class="org-sqp-alert" id="jbj21-rt-banner">
+          <span>📈</span>
+          <span id="jbj21-rt-banner-text">Loading…</span>
+        </div>
+        <div class="org-sqp-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="jbj21-rt-daterange">Loading…</span></div>
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label style="font-size:11px;color:var(--muted);">Compare to:</label>
+              <select id="jbj21-rt-window" onchange="window.renderRankTracker('jbj0021')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+                <option value="7">1 week ago</option>
+                <option value="28" selected>~4 weeks ago</option>
+                <option value="84">~12 weeks ago</option>
+                <option value="9999">Earliest available</option>
+              </select>
+            </div>
+          </div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr>
+                <th>Product</th><th>Keyword</th><th>Vol/mo</th>
+                <th id="jbj21-rt-col-older">Earlier</th><th id="jbj21-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+              </tr></thead>
+              <tbody id="jbj21-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
+            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as "hair growth serum" won't catch spend under "hair growth serums") — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+          </div>
+        </div>
+      </div>
+    </div><!-- /org-jbj0021 -->
 
   </div><!-- /page-organic -->
 
@@ -3559,7 +3765,7 @@ function showPage(id, btn) {
   // shared keyword tracker data now rather than waiting for someone to
   // click into Rank Tracker first. initRankTracker caches internally, so
   // this is a no-op on subsequent visits to the page.
-  if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('products');
+  if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('jbj0001');
 
   // Export PDF Report button — only shown on the three "performance" pages
   // (Sales, Marketing, Events). Hidden everywhere else (Overview, Inventory,
@@ -9759,8 +9965,25 @@ async function initSnsExternal() {
   // block itself first executes — safe because this only actually runs
   // when a Rank Tracker tab is clicked, well after every script on the
   // page has loaded.
+  // Per-product categories for the Organic page — added 2026-09-04 per
+  // Jaclyn: Just Bjorn has 5 real SKUs, and each should have its own tab
+  // with its own Rank Tracker scoped to just that SKU's own ASIN, rather
+  // than all 5 pooled into one combined "products" bucket. Deliberately
+  // a SEPARATE constant from window.REVIEW_CATEGORY_PRODUCTS (used by
+  // the Insights page's Reviews tab) rather than reusing/splitting that
+  // one — this page's category keys and that page's are different
+  // concepts that just happen to currently share the same 5 products,
+  // and changing one page's grouping shouldn't risk changing the other's.
+  const ORG_PRODUCT_CATEGORIES = {
+    jbj0001: [{ sku: 'JBJ0001', asin: 'B0CH43DKT1', label: 'Stick Packs (10 Count)' }],
+    jbj0002: [{ sku: 'JBJ0002', asin: 'B0CH43TMBV', label: '45 Serving Pouch' }],
+    jbj0003: [{ sku: 'JBJ0003', asin: 'B0CH43J2RR', label: 'Starter Kit' }],
+    jbj0004: [{ sku: 'JBJ0004', asin: 'B0CNBHK1K3', label: '30 Serving Pouch' }],
+    jbj0021: [{ sku: 'JBJ0021', asin: 'B0GP93B5ZN', label: 'Stick Pack Sample Set (3 Count)' }],
+  };
+
   function buildAsinMap(category) {
-    const products = (window.REVIEW_CATEGORY_PRODUCTS && window.REVIEW_CATEGORY_PRODUCTS[category]) || [];
+    const products = ORG_PRODUCT_CATEGORIES[category] || [];
     const map = {};
     products.forEach(p => { map[p.asin] = { sku: p.sku, label: p.label }; });
     return map;
@@ -9832,10 +10055,10 @@ async function initSnsExternal() {
   }
   window.renderFastestPathToPage1 = renderFastestPathToPage1;
 
-  // DOM id prefix (Just Bjorn has one product line, not évolis's 5
-  // hair-care categories, so this collapses to a single 'products' key).
-  const RT_ID_PREFIX = { products: 'prod' };
-  const RT_CATEGORY_LABEL = { products: 'Product' };
+  // DOM id prefixes and display labels — one per real Just Bjorn SKU
+  // now (was a single 'products' bucket covering all 5).
+  const RT_ID_PREFIX = { jbj0001: 'jbj1', jbj0002: 'jbj2', jbj0003: 'jbj3', jbj0004: 'jbj4', jbj0021: 'jbj21' };
+  const RT_CATEGORY_LABEL = { jbj0001: 'Stick Packs (10 Count)', jbj0002: '45 Serving Pouch', jbj0003: 'Starter Kit', jbj0004: '30 Serving Pouch', jbj0021: 'Stick Pack Sample Set (3 Count)' };
 
   function csvUrl() {
     return `https://docs.google.com/spreadsheets/d/${KW_TRACKER_SHEET_ID}/export?format=csv&gid=${KW_TRACKER_GID}&_cb=${Date.now()}`;
@@ -9990,20 +10213,81 @@ async function initSnsExternal() {
   // which only holds if the sheet is kept in reverse-chron order by
   // something other than appendRows() (which appends to the bottom).
   // Sorting explicitly here is strictly more correct and costs nothing.
+  //
+  // EXTENDED 2026-09-04 per Jaclyn — this previously only extracted
+  // rank_changes-derived per-keyword recommendations (for the Rank
+  // Tracker table's "Recommended Action" column) and bailed out entirely
+  // if rank_changes was empty. The brand-wide summary/wins/actions/
+  // opportunities fields Claude also writes on every run were being
+  // read from this exact same sheet elsewhere on the dashboard (the
+  // Insights page) but were never surfaced here on Organic at all —
+  // the page was built before a real run-analysis result existed to
+  // show, and never wired up once one did. Now stashes those fields on
+  // the returned Map too (same pattern as __asOfDate/__comparisonWindow
+  // below), and no longer requires rank_changes to be present to do so.
   function buildAiRecommendationMap(rows) {
     if (!rows.length) return null;
     const sorted = rows.slice().sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
     const latest = sorted[0];
     let organic;
     try { organic = JSON.parse(latest.organic_json || '{}'); } catch (e) { return null; }
-    if (!organic.rank_changes || !organic.rank_changes.length) return null;
     const map = new Map();
-    organic.rank_changes.forEach(r => {
+    (organic.rank_changes || []).forEach(r => {
       if (r.keyword && r.recommended_action) map.set(r.keyword.toLowerCase(), r.recommended_action);
     });
     map.__asOfDate = latest.date || '';
     map.__comparisonWindow = organic.comparison_window || null;
+    map.__summary = organic.summary || '';
+    map.__wins = organic.wins || [];
+    map.__actions = organic.actions || [];
+    map.__opportunities = organic.opportunities || [];
     return map;
+  }
+
+  // Renders the brand-wide Summary/Win/Action/Opportunity cards onto one
+  // product tab's Insights sub-tab. Added 2026-09-04 — this data is
+  // brand-wide (one Run Analysis result per brand, not per-SKU), so the
+  // same content is shown on every product's tab; only the Fastest Path
+  // to Page 1 list below it and the Rank Tracker table are genuinely
+  // scoped to that one product's own ASIN. Showing the real brand-wide
+  // analysis on every tab is more honest than fabricating a fake
+  // per-product split the underlying data doesn't actually have.
+  function renderOrganicInsightCards(category) {
+    const prefix = RT_ID_PREFIX[category];
+    const wrap = document.getElementById(prefix + '-insight-cards');
+    if (!wrap) return;
+    if (!_aiRecommendations || !_aiRecommendations.__summary) {
+      wrap.innerHTML = '<div class="org-sqp-alert"><span>📊</span><span>No Run Analysis result yet — click "Run Analysis" on the Insights tab to generate one.</span></div>';
+      return;
+    }
+    const m = _aiRecommendations;
+    const bullets = arr => (arr && arr.length)
+      ? arr.map(s => `<li>${escapeHtml(s)}</li>`).join('')
+      : '<li style="color:var(--muted);font-style:italic;">None reported this run.</li>';
+    const pills = arr => (arr && arr.length)
+      ? arr.map(s => `<span class="p1-lbl slate" style="display:inline-block;margin:2px 4px 2px 0;">${escapeHtml(s)}</span>`).join('')
+      : '<span style="color:var(--muted);font-style:italic;font-size:12px;">None reported this run.</span>';
+    wrap.innerHTML = `
+      <div class="two-col" style="margin-bottom:14px;">
+        <div class="ppc-card" style="border-left:4px solid var(--navy);">
+          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;">Summary — as of ${escapeHtml(m.__asOfDate || '')}</div>
+          <div style="font-size:13px;line-height:1.6;">${escapeHtml(m.__summary)}</div>
+        </div>
+        <div class="ppc-card" style="border-left:4px solid #1db88a;">
+          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#1db88a;margin-bottom:6px;">✓ Win</div>
+          <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;">${bullets(m.__wins)}</ul>
+        </div>
+      </div>
+      <div class="two-col" style="margin-bottom:20px;">
+        <div class="ppc-card" style="border-left:4px solid var(--danger);">
+          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--danger);margin-bottom:6px;">⚡ Action</div>
+          <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;">${bullets(m.__actions)}</ul>
+        </div>
+        <div class="ppc-card" style="border-left:4px solid var(--warn);">
+          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--warn);margin-bottom:6px;">💡 Opportunity</div>
+          <div>${pills(m.__opportunities)}</div>
+        </div>
+      </div>`;
   }
 
   let _kwRows = null; // raw parsed rows, cached after first successful fetch
@@ -10046,12 +10330,13 @@ async function initSnsExternal() {
           _aiRecommendations = isCsv(insightsCsv) ? buildAiRecommendationMap(parseCsvRows(insightsCsv)) : null;
         }
         window.renderRankTracker(category);
-        // Fastest Path to Page 1 lives on each category's "Insights"
-        // sub-tab (the default view, shown before Rank Tracker is ever
-        // clicked) — render all 5 categories now since _kwRows is shared
-        // and already loaded, rather than waiting for each category's
-        // own Rank Tracker tab to be clicked.
-        Object.keys(RT_ID_PREFIX).forEach(cat => renderFastestPathToPage1(cat));
+        // Fastest Path to Page 1 and the Summary/Win/Action/Opportunity
+        // cards both live on each product's "Insights" sub-tab (the
+        // default view, shown before Rank Tracker is ever clicked) —
+        // render for all products now since _kwRows/_aiRecommendations
+        // are shared and already loaded, rather than waiting for each
+        // product's own tab to be clicked.
+        Object.keys(RT_ID_PREFIX).forEach(cat => { renderFastestPathToPage1(cat); renderOrganicInsightCards(cat); });
       } catch (err) {
         console.warn(`[RankTracker][${category}] load failed:`, err.message);
         if (bannerText) bannerText.textContent = 'Could not load keyword tracker data — ' + err.message;
@@ -10064,7 +10349,7 @@ async function initSnsExternal() {
   // anymore, kept only in case anything external still references the
   // old name (renamed from initRankTrackerActivators — Just Bjorn has
   // one product line, not évolis's category split).
-  window.initRankTrackerActivators = function () { return window.initRankTracker('products'); };
+  window.initRankTrackerActivators = function () { return window.initRankTracker('jbj0001'); };
 
   window.renderRankTracker = function (category) {
     if (!_kwRows) return; // not loaded yet — initRankTracker will call this once it is
