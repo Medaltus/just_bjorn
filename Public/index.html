@@ -10264,13 +10264,19 @@ async function initSnsExternal() {
     const bullets = arr => (arr && arr.length)
       ? arr.map(s => `<li>${escapeHtml(s)}</li>`).join('')
       : '<li style="color:var(--muted);font-style:italic;">None reported this run.</li>';
-    const pills = arr => (arr && arr.length)
-      ? arr.map(s => `<span class="p1-lbl slate" style="display:inline-block;margin:2px 4px 2px 0;">${escapeHtml(s)}</span>`).join('')
-      : '<span style="color:var(--muted);font-style:italic;font-size:12px;">None reported this run.</span>';
+    // FIXED 2026-09-04 per Jaclyn — Opportunity was rendering as pill/chip
+    // badges (borrowed from the p1-lbl "PUSH TARGET"/"QUICK WIN" style
+    // used elsewhere), which assumed this field is always a list of short
+    // keyword phrases. It isn't always — Claude sometimes writes a single
+    // full-sentence opportunity instead of a keyword list, which blew up
+    // into one giant uppercase pill spanning the card. Opportunity is now
+    // a plain bulleted list, same styling as Win/Action, matching the
+    // reference design.
     wrap.innerHTML = `
       <div class="two-col" style="margin-bottom:14px;">
         <div class="ppc-card" style="border-left:4px solid var(--navy);">
-          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px;">Summary — as of ${escapeHtml(m.__asOfDate || '')}</div>
+          <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:2px;">Summary</div>
+          <div style="font-size:14px;font-weight:700;color:var(--navy);margin-bottom:8px;">As of ${escapeHtml(m.__asOfDate || '')}</div>
           <div style="font-size:13px;line-height:1.6;">${escapeHtml(m.__summary)}</div>
         </div>
         <div class="ppc-card" style="border-left:4px solid #1db88a;">
@@ -10285,7 +10291,7 @@ async function initSnsExternal() {
         </div>
         <div class="ppc-card" style="border-left:4px solid var(--warn);">
           <div class="org-sqp-title" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--warn);margin-bottom:6px;">💡 Opportunity</div>
-          <div>${pills(m.__opportunities)}</div>
+          <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;">${bullets(m.__opportunities)}</ul>
         </div>
       </div>`;
   }
