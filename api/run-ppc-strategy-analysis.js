@@ -482,6 +482,22 @@ function findField(row, candidates) {
   for (const c of candidates) {
     if (row[c] !== undefined && row[c] !== null && row[c] !== '') return row[c];
   }
+  // FALLBACK — added 2026-09-04 per Jaclyn: readRows() builds each row's
+  // keys from the sheet's raw header cells with zero trimming or case
+  // normalization (confirmed directly in _sheets_client.js), so a single
+  // stray trailing space or a casing drift on a header cell would make
+  // every one of the exact-match candidates above silently fail, and
+  // this would return null — which callers then treat as "0 sessions" /
+  // "0 units" rather than "couldn't find this column." This does one
+  // more pass, trimmed and lowercased on both sides, before giving up for
+  // real.
+  const normalizedCandidates = candidates.map(c => c.trim().toLowerCase());
+  for (const key of Object.keys(row)) {
+    const normalizedKey = key.trim().toLowerCase();
+    if (normalizedCandidates.includes(normalizedKey) && row[key] !== undefined && row[key] !== null && row[key] !== '') {
+      return row[key];
+    }
+  }
   return null;
 }
 
@@ -655,6 +671,19 @@ function buildSkuSnapshots(kwRows, bizRowsFull, sqpRows, ppcByAsin, oosMaps, cro
     const bizRow = bizEntry ? bizEntry.row : null;
     const asin = bizRow ? (findField(bizRow, BIZ_FIELD_CANDIDATES.asin) || '').toString().trim().toUpperCase() : '';
 
+    // DIAGNOSTIC — added 2026-09-04 per Jaclyn: the Strategy by Product page
+    // was showing "0 sessions, 0 units" for several SKUs that the real
+    // Business Report sheet shows real, non-zero traffic for. Rather than
+    // guess at a fix sight-unseen, this logs exactly what row (if any) was
+    // matched for this SKU and every raw header key on it, so the next
+    // real run's Vercel logs show definitively whether this is a SKU-
+    // matching miss (bizRow null), a header-name mismatch (bizRow exists
+    // but sessions/units come back null), or something else entirely
+    // (bizRow has real sessions/units already, meaning the bug is
+    // downstream of this function, not here).
+    console.log(`[run-ppc-strategy-analysis][qa] SKU ${sku} — bizRow found: ${!!bizRow}` +
+      (bizRow ? ` — raw header keys: ${Object.keys(bizRow).join(' | ')} — sortKey used: ${bizEntry._sortKey}` : ' — this SKU has no matching row in the Business Report sheet at all'));
+
     const topKeywords = (kwBySku.get(sku) || [])
       .filter(r => r.keyword)
       .map(r => ({
@@ -670,6 +699,12 @@ function buildSkuSnapshots(kwRows, bizRowsFull, sqpRows, ppcByAsin, oosMaps, cro
 
     const sessions = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.sessions)) : null;
     const units = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.units)) : null;
+    // DIAGNOSTIC (cont'd) — the resolved values themselves, so a header-
+    // name mismatch (raw value found but not parsed) is distinguishable
+    // from a genuine "column not found at all" case.
+    if (bizRow) {
+      console.log(`[run-ppc-strategy-analysis][qa] SKU ${sku} — raw SESSIONS candidate value: ${JSON.stringify(findField(bizRow, BIZ_FIELD_CANDIDATES.sessions))} -> parsed: ${sessions} — raw UNITS candidate value: ${JSON.stringify(findField(bizRow, BIZ_FIELD_CANDIDATES.units))} -> parsed: ${units}`);
+    }
     const revenue = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.revenue)) : null;
     const conversionPct = bizRow ? parseConversionPct(findField(bizRow, BIZ_FIELD_CANDIDATES.conversion)) : null;
 
