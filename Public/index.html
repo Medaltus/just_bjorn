@@ -19650,20 +19650,20 @@ async function loadAuditResultsFromSheet() {
                     ? (actualPct >= 100 ? 'Hit goal' : 'Missed goal')
                     : `Projecting $${Math.round(projected).toLocaleString()}`;
                 return `<div style="text-align:center;">
+                  <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px;">${label}</div>
                   <div style="position:relative;display:inline-block;">
                     ${buildGaugeSvg(actualPct, color)}
                     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:700;color:var(--navy);">${actualPct}%</div>
                   </div>
-                  <div style="font-size:12px;color:var(--muted);margin-top:6px;">${label}</div>
-                  <div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:4px;">${resultLine}</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:8px;">${resultLine}</div>
                   <div style="font-size:14px;font-weight:700;color:var(--navy);">Goal $${Math.round(goal).toLocaleString()}</div>
                 </div>`;
               };
 
               gtWrap.innerHTML = `
-                <div class="org-section-title" style="margin-bottom:10px;">Goal Tracker</div>
+                <div class="org-section-title" style="margin-bottom:10px;font-size:22px;font-weight:700;">Goal Tracker</div>
                 <div class="card" style="background:var(--sand);border-top:3px solid var(--navy);margin-bottom:22px;">
-                  <div class="card-title" style="margin-bottom:14px;">Amazon</div>
+                  <div class="card-title" style="margin-bottom:14px;font-size:19px;font-weight:700;">Amazon</div>
                   <div style="display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px;">
                     ${gtRing(totalActual, totalGoal, 'Total Sales')}
                     ${gtRing(organicActual, organicGoal, 'Organic Sales')}
