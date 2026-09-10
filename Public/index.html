@@ -1401,6 +1401,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;"></div>
     </div>
 
+    <!-- Goal Tracker — added 2026-09-10, ported from évolis (positioned
+         just below the period selector, matching where Skinuva's sits —
+         évolis's own is further down the page). One card only (Amazon) —
+         see the header comment above renderGoalTracker's helper
+         functions in the script for the full reasoning. -->
+    <div id="ov-goal-tracker"></div>
+
     <div class="kpi-row">
       <div class="kpi-card" id="ov-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-units"><div class="kpi-label">Total Units Sold</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -18815,6 +18822,103 @@ async function loadAuditResultsFromSheet() {
     window.initOverviewLive(key);
   };
 
+  // ═══════════════════════════════════════════════════════════════════
+  // GOAL TRACKER — added 2026-09-10, ported from évolis's Overview page
+  // (built there Sept 2026). Just Bjorn gets ONE card, not évolis's two
+  // (Amazon+Walmart / Website) — the goals sheet itself only tracks
+  // Amazon-specific metrics (Amazon Fees, ACOS, TACOS, Amazon-Ads
+  // terminology throughout) with no Walmart breakout anywhere in it, so
+  // the card is titled "Amazon" and compares Amazon-only actual revenue,
+  // not the Amazon+Walmart blend used elsewhere on this page. Real
+  // column positions confirmed directly against Just Bjorn's own sheet
+  // (not assumed from évolis's O/T/AD) — per Jaclyn 2026-09-10: Total =
+  // column O, Organic = column S, Ads = column Z. Also note: column O's
+  // OWN header ("Dollar Sales Goal") is a dead/empty column on this
+  // sheet — the real values live one column over in "DS Goal V2" (also
+  // column O once you account for the merged/skipped column 14) — same
+  // "trust the real data, not the header label" gotcha évolis's sheet
+  // had on its Organic column, just manifesting differently here.
+  // ═══════════════════════════════════════════════════════════════════
+  const GOALS_SHEET_ID = '1trsHDgVSLprsOOjOuFWGZRDqVOV-eII3';
+  const GOALS_GID = '333511738';
+  const GOALS_COL = { total: 14, organic: 18, ads: 25 }; // 0-indexed array position: col O, col S, col Z
+
+  // Universal parser (from the porting notes) — returns plain 2D arrays,
+  // not header-keyed objects, since at least one column's header text
+  // can't be trusted (see the column-O note above). Quote-aware for
+  // embedded commas (goal cells can contain values like " $ 10,856.00 ").
+  function parseCsv2D(text) {
+    const rows = [];
+    let row = [], field = '', inQuotes = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (inQuotes) {
+        if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else inQuotes = false; }
+        else field += c;
+      } else {
+        if (c === '"') inQuotes = true;
+        else if (c === ',') { row.push(field); field = ''; }
+        else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+        else if (c === '\r') { /* skip */ }
+        else field += c;
+      }
+    }
+    if (field || row.length) { row.push(field); rows.push(row); }
+    return rows;
+  }
+
+  // ADAPTED for Just Bjorn, not copied verbatim — évolis's sheet holds
+  // "MMM-YY" TEXT in column A; Just Bjorn's holds a real date value
+  // (confirmed via direct inspection: datetime objects, not text).
+  // Parses whatever Google's CSV export renders that as and compares
+  // year/month numerically rather than string-matching a format that
+  // doesn't apply here.
+  function findGoalsRow(rows, year, month) {
+    for (const r of rows) {
+      const raw = (r[0] || '').trim();
+      if (!raw) continue;
+      const d = new Date(raw);
+      if (!isNaN(d.getTime()) && d.getFullYear() === year && (d.getMonth() + 1) === month) return r;
+    }
+    return null;
+  }
+
+  function parseGoalNum(raw) {
+    if (raw === undefined || raw === null || raw === '') return null;
+    const n = parseFloat(String(raw).replace(/[$,]/g, '').trim());
+    return Number.isFinite(n) ? n : null;
+  }
+
+  // Universal, from the porting notes — plain SVG, deliberately not
+  // Chart.js (a single-value gauge doesn't need a charting library, and
+  // this sidesteps the canvas-reuse bug class entirely — this exact page
+  // already hit that bug twice, on the donut and trend charts above,
+  // since its init function can now run repeatedly on every toggle
+  // click). transform:rotate(-90deg) starts the arc at 12 o'clock.
+  function buildGaugeSvg(pct, colorHex) {
+    const size = 140, stroke = 14, r = (size - stroke) / 2, c = size / 2;
+    const circumference = 2 * Math.PI * r;
+    const clamped = Math.max(0, Math.min(100, pct));
+    const dashOffset = circumference * (1 - clamped / 100);
+    return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);">
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${stroke}"/>
+      <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${colorHex}" stroke-width="${stroke}"
+        stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="butt"/>
+    </svg>`;
+  }
+
+  // Pending-inclusive — Goal Tracker counts pending orders as real
+  // progress toward a goal (not yet returned, just not yet settled).
+  // Confirmed isValidAmazonRow above DOES exclude pending before writing
+  // this separate variant, per the porting notes' own instruction not to
+  // assume a new variant is needed without checking first.
+  function goalsIsValidAmazonRow(r) {
+    const status = (r.status || '').toLowerCase().trim();
+    if (status === 'cancelled') return false;
+    if ((r.promotion_ids || '').toLowerCase().includes('vine')) return false;
+    return true;
+  }
+
   window.initOverviewLive = async function (periodKey) {
     periodKey = periodKey || window._overviewPeriodKey || 'mtd';
     // Was a plain boolean guard (permanently blocked any re-run after the
@@ -19474,6 +19578,97 @@ async function loadAuditResultsFromSheet() {
         proratedSalesPrev = twoMonthsAgoSales * (daysElapsed / daysInTwoMonthsAgo);
       } else {
         console.warn('[JustBjorn][overview] ad orders sheet did not return CSV — Ad Spend/ACOS will reflect Website only.');
+      }
+
+      // ── Goal Tracker render — see the helper functions and header
+      // comment above this function for the full port write-up.
+      try {
+        const gtWrap = document.getElementById('ov-goal-tracker');
+        if (gtWrap) {
+          const goalsCsv = await fetch(`https://docs.google.com/spreadsheets/d/${GOALS_SHEET_ID}/export?format=csv&gid=${GOALS_GID}&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+          if (!isCsv(goalsCsv)) {
+            console.warn('[JustBjorn][overview][GoalTracker] goals sheet did not return CSV.');
+            gtWrap.innerHTML = '';
+          } else {
+            const rows2D = parseCsv2D(goalsCsv);
+            const goalRow = findGoalsRow(rows2D, refYear, refMonth);
+            if (!goalRow) {
+              console.warn(`[JustBjorn][overview][GoalTracker] no row found for ${refYear}-${refMonth} — check date format in column A.`);
+              gtWrap.innerHTML = '';
+            } else {
+              const totalGoal = parseGoalNum(goalRow[GOALS_COL.total]) || 0;
+              const organicGoal = parseGoalNum(goalRow[GOALS_COL.organic]) || 0;
+              const adsGoal = parseGoalNum(goalRow[GOALS_COL.ads]) || 0;
+
+              // Actual — pending-inclusive, netted against returns, same
+              // date range already resolved for the page's own toggle.
+              const goalsAmzAgg = aggregateRange(amzRows, mtdStartStr, mtdEndStr, goalsIsValidAmazonRow);
+              const totalActual = goalsAmzAgg.totalRevenue - amzReturnsMtd.totalAmt;
+
+              // Ads actual — MTD reuses the page's own established
+              // prorated estimate (Amazon ad data is monthly-bucketed,
+              // not daily — no true day-level MTD figure exists, same
+              // limitation as the Ad Spend/ACOS KPI card above). Last
+              // Full Month uses the real, final total directly, since
+              // the month is over and real data exists.
+              let adsActual;
+              if (periodKey === 'lastFull') {
+                const adRowsThisMonth = isCsv(adOrdersCsv)
+                  ? parseCsv(adOrdersCsv).filter(r => parseInt(r.year, 10) === refYear && parseInt(r.month, 10) === refMonth)
+                  : [];
+                adsActual = adRowsThisMonth.reduce((s, r) => s + parseAmt(r.sales), 0);
+              } else {
+                adsActual = proratedSales;
+              }
+              const organicActual = Math.max(0, totalActual - adsActual);
+
+              const daysInTargetMonth = new Date(refYear, refMonth, 0).getDate();
+              const projectionFactor = periodKey === 'lastFull' ? 1 : (daysInTargetMonth / Math.max(1, daysElapsed));
+
+              const gtRing = (actual, goal, label) => {
+                // Fill + center number reflect actual-so-far ÷ goal —
+                // honest progress. Projection is used ONLY to pick the
+                // ring's color, never what it's filled to (a ring
+                // projected at 127% would otherwise render as a
+                // maxed-out circle, hiding that we're only partway
+                // there in real dollars right now).
+                const actualPct = goal > 0 ? Math.round((actual / goal) * 100) : 0;
+                const projected = actual * projectionFactor;
+                const projectedPct = goal > 0 ? Math.round((projected / goal) * 100) : 0;
+                const color = goal <= 0 ? 'var(--muted)' : (projectedPct >= 100 ? 'var(--green)' : 'var(--danger)');
+                const resultLine = goal <= 0
+                  ? 'No goal set'
+                  : periodKey === 'lastFull'
+                    ? (actualPct >= 100 ? 'Hit goal' : 'Missed goal')
+                    : `Projecting $${Math.round(projected).toLocaleString()}`;
+                return `<div style="text-align:center;">
+                  <div style="position:relative;display:inline-block;">
+                    ${buildGaugeSvg(actualPct, color)}
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:700;color:var(--navy);">${actualPct}%</div>
+                  </div>
+                  <div style="font-size:12px;color:var(--muted);margin-top:6px;">${label}</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:4px;">${resultLine}</div>
+                  <div style="font-size:14px;font-weight:700;color:var(--navy);">Goal $${Math.round(goal).toLocaleString()}</div>
+                </div>`;
+              };
+
+              gtWrap.innerHTML = `
+                <div class="org-section-title" style="margin-bottom:10px;">Goal Tracker</div>
+                <div class="card" style="background:var(--sand);border-top:3px solid var(--navy);margin-bottom:22px;">
+                  <div class="card-title" style="margin-bottom:14px;">Amazon</div>
+                  <div style="display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px;">
+                    ${gtRing(totalActual, totalGoal, 'Total Sales')}
+                    ${gtRing(organicActual, organicGoal, 'Organic Sales')}
+                    ${gtRing(adsActual, adsGoal, 'Ads Sales')}
+                  </div>
+                </div>`;
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('[JustBjorn][overview][GoalTracker] failed:', err.message);
+        const gtWrap2 = document.getElementById('ov-goal-tracker');
+        if (gtWrap2) gtWrap2.innerHTML = '';
       }
 
       // Walmart — added 2026-08-06 per Jaclyn. Reads SHEET_WALMART_ADVERTISING
