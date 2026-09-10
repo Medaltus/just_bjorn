@@ -18867,20 +18867,21 @@ async function loadAuditResultsFromSheet() {
     return rows;
   }
 
-  // ADAPTED for Just Bjorn, not copied verbatim — évolis's sheet holds
-  // "MMM-YY" TEXT in column A; Just Bjorn's holds a real date value
-  // (confirmed via direct inspection: datetime objects, not text).
-  // Parses whatever Google's CSV export renders that as and compares
-  // year/month numerically rather than string-matching a format that
-  // doesn't apply here.
+  // REVISED 2026-09-10 — my first pass here (date-parsing via new Date())
+  // was solving the wrong problem. openpyxl showed column A's underlying
+  // value as a real date object, which was true but not the whole
+  // picture: Jaclyn confirmed directly from the live sheet (cell A48,
+  // formula bar shows the real value "8/26/2026") that the cell is
+  // DISPLAY-FORMATTED to show as "Aug-26" — and Google Sheets' CSV
+  // export renders date-formatted cells using their display format, not
+  // the raw underlying value. So despite the different underlying data
+  // type, Just Bjorn's sheet exports the exact same "MMM-YY" text
+  // évolis's does. Back to the universal string-match version from the
+  // porting notes, unmodified.
   function findGoalsRow(rows, year, month) {
-    for (const r of rows) {
-      const raw = (r[0] || '').trim();
-      if (!raw) continue;
-      const d = new Date(raw);
-      if (!isNaN(d.getTime()) && d.getFullYear() === year && (d.getMonth() + 1) === month) return r;
-    }
-    return null;
+    const monthAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month - 1];
+    const target = `${monthAbbr}-${String(year).slice(2)}`;
+    return rows.find(r => (r[0] || '').trim() === target) || null;
   }
 
   function parseGoalNum(raw) {
@@ -19593,7 +19594,14 @@ async function loadAuditResultsFromSheet() {
             const rows2D = parseCsv2D(goalsCsv);
             const goalRow = findGoalsRow(rows2D, refYear, refMonth);
             if (!goalRow) {
-              console.warn(`[JustBjorn][overview][GoalTracker] no row found for ${refYear}-${refMonth} — check date format in column A.`);
+              // DIAGNOSTIC — added 2026-09-10: findGoalsRow's date parsing
+              // (new Date(raw)) isn't matching any row, meaning the guess
+              // at Google's CSV date-export format was wrong. Logging the
+              // actual raw column-A text from the last several non-empty
+              // rows so the real format can be seen directly instead of
+              // guessed again.
+              const rawColA = rows2D.map(r => r[0]).filter(v => v && v.trim());
+              console.warn(`[JustBjorn][overview][GoalTracker] no row found for ${refYear}-${refMonth} — check date format in column A. Last 10 raw column-A values seen: ${JSON.stringify(rawColA.slice(-10))}`);
               gtWrap.innerHTML = '';
             } else {
               const totalGoal = parseGoalNum(goalRow[GOALS_COL.total]) || 0;
@@ -20045,4 +20053,3 @@ window.addEventListener('load', async () => {
 </script>
 </body>
 </html>
- 
