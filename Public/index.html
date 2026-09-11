@@ -1442,6 +1442,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
 
+    <!-- Ad Spend by Type — added 2026-09-11, ported from évolis. Amazon
+         only — the Ad Orders / Advertising Cache sheets have no
+         SP/SB/SD breakdown for Walmart. New fetch (SHEET_ADVERTISING
+         isn't already in scope anywhere on this page — confirmed before
+         building, see the porting notes). -->
+    <div class="card" style="margin-bottom:22px;">
+      <div class="card-title">Ad Spend by Type — Amazon, Month to Date</div>
+      <div id="ov-ad-type-card"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+    </div>
+
     <div class="two-col" style="margin-bottom:22px;">
       <div class="card" style="margin-top:0;">
         <div class="card-title" id="ov-donut-title">Revenue by Channel — Month to Date</div>
@@ -3355,6 +3365,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <div class="ppc-note" style="margin-top:12px;">
           ℹ Ad Spend/Ad Sales/Impressions/Clicks summed across Amazon + Walmart's own ad platforms. Total Sales/Orders are all-channel, organic + ads combined, using each channel's own order-validity rules (Amazon: excludes cancelled/pending + Vine; Walmart: excludes cancelled/canceled). ACOS/TACOS/CTR/CPC/AOV are recomputed from the summed totals, not averaged from each channel's own percentage — averaging percentages directly would be mathematically wrong. CVR is intentionally omitted — neither ad summary sheet has an orders/purchases column, only ad units, so there's no real conversion-rate denominator to compute from a proxy would be misleading.
         </div>
+      </div>
+
+      <!-- Ad Spend by Type — added 2026-09-11, ported from évolis.
+           Amazon only, reuses data already fetched for the KPI row
+           above — see ppcLoadBlendedPerformance/computeBlended. -->
+      <div class="ppc-card">
+        <div class="ppc-card-title">Ad Spend by Type — Amazon</div>
+        <div id="ppc-ad-type-card"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
 
       <div class="ppc-card">
@@ -14116,12 +14134,69 @@ async function ppcLoadBlendedPerformance(periodKey) {
     const cpc   = clicks > 0 ? (adSpend / clicks) : 0;
     const aov   = totalOrders > 0 ? (totalSales / totalOrders) : 0;
 
-    return { adSpend, adSales, acos, totalSales, tacos, impressions, clicks, ctr, cpc, totalOrders, aov };
+    // Ad Spend by Type (SP/SB/SD) — added 2026-09-11, ported from évolis.
+    // Reuses amzAd above — already the correct row for this exact period
+    // — rather than adding a second fetch of the same sheet. Amazon
+    // only; no SP/SB/SD split exists on the Walmart side of this sheet.
+    const adType = {
+      sp: { spend: numOr0(amzAd.sp_spend), sales: numOr0(amzAd.sp_sales), units: numOr0(amzAd.sp_ad_units), acos: numOr0(amzAd.sp_acos), campaigns: numOr0(amzAd.sp_campaigns_running) },
+      sb: { spend: numOr0(amzAd.sb_spend), sales: numOr0(amzAd.sb_sales), units: numOr0(amzAd.sb_ad_units), acos: numOr0(amzAd.sb_acos), campaigns: numOr0(amzAd.sb_campaigns_running) },
+      sd: { spend: numOr0(amzAd.sd_spend), sales: numOr0(amzAd.sd_sales), units: numOr0(amzAd.sd_ad_units), acos: numOr0(amzAd.sd_acos), campaigns: numOr0(amzAd.sd_campaigns_running) },
+    };
+
+    return { adSpend, adSales, acos, totalSales, tacos, impressions, clicks, ctr, cpc, totalOrders, aov, adType };
   }
 
   try {
     const curr = await computeBlended(cfg);
     console.log('[BlendedPerf][qa] period:', JSON.stringify(cfg), '— totalSales:', curr.totalSales, 'totalOrders:', curr.totalOrders);
+
+    // Ad Spend by Type (SP/SB/SD) — added 2026-09-11, ported from
+    // évolis. Uses curr.adType, already extracted from amzAd inside
+    // computeBlended above — no separate fetch on this page at all.
+    (function renderPpcAdTypeCard() {
+      const wrap = document.getElementById('ppc-ad-type-card');
+      if (!wrap) return;
+      const { sp, sb, sd } = curr.adType;
+      const totalSpend = sp.spend + sb.spend + sd.spend;
+
+      let noteHtml = '';
+      if (totalSpend <= 0) {
+        noteHtml = '<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:10px;">No ad spend recorded for this period yet.</div>';
+      } else if (sb.spend <= 0 && sd.spend <= 0) {
+        noteHtml = '<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:10px;">ℹ 100% Sponsored Products this period — no active Sponsored Brands or Sponsored Display spend.</div>';
+      }
+
+      const moneyFmt = v => '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const acosCell = v => v > 0 ? v.toFixed(1) + '%' : '<span class="tp-dash">—</span>';
+      const rowsHtml = [
+        { label: 'Sponsored Products', d: sp }, { label: 'Sponsored Brands', d: sb }, { label: 'Sponsored Display', d: sd },
+      ].map(r => `<tr><td>${r.label}</td><td>${r.d.campaigns.toLocaleString()}</td><td>${acosCell(r.d.acos)}</td><td>${moneyFmt(r.d.spend)}</td><td>${moneyFmt(r.d.sales)}</td></tr>`).join('');
+
+      wrap.innerHTML = `
+        <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+          <div style="flex:0 0 280px;position:relative;height:220px;"><canvas id="chart-ppc-ad-type"></canvas></div>
+          <div style="flex:1 1 380px;min-width:320px;overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr><th>Ad Type</th><th># Campaigns</th><th>ACOS</th><th>Spend</th><th>Sales</th></tr></thead>
+              <tbody>${rowsHtml}</tbody>
+            </table>
+          </div>
+        </div>
+        ${noteHtml}`;
+
+      if (totalSpend > 0) {
+        if (window._ppcAdTypeChart) { window._ppcAdTypeChart.destroy(); window._ppcAdTypeChart = null; }
+        window._ppcAdTypeChart = new Chart(document.getElementById('chart-ppc-ad-type'), {
+          type: 'doughnut',
+          data: {
+            labels: ['Sponsored Products', 'Sponsored Brands', 'Sponsored Display'],
+            datasets: [{ data: [sp.spend, sb.spend, sd.spend], backgroundColor: ['#001f60', '#24e9a3', '#c87d2f'], borderWidth: 0 }],
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } } } } },
+        });
+      }
+    })();
 
     setVal('pb-kpi-ad-spend',    '$' + curr.adSpend.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
     setVal('pb-kpi-ad-sales',    '$' + curr.adSales.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
@@ -19754,6 +19829,73 @@ async function loadAuditResultsFromSheet() {
             <td>${money(aov)}</td>
           </tr>`;
         }).join('');
+      })();
+
+      // Ad Spend by Type (SP/SB/SD) — added 2026-09-11, ported from
+      // évolis. Amazon only. New fetch — SHEET_ADVERTISING isn't already
+      // in scope anywhere on this page (the existing Ad Spend/ACOS KPI
+      // above reads SHEET_AD_ORDERS instead, which has no SP/SB/SD
+      // split at all). Sheet ID declared as a LOCAL const right here,
+      // not reused from anywhere else in the file — a previous port of
+      // this exact feature shipped a ReferenceError from assuming a
+      // same-named const elsewhere in the file was reachable; this
+      // file's separate <script> tags don't share scope with each other
+      // at all, so that assumption is never safe.
+      (async function renderAdTypeCard() {
+        const wrap = document.getElementById('ov-ad-type-card');
+        if (!wrap) return;
+        try {
+          const AD_SUMMARY_SHEET_ID = window.SHEET_CFG.SHEET_ADVERTISING.fileId;
+          const AD_SUMMARY_GID = window.SHEET_CFG.SHEET_ADVERTISING.gid;
+          const adSummaryCsv = await fetch(ovCsvUrl(AD_SUMMARY_SHEET_ID, AD_SUMMARY_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+          if (!isCsv(adSummaryCsv)) { wrap.innerHTML = ''; return; }
+          const row = parseCsv(adSummaryCsv).find(r => parseInt(r.year, 10) === refYear && parseInt(r.month, 10) === refMonth);
+          const num = v => parseFloat(String(v == null ? '' : v).replace(/[$,]/g, '')) || 0;
+          const sp = { spend: row ? num(row.sp_spend) : 0, sales: row ? num(row.sp_sales) : 0, units: row ? num(row.sp_ad_units) : 0, acos: row ? num(row.sp_acos) : 0, campaigns: row ? num(row.sp_campaigns_running) : 0 };
+          const sb = { spend: row ? num(row.sb_spend) : 0, sales: row ? num(row.sb_sales) : 0, units: row ? num(row.sb_ad_units) : 0, acos: row ? num(row.sb_acos) : 0, campaigns: row ? num(row.sb_campaigns_running) : 0 };
+          const sd = { spend: row ? num(row.sd_spend) : 0, sales: row ? num(row.sd_sales) : 0, units: row ? num(row.sd_ad_units) : 0, acos: row ? num(row.sd_acos) : 0, campaigns: row ? num(row.sd_campaigns_running) : 0 };
+          const totalSpend = sp.spend + sb.spend + sd.spend;
+
+          let noteHtml = '';
+          if (totalSpend <= 0) {
+            noteHtml = '<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:10px;">No ad spend recorded for this period yet.</div>';
+          } else if (sb.spend <= 0 && sd.spend <= 0) {
+            noteHtml = '<div style="font-size:12px;color:var(--muted);font-style:italic;margin-top:10px;">ℹ 100% Sponsored Products this period — no active Sponsored Brands or Sponsored Display spend.</div>';
+          }
+
+          const moneyFmt = v => '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          const acosCell = v => v > 0 ? v.toFixed(1) + '%' : '<span class="tp-dash">—</span>';
+          const rowsHtml = [
+            { label: 'Sponsored Products', d: sp }, { label: 'Sponsored Brands', d: sb }, { label: 'Sponsored Display', d: sd },
+          ].map(r => `<tr><td>${r.label}</td><td>${r.d.campaigns.toLocaleString()}</td><td>${acosCell(r.d.acos)}</td><td>${moneyFmt(r.d.spend)}</td><td>${moneyFmt(r.d.sales)}</td></tr>`).join('');
+
+          wrap.innerHTML = `
+            <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
+              <div style="flex:0 0 280px;position:relative;height:220px;"><canvas id="chart-ov-ad-type"></canvas></div>
+              <div style="flex:1 1 380px;min-width:320px;overflow-x:auto;">
+                <table class="data-table">
+                  <thead><tr><th>Ad Type</th><th># Campaigns</th><th>ACOS</th><th>Spend</th><th>Sales</th></tr></thead>
+                  <tbody>${rowsHtml}</tbody>
+                </table>
+              </div>
+            </div>
+            ${noteHtml}`;
+
+          if (totalSpend > 0) {
+            if (window._ovAdTypeChart) { window._ovAdTypeChart.destroy(); window._ovAdTypeChart = null; }
+            window._ovAdTypeChart = new Chart(document.getElementById('chart-ov-ad-type'), {
+              type: 'doughnut',
+              data: {
+                labels: ['Sponsored Products', 'Sponsored Brands', 'Sponsored Display'],
+                datasets: [{ data: [sp.spend, sb.spend, sd.spend], backgroundColor: ['#001f60', '#24e9a3', '#c87d2f'], borderWidth: 0 }],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } } } } },
+            });
+          }
+        } catch (err) {
+          console.warn('[JustBjorn][overview][AdType] failed:', err.message);
+          wrap.innerHTML = '';
+        }
       })();
 
       // -- Trend: trailing 6 COMPLETED months, blended revenue across channels --
