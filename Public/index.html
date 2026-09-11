@@ -1448,7 +1448,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
          isn't already in scope anywhere on this page — confirmed before
          building, see the porting notes). -->
     <div class="card" style="margin-bottom:22px;">
-      <div class="card-title">Ad Spend by Type — Amazon, Month to Date</div>
+      <div class="card-title">Ad Spend &amp; Sales by Type — Amazon, Month to Date</div>
       <div id="ov-ad-type-card"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
     </div>
 
@@ -19855,6 +19855,7 @@ async function loadAuditResultsFromSheet() {
           const sb = { spend: row ? num(row.sb_spend) : 0, sales: row ? num(row.sb_sales) : 0, units: row ? num(row.sb_ad_units) : 0, acos: row ? num(row.sb_acos) : 0, campaigns: row ? num(row.sb_campaigns_running) : 0 };
           const sd = { spend: row ? num(row.sd_spend) : 0, sales: row ? num(row.sd_sales) : 0, units: row ? num(row.sd_ad_units) : 0, acos: row ? num(row.sd_acos) : 0, campaigns: row ? num(row.sd_campaigns_running) : 0 };
           const totalSpend = sp.spend + sb.spend + sd.spend;
+          const totalSales = sp.sales + sb.sales + sd.sales;
 
           let noteHtml = '';
           if (totalSpend <= 0) {
@@ -19869,9 +19870,21 @@ async function loadAuditResultsFromSheet() {
             { label: 'Sponsored Products', d: sp }, { label: 'Sponsored Brands', d: sb }, { label: 'Sponsored Display', d: sd },
           ].map(r => `<tr><td>${r.label}</td><td>${r.d.campaigns.toLocaleString()}</td><td>${acosCell(r.d.acos)}</td><td>${moneyFmt(r.d.spend)}</td><td>${moneyFmt(r.d.sales)}</td></tr>`).join('');
 
+          // Two charts, not one — added 2026-09-12 per Jaclyn: spend share
+          // alone only tells half the story (a type could take real spend
+          // and produce little/no sales, or the reverse) — showing both
+          // side by side surfaces that mismatch visually instead of
+          // requiring someone to cross-reference the table's columns.
           wrap.innerHTML = `
             <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:center;">
-              <div style="flex:0 0 280px;position:relative;height:220px;"><canvas id="chart-ov-ad-type"></canvas></div>
+              <div style="flex:0 0 200px;text-align:center;">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">By Spend</div>
+                <div style="position:relative;height:180px;"><canvas id="chart-ov-ad-type-spend"></canvas></div>
+              </div>
+              <div style="flex:0 0 200px;text-align:center;">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px;">By Sales</div>
+                <div style="position:relative;height:180px;"><canvas id="chart-ov-ad-type-sales"></canvas></div>
+              </div>
               <div style="flex:1 1 380px;min-width:320px;overflow-x:auto;">
                 <table class="data-table">
                   <thead><tr><th>Ad Type</th><th># Campaigns</th><th>ACOS</th><th>Spend</th><th>Sales</th></tr></thead>
@@ -19881,15 +19894,27 @@ async function loadAuditResultsFromSheet() {
             </div>
             ${noteHtml}`;
 
+          const adTypeLegend = { position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { size: 10 }, padding: 8 } };
           if (totalSpend > 0) {
             if (window._ovAdTypeChart) { window._ovAdTypeChart.destroy(); window._ovAdTypeChart = null; }
-            window._ovAdTypeChart = new Chart(document.getElementById('chart-ov-ad-type'), {
+            window._ovAdTypeChart = new Chart(document.getElementById('chart-ov-ad-type-spend'), {
               type: 'doughnut',
               data: {
                 labels: ['Sponsored Products', 'Sponsored Brands', 'Sponsored Display'],
                 datasets: [{ data: [sp.spend, sb.spend, sd.spend], backgroundColor: ['#001f60', '#24e9a3', '#c87d2f'], borderWidth: 0 }],
               },
-              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } } } } },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: adTypeLegend } },
+            });
+          }
+          if (totalSales > 0) {
+            if (window._ovAdSalesTypeChart) { window._ovAdSalesTypeChart.destroy(); window._ovAdSalesTypeChart = null; }
+            window._ovAdSalesTypeChart = new Chart(document.getElementById('chart-ov-ad-type-sales'), {
+              type: 'doughnut',
+              data: {
+                labels: ['Sponsored Products', 'Sponsored Brands', 'Sponsored Display'],
+                datasets: [{ data: [sp.sales, sb.sales, sd.sales], backgroundColor: ['#001f60', '#24e9a3', '#c87d2f'], borderWidth: 0 }],
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: adTypeLegend } },
             });
           }
         } catch (err) {
