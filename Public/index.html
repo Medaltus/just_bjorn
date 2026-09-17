@@ -11323,7 +11323,25 @@ window.initEventStrategyHeader = async function () {
     if (isTbd(startRaw) || isTbd(endRaw)) {
       datesEl.textContent = 'Dates TBD';
     } else {
-      const fmt = d => { const dt = new Date(d); return isNaN(dt.getTime()) ? null : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); };
+      // FIXED 2026-09-17 per Jaclyn — new Date('2026-10-06') (a bare
+      // YYYY-MM-DD string) parses as UTC midnight, not local midnight,
+      // per the ECMAScript date-string spec. Formatting that via
+      // toLocaleDateString() in any US timezone (all of which sit behind
+      // UTC) shows the PREVIOUS calendar day — "2026-10-06" displayed as
+      // "Oct 5". Confirmed directly against the real sheet: row 10 says
+      // Oct 6 - Oct 7, the page showed Oct 5 - Oct 6, a clean 1-day
+      // shift on both ends, not a wrong-source-tab issue. Fix: parse the
+      // Y/M/D components manually and build the Date with the local-
+      // timezone constructor (new Date(year, month-1, day)) instead of
+      // handing the raw string to new Date(), which is what triggers the
+      // UTC interpretation in the first place.
+      const fmt = d => {
+        const s = (d || '').trim();
+        const m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!m) return null;
+        const dt = new Date(parseInt(m[1], 10), parseInt(m[2], 10) - 1, parseInt(m[3], 10));
+        return isNaN(dt.getTime()) ? null : dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      };
       const startFmt = fmt(startRaw), endFmt = fmt(endRaw);
       datesEl.textContent = (startFmt && endFmt) ? `${startFmt} – ${endFmt}` : 'Dates TBD';
     }
@@ -18061,7 +18079,16 @@ async function loadAuditResultsFromSheet() {
       ? '<div class="pdfx-hdr-tag">' + pdfxEscape(customValue) + '</div>' + (customSubValue ? '<div class="pdfx-hdr-month" style="font-size:11px;">' + pdfxEscape(customSubValue) + '</div>' : '')
       : '<div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div>';
     return '<div class="pdfx-topband">' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
+      // min-height:80px added 2026-09-17 — makes explicit what was
+      // previously only an implicit side-effect of flexbox
+      // align-items:center (the 80px logo already dominated this row's
+      // height as long as the tag-right text stayed shorter than that,
+      // which it always has so far). Locking it explicitly means this
+      // row's height can never drift even if a future customValue/
+      // customSubValue combination on some other page ends up taller
+      // than today's cases — the row simply can't shrink below 80px
+      // regardless of what text is next to the logo.
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;min-height:80px;">' +
         '<span class="pdfx-logo-navy" style="display:inline-block;">' + pdfxLogoHtml('height:80px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
         '<div class="pdfx-tagright">' + tagHtml + '</div>' +
       '</div>' +
@@ -18736,6 +18763,7 @@ async function loadAuditResultsFromSheet() {
 
       const pdf = new jsPDFCtor({ unit: 'in', format: 'letter', orientation: 'portrait' });
       const pageWidthIn = 8.5, pageHeightIn = 11;
+      let isFirstPdfPage = true;
 
       for (let i = 0; i < pageEls.length; i++) {
         const el = pageEls[i];
@@ -18783,10 +18811,50 @@ async function loadAuditResultsFromSheet() {
         });
         console.log('[pdf-export] page', i + 1, 'canvas size:', canvas.width, 'x', canvas.height);
         const imgData = canvas.toDataURL('image/jpeg', 0.97);
-        if (i > 0) pdf.addPage();
-        // Scale the captured canvas to fill the page width, preserving aspect ratio
         const renderedHeightIn = pageWidthIn * (canvas.height / canvas.width);
-        pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthIn, Math.min(renderedHeightIn, pageHeightIn));
+
+        // FIXED 2026-09-17 per Jaclyn — was Math.min(renderedHeightIn,
+        // pageHeightIn), which forced width to stay at the full page
+        // width while clamping height down to fit — a vertical squish,
+        // not a resize, whenever a page's real content ran taller than
+        // one physical page (.pdfx-page only has a min-height, so this
+        // varied page to page depending on how much content each one
+        // actually had — which is exactly why the header, and everything
+        // else, came out a visibly different height on almost every
+        // page). Every page's real total content height differs, so the
+        // squish amount differed too. Rather than distort content to fit,
+        // an overflowing page now gets sliced into multiple true-sized
+        // PDF pages instead — same pixel density throughout, nothing
+        // ever compressed. Known tradeoff: this is a blind pixel slice
+        // with no awareness of where a table row or card boundary falls,
+        // so a page that splits will do so at whatever pixel row lands
+        // exactly one page-height down, possibly mid-element. That's a
+        // real cost, but a table split across two pages is a far smaller
+        // problem than every element on the page being invisibly
+        // stretched or squished by a different, unpredictable amount.
+        if (renderedHeightIn <= pageHeightIn) {
+          if (!isFirstPdfPage) pdf.addPage();
+          isFirstPdfPage = false;
+          pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthIn, renderedHeightIn);
+        } else {
+          const pxPerInch = canvas.width / pageWidthIn;
+          const sliceHeightPx = Math.floor(pageHeightIn * pxPerInch);
+          let offsetPx = 0;
+          while (offsetPx < canvas.height) {
+            const thisSliceHeightPx = Math.min(sliceHeightPx, canvas.height - offsetPx);
+            const sliceCanvas = document.createElement('canvas');
+            sliceCanvas.width = canvas.width;
+            sliceCanvas.height = thisSliceHeightPx;
+            const sctx = sliceCanvas.getContext('2d');
+            sctx.drawImage(canvas, 0, offsetPx, canvas.width, thisSliceHeightPx, 0, 0, canvas.width, thisSliceHeightPx);
+            const sliceImgData = sliceCanvas.toDataURL('image/jpeg', 0.97);
+            if (!isFirstPdfPage) pdf.addPage();
+            isFirstPdfPage = false;
+            const sliceHeightIn = thisSliceHeightPx / pxPerInch;
+            pdf.addImage(sliceImgData, 'JPEG', 0, 0, pageWidthIn, sliceHeightIn);
+            offsetPx += thisSliceHeightPx;
+          }
+        }
       }
 
       const filename = 'Just_Bjorn_Partnership_Report_' + (monthYear ? monthYear.replace(' ', '_') : 'Report') + '.pdf';
