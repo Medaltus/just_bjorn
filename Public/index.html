@@ -18236,9 +18236,9 @@ async function loadAuditResultsFromSheet() {
     // Same pill-badge + headline pattern as Executive Summary on the cover
     // page (.pdfx-pill / .pdfx-cover-cols), so the two sections match
     // exactly as designed on the live dashboard. Per Jaclyn 2026-07-14.
-    return '<div class="pdfx-card" style="margin-top:14px;">' +
-      '<span class="pdfx-pill" style="margin-bottom:16px;">Future Opportunities</span>' +
-      '<div class="pdfx-cover-cols">' + cards + '</div>' +
+    return '<div class="pdfx-card" style="margin-top:0;">' +
+      '<span class="pdfx-pill" style="margin-bottom:12px;">Future Opportunities</span>' +
+      '<div class="pdfx-cover-cols" style="gap:24px;">' + cards + '</div>' +
       '</div>';
   }
 
@@ -18342,7 +18342,14 @@ async function loadAuditResultsFromSheet() {
           '<div class="pdfx-chlabel" style="margin-top:16px;">Customer Service</div>' +
           '<div class="pdfx-kpis n3" style="margin-top:6px;">' + csKpis.map(kpiCardWithSub).join('') + '</div>' +
           '<div class="pdfx-card" style="margin-top:14px;margin-bottom:0;">' +
-            '<div class="pdfx-card-title">Orders by State · Last 30 Days</div>' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;">' +
+              '<div class="pdfx-card-title" style="margin-bottom:0;">Orders by State · Last 30 Days</div>' +
+              '<div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);">' +
+                '<span>Fewer</span>' +
+                '<div style="width:60px;height:6px;border-radius:3px;background:linear-gradient(to right,#dce6f5,#001F60);"></div>' +
+                '<span>More</span>' +
+              '</div>' +
+            '</div>' +
             mapHtml +
           '</div>' +
         '</div>' +
@@ -18351,13 +18358,20 @@ async function loadAuditResultsFromSheet() {
 
   function buildOpportunitiesPage(monthYear) {
     const kpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
+    // Tightened 2026-09-17 per Jaclyn — this page only ever has 2 content
+    // blocks (the chart card + Future Opportunities), so the shared
+    // .pdfx-inner page padding and the default block margins (both tuned
+    // for pages with more content) left this one looking sparse. Overrides
+    // are scoped to THIS page's own inline styles only — .pdfx-inner and
+    // .pdfx-card's shared CSS rules are untouched, so no other PDF page is
+    // affected.
     return '' +
       '<div class="pdfx-page">' +
-        '<div class="pdfx-inner">' +
+        '<div class="pdfx-inner" style="padding:22px 46px 26px;">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
-          '<div class="pdfx-chlabel">Subscribe &amp; Save</div>' +
-          '<div class="pdfx-kpis n2" style="margin-top:6px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>' +
+          '<div class="pdfx-chlabel" style="margin-top:14px;">Subscribe &amp; Save</div>' +
+          '<div class="pdfx-kpis n2" style="margin-top:6px;margin-bottom:10px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
+          '<div class="pdfx-card" style="margin-bottom:10px;"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>' +
           pdfxFutureOpportunitiesBlock() +
           pdfxFooter(monthYear) +
         '</div>' +
@@ -20304,4 +20318,3 @@ window.addEventListener('load', async () => {
 </script>
 </body>
 </html>
- 
