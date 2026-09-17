@@ -19839,6 +19839,55 @@ async function loadAuditResultsFromSheet() {
               const daysInTargetMonth = new Date(refYear, refMonth, 0).getDate();
               const projectionFactor = periodKey === 'lastFull' ? 1 : (daysInTargetMonth / Math.max(1, daysElapsed));
 
+              // Cancellation-rate-adjusted projection — ported 2026-09-17
+              // from MiGuard's dashboard. Multi-channel decision the
+              // porting spec explicitly calls out as needing a real,
+              // non-silent choice: this Goal Tracker card is Amazon-only
+              // already (the goals sheet itself has no Walmart columns
+              // at all — see the header comment on GOALS_COL above), so
+              // an Amazon-only cancel rate computed from amzRows (the
+              // same Amazon order rows already driving every other
+              // number in this card) is the consistent, natural choice
+              // here — not a default, a fit with what this card already is.
+              // Reuses amzRows already fetched above; no new data source.
+              let cancelRate = null;
+              if (periodKey !== 'lastFull') {
+                // Only matters for an in-progress month's projection — a
+                // completed month's actual is already final.
+                const orders = {};
+                amzRows.forEach(r => {
+                  const oid = r.order_id;
+                  if (!oid) return;
+                  // normalizeDate returns a "YYYY-MM-DD" STRING, not a
+                  // Date object — confirmed by reading its actual
+                  // implementation before using it, not assumed from its
+                  // variable name. Extracting year/month via substring
+                  // rather than calling Date methods on it.
+                  const d = normalizeDate(r.date);
+                  if (!d || d.length < 7) return;
+                  const y = parseInt(d.substring(0, 4), 10);
+                  const m = parseInt(d.substring(5, 7), 10);
+                  if (!orders[oid]) orders[oid] = { cancelled: false, isCurrentMonth: false, isVine: false };
+                  if ((r.status || '').trim().toLowerCase() === 'cancelled') orders[oid].cancelled = true;
+                  if (y === refYear && m === refMonth) orders[oid].isCurrentMonth = true;
+                  if ((r.promotion_ids || '').toLowerCase().includes('vine')) orders[oid].isVine = true;
+                });
+                let totalOrders = 0, cancelledOrders = 0;
+                Object.values(orders).forEach(o => {
+                  if (o.isVine || o.isCurrentMonth) return; // exclude Vine + the in-progress month itself
+                  totalOrders++;
+                  if (o.cancelled) cancelledOrders++;
+                });
+                // Pooled all-time rate, not a rolling window — per the
+                // spec, a real shift in cancellation behavior will show
+                // up increasingly diluted over time as more history
+                // accumulates. Flagged as a known, accepted tradeoff in
+                // the porting notes, not something to silently "fix"
+                // here without a real decision to scope it to a trailing
+                // window instead.
+                cancelRate = totalOrders > 0 ? (cancelledOrders / totalOrders) : null;
+              }
+
               const gtRing = (actual, goal, label) => {
                 // Fill + center number reflect actual-so-far ÷ goal —
                 // honest progress. Projection is used ONLY to pick the
@@ -19847,7 +19896,8 @@ async function loadAuditResultsFromSheet() {
                 // maxed-out circle, hiding that we're only partway
                 // there in real dollars right now).
                 const actualPct = goal > 0 ? Math.round((actual / goal) * 100) : 0;
-                const projected = actual * projectionFactor;
+                const rawProjected = actual * projectionFactor;
+                const projected = (periodKey !== 'lastFull' && cancelRate != null) ? rawProjected * (1 - cancelRate) : rawProjected;
                 const projectedPct = goal > 0 ? Math.round((projected / goal) * 100) : 0;
                 const color = goal <= 0 ? 'var(--muted)' : (projectedPct >= 100 ? 'var(--green)' : 'var(--danger)');
                 const resultLine = goal <= 0
@@ -19855,6 +19905,11 @@ async function loadAuditResultsFromSheet() {
                   : periodKey === 'lastFull'
                     ? (actualPct >= 100 ? 'Hit goal' : 'Missed goal')
                     : `Projecting $${Math.round(projected).toLocaleString()}`;
+                const cancelNote = (goal > 0 && periodKey !== 'lastFull')
+                  ? (cancelRate != null
+                      ? `<div style="font-size:10px;color:var(--muted);margin-top:2px;">adj. for ${Math.round(cancelRate * 100)}% avg. cancel rate</div>`
+                      : `<div style="font-size:10px;color:var(--muted);margin-top:2px;">no cancel-rate history yet</div>`)
+                  : '';
                 return `<div style="text-align:center;">
                   <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px;">${label}</div>
                   <div style="position:relative;display:inline-block;">
@@ -19862,6 +19917,7 @@ async function loadAuditResultsFromSheet() {
                     <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:700;color:var(--navy);">${actualPct}%</div>
                   </div>
                   <div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:8px;">${resultLine}</div>
+                  ${cancelNote}
                   <div style="font-size:14px;font-weight:700;color:var(--navy);">Goal $${Math.round(goal).toLocaleString()}</div>
                 </div>`;
               };
