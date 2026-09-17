@@ -18763,7 +18763,6 @@ async function loadAuditResultsFromSheet() {
 
       const pdf = new jsPDFCtor({ unit: 'in', format: 'letter', orientation: 'portrait' });
       const pageWidthIn = 8.5, pageHeightIn = 11;
-      let isFirstPdfPage = true;
 
       for (let i = 0; i < pageEls.length; i++) {
         const el = pageEls[i];
@@ -18811,50 +18810,10 @@ async function loadAuditResultsFromSheet() {
         });
         console.log('[pdf-export] page', i + 1, 'canvas size:', canvas.width, 'x', canvas.height);
         const imgData = canvas.toDataURL('image/jpeg', 0.97);
+        if (i > 0) pdf.addPage();
+        // Scale the captured canvas to fill the page width, preserving aspect ratio
         const renderedHeightIn = pageWidthIn * (canvas.height / canvas.width);
-
-        // FIXED 2026-09-17 per Jaclyn — was Math.min(renderedHeightIn,
-        // pageHeightIn), which forced width to stay at the full page
-        // width while clamping height down to fit — a vertical squish,
-        // not a resize, whenever a page's real content ran taller than
-        // one physical page (.pdfx-page only has a min-height, so this
-        // varied page to page depending on how much content each one
-        // actually had — which is exactly why the header, and everything
-        // else, came out a visibly different height on almost every
-        // page). Every page's real total content height differs, so the
-        // squish amount differed too. Rather than distort content to fit,
-        // an overflowing page now gets sliced into multiple true-sized
-        // PDF pages instead — same pixel density throughout, nothing
-        // ever compressed. Known tradeoff: this is a blind pixel slice
-        // with no awareness of where a table row or card boundary falls,
-        // so a page that splits will do so at whatever pixel row lands
-        // exactly one page-height down, possibly mid-element. That's a
-        // real cost, but a table split across two pages is a far smaller
-        // problem than every element on the page being invisibly
-        // stretched or squished by a different, unpredictable amount.
-        if (renderedHeightIn <= pageHeightIn) {
-          if (!isFirstPdfPage) pdf.addPage();
-          isFirstPdfPage = false;
-          pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthIn, renderedHeightIn);
-        } else {
-          const pxPerInch = canvas.width / pageWidthIn;
-          const sliceHeightPx = Math.floor(pageHeightIn * pxPerInch);
-          let offsetPx = 0;
-          while (offsetPx < canvas.height) {
-            const thisSliceHeightPx = Math.min(sliceHeightPx, canvas.height - offsetPx);
-            const sliceCanvas = document.createElement('canvas');
-            sliceCanvas.width = canvas.width;
-            sliceCanvas.height = thisSliceHeightPx;
-            const sctx = sliceCanvas.getContext('2d');
-            sctx.drawImage(canvas, 0, offsetPx, canvas.width, thisSliceHeightPx, 0, 0, canvas.width, thisSliceHeightPx);
-            const sliceImgData = sliceCanvas.toDataURL('image/jpeg', 0.97);
-            if (!isFirstPdfPage) pdf.addPage();
-            isFirstPdfPage = false;
-            const sliceHeightIn = thisSliceHeightPx / pxPerInch;
-            pdf.addImage(sliceImgData, 'JPEG', 0, 0, pageWidthIn, sliceHeightIn);
-            offsetPx += thisSliceHeightPx;
-          }
-        }
+        pdf.addImage(imgData, 'JPEG', 0, 0, pageWidthIn, Math.min(renderedHeightIn, pageHeightIn));
       }
 
       const filename = 'Just_Bjorn_Partnership_Report_' + (monthYear ? monthYear.replace(' ', '_') : 'Report') + '.pdf';
