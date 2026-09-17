@@ -18070,8 +18070,14 @@ async function loadAuditResultsFromSheet() {
       '<div class="pdfx-header-divider"></div>';
   }
 
-  function pdfxFooter(monthYear) {
-    return '<div class="pdfx-footer">' +
+  function pdfxFooter(monthYear, compact) {
+    // compact — added 2026-09-17, Opportunities page only. Overrides the
+    // shared .pdfx-footer's divider line + generous top spacing (36px
+    // margin, 16px padding, border-top) inline, so every OTHER page's
+    // footer is completely unaffected — the shared CSS rule itself isn't
+    // touched, only this one call site opts out of it.
+    const style = compact ? ' style="margin-top:6px;padding-top:0;border-top:none;"' : '';
+    return '<div class="pdfx-footer"' + style + '>' +
       '<div><div class="pdfx-footer-brand">medaltus.</div><div class="pdfx-footer-tag">A trusted partner for your brand.</div></div>' +
       '<div class="pdfx-footer-right">Generated: ' + pdfxEscape(monthYear) + '<br><span class="pdfx-footer-conf">CONFIDENTIAL</span></div>' +
       '</div>';
@@ -18373,7 +18379,7 @@ async function loadAuditResultsFromSheet() {
           '<div class="pdfx-kpis n2" style="margin-top:6px;margin-bottom:10px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
           '<div class="pdfx-card" style="margin-bottom:10px;"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>' +
           pdfxFutureOpportunitiesBlock() +
-          pdfxFooter(monthYear) +
+          pdfxFooter(monthYear, true) +
         '</div>' +
       '</div>';
   }
