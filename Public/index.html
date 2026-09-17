@@ -1423,6 +1423,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="kpi-card" id="ov-kpi-ad-orders"><div class="kpi-label">MTD Ad-Driven Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-ad-sales"><div class="kpi-label">MTD Ad Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-pending"><div class="kpi-label">Pending Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+      <div class="kpi-card" id="ov-kpi-conv-rate"><div class="kpi-label">Conversion Rate</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
     </div>
 
     <!-- Channel Breakdown — added 2026-08-25, replicated from Skinuva.
@@ -1475,9 +1476,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <th style="text-align:left;padding:8px 10px;">Total Units</th>
             <th style="text-align:left;padding:8px 10px;">Ads (Amazon)</th>
             <th style="text-align:left;padding:8px 10px;">Organic</th>
+            <th style="text-align:left;padding:8px 10px;">Conv. %</th>
           </tr>
         </thead>
-        <tbody id="ov-products-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
+        <tbody id="ov-products-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
       </table>
     </div>
 
@@ -19684,6 +19686,41 @@ async function loadAuditResultsFromSheet() {
         return `<span class="tp-units">${curr.toLocaleString()}</span>${momBadge(curr, prevVal)}`;
       }
 
+      // Conversion Rate — added 2026-09-17 per Jaclyn: real Sessions vs.
+      // real purchase behavior, deliberately NOT netted against returns/
+      // cancellations (that's a different question — "did this order
+      // eventually stick" — from "did a visitor decide to buy"), and
+      // deliberately excluding Vine (free/discounted review units aren't
+      // organic purchase-intent). Uses UNITS_ORDERED (raw) minus
+      // VINE_UNITS_DEDUCTED specifically — NOT UNITS_ORDERED_CLEAN, which
+      // also strips out cancelled units and would silently answer the
+      // wrong question. New fetch — SHEET_BUSINESS_REPORT isn't already
+      // in scope anywhere on this page. Local consts declared right here,
+      // not reused from elsewhere in the file, per the same cross-scope
+      // lesson as the Ad Spend by Type card above.
+      const bizByAsin = {};
+      let ovConvUnitsExVine = 0, ovConvSessions = 0;
+      try {
+        const BIZ_REPORT_SHEET_ID = window.SHEET_CFG.SHEET_BUSINESS_REPORT.fileId;
+        const BIZ_REPORT_GID = window.SHEET_CFG.SHEET_BUSINESS_REPORT.gid;
+        const bizCsv = await fetch(ovCsvUrl(BIZ_REPORT_SHEET_ID, BIZ_REPORT_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        if (isCsv(bizCsv)) {
+          parseCsv(bizCsv).forEach(r => {
+            if (parseInt(r.YEAR, 10) !== refYear || parseInt(r.MONTH, 10) !== refMonth) return;
+            const asin = (r.ASIN || '').trim();
+            if (!asin) return;
+            const sessions = parseInt(r.SESSIONS, 10) || 0;
+            const unitsExVine = Math.max(0, (parseInt(r.UNITS_ORDERED, 10) || 0) - (parseInt(r.VINE_UNITS_DEDUCTED, 10) || 0));
+            bizByAsin[asin] = { sessions, unitsExVine };
+            ovConvSessions += sessions;
+            ovConvUnitsExVine += unitsExVine;
+          });
+        }
+      } catch (err) {
+        console.warn('[JustBjorn][overview][ConvRate] failed:', err.message);
+      }
+      setKpiPlain('ov-kpi-conv-rate', ovConvSessions > 0 ? (ovConvUnitsExVine / ovConvSessions * 100).toFixed(1) + '%' : '—', 'Units (ex-Vine) ÷ Sessions, this month');
+
       const productRows = Array.from(allAsins).map(asin => {
         // Website removed from this sum 2026-08-25 per Jaclyn — Amazon +
         // Walmart only, same scope as every other blended metric on this
@@ -19699,13 +19736,15 @@ async function loadAuditResultsFromSheet() {
         // 2026-08-06 per Jaclyn).
         const adUnits = Math.min(adUnitsByAsin[asin] || 0, a) + Math.min(wmtAdUnitsByAsin[asin] || 0, m);
         const orgUnits = total - adUnits;
-        return { asin, name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits };
+        const biz = bizByAsin[asin];
+        const convPct = (biz && biz.sessions > 0) ? (biz.unitsExVine / biz.sessions * 100) : null;
+        return { asin, name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits, convPct };
       }).sort((x, y) => y.total - x.total).slice(0, 15);
 
       const tbody = document.getElementById('ov-products-tbody');
       if (tbody) {
         if (!productRows.length) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
         } else {
           tbody.innerHTML = productRows.map((r, i) => `
             <tr>
@@ -19716,6 +19755,7 @@ async function loadAuditResultsFromSheet() {
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.total, r.totalPrev)}</div></td>
               <td style="padding:7px 10px;">${r.adUnits > 0 ? `<span class="tp-units">${r.adUnits.toLocaleString()}</span>` : '<span class="tp-dash">—</span>'}</td>
               <td style="padding:7px 10px;">${r.orgUnits > 0 ? `<span class="tp-units">${r.orgUnits.toLocaleString()}</span>` : '<span class="tp-dash">—</span>'}</td>
+              <td style="padding:7px 10px;">${r.convPct != null ? `<span class="tp-units">${r.convPct.toFixed(1)}%</span>` : '<span class="tp-dash">—</span>'}</td>
             </tr>`).join('');
         }
       }
