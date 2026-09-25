@@ -12060,9 +12060,48 @@ const SHEET_LISTINGS_ID       = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.fileId;
 // rewritten to expect SHEET_PRODUCT_INVENTORY's column layout.
 const SHEET_PRODUCT_INVENTORY_ID = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.fileId; // missed by the initial sweep (var name doesn't match the SHEET_ID/_GID pattern literally)
 const SHEET_LISTINGS_GID = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.gid; // changed 2026-08-07 per Jaclyn — was '1253931757' (the old dedicated Listings sheet); this is the "evolis" tab on the Products Cache sheet, same one already used server-side as the audit's own input
-const KEYWORD_STRATEGY_SHEET_ID = ''; // TODO(JBJ): no per-brand sheet/tab exists yet for this resource — confirm with Jaclyn before wiring (see build notes)
-const SKU_KW_GID_MAP = {}; // TODO(JBJ): per-SKU keyword-strategy gids — none exist yet for just-bjorn (same underlying KEYWORD_STRATEGY_SHEET_ID gap noted above); populate once Jaclyn provisions per-SKU tabs
+// FIXED 2026-09-25 per Jaclyn — the old TODO comments here assumed
+// keywordSheetId/skuGidMap pointed at a separate, never-provisioned
+// "Keyword Strategy" sheet. Checked the actual backend code instead of
+// trusting that assumption: it reads "Top 20 Keywords" / "Top 20
+// Opportunity Keywords" / "Top 20 Reach for the stars keywords" headers
+// and "Current Competitors" / "CATEGORY LEADERS" sections — that's the
+// SAME Competitor Research sheet (SHEET_COMPETITOR) already wired up for
+// Insights → Products' Keyword Strategy cards, not a different resource.
+// These were empty stubs this whole time, meaning every Listing Audit
+// run so far had ZERO keyword/competitor enrichment — silently, since
+// the backend just logs a debugFail and continues without it rather
+// than erroring. skuGidMap now maps each SKU to its own category's gid,
+// so Stick Pack SKUs correctly get Stick Pack-specific keyword/
+// competitor context instead of the general Collagen line's.
+const KEYWORD_STRATEGY_SHEET_ID = window.SHEET_CFG.SHEET_COMPETITOR.fileId;
+const SKU_KW_GID_MAP = {
+  JBJ0001: window.SHEET_CFG.SHEET_COMPETITOR_STICK_PACKS.gid, // Stick Packs (10 Count)
+  JBJ0002: window.SHEET_CFG.SHEET_COMPETITOR.gid,             // 45 Serving Pouch
+  JBJ0003: window.SHEET_CFG.SHEET_COMPETITOR.gid,             // Starter Kit
+  JBJ0004: window.SHEET_CFG.SHEET_COMPETITOR.gid,             // 30 Serving Pouch
+  JBJ0021: window.SHEET_CFG.SHEET_COMPETITOR_STICK_PACKS.gid, // Stick Pack Sample Set (3 Count)
+};
 const LISTING_AUDIT_EVOLIS_GID = window.SHEET_CFG.SHEET_LISTING_AUDIT.gid;
+
+// ADDED 2026-09-25 — the rest of this newer run-listing-audit.js's
+// optional enrichment params (masterSkuSheetId/Gid, brandInsightsSheetId/
+// Gid, businessReportSheetId/Gid, adSearchTermsSheetId/Gid,
+// amazonReviewsSheetId/Gid) were never being sent by this frontend at
+// all — not stubbed out, just entirely absent from the POST body. Each
+// one below routes through an already-confirmed SHEET_CONFIG entry used
+// elsewhere in this file, except SHEET_BRAND_INSIGHTS, which is new
+// (Jaclyn's Brand Insights tab, added to sheet-config.example.json).
+const MASTER_SKU_SHEET_ID = window.SHEET_CFG.SHEET_MASTER_SKU_LIST.fileId;
+const MASTER_SKU_GID = window.SHEET_CFG.SHEET_MASTER_SKU_LIST.gid;
+const BRAND_INSIGHTS_SHEET_ID = window.SHEET_CFG.SHEET_BRAND_INSIGHTS.fileId;
+const BRAND_INSIGHTS_GID = window.SHEET_CFG.SHEET_BRAND_INSIGHTS.gid;
+const AUDIT_BUSINESS_REPORT_SHEET_ID = window.SHEET_CFG.SHEET_BUSINESS_REPORT.fileId;
+const AUDIT_BUSINESS_REPORT_GID = window.SHEET_CFG.SHEET_BUSINESS_REPORT.gid;
+const AUDIT_AD_SEARCH_TERMS_SHEET_ID = window.SHEET_CFG.SHEET_AD_SEARCH_TERMS.fileId;
+const AUDIT_AD_SEARCH_TERMS_GID = window.SHEET_CFG.SHEET_AD_SEARCH_TERMS.gid;
+const AUDIT_AMAZON_REVIEWS_SHEET_ID = window.SHEET_CFG.SHEET_AMAZON_REVIEWS.fileId;
+const AUDIT_AMAZON_REVIEWS_GID = window.SHEET_CFG.SHEET_AMAZON_REVIEWS.gid;
 
 // ═══════════════════════════════════════════════════════════════════
 // INSIGHTS OVERVIEW — units chart, Active/Peak/Total SKU KPIs, and
@@ -17113,8 +17152,19 @@ async function runListingAudit() {
             brand:          INSIGHTS_BRAND_TAB,
             sourceSheetId:  SHEET_PRODUCT_INVENTORY_ID,
             auditSheetId:   LISTING_AUDIT_SHEET_ID,
+            auditGid:       LISTING_AUDIT_EVOLIS_GID,
             keywordSheetId: KEYWORD_STRATEGY_SHEET_ID,
             skuGidMap:      SKU_KW_GID_MAP,
+            masterSkuSheetId:     MASTER_SKU_SHEET_ID,
+            masterSkuGid:         MASTER_SKU_GID,
+            brandInsightsSheetId: BRAND_INSIGHTS_SHEET_ID,
+            brandInsightsGid:     BRAND_INSIGHTS_GID,
+            businessReportSheetId: AUDIT_BUSINESS_REPORT_SHEET_ID,
+            businessReportGid:     AUDIT_BUSINESS_REPORT_GID,
+            adSearchTermsSheetId:  AUDIT_AD_SEARCH_TERMS_SHEET_ID,
+            adSearchTermsGid:      AUDIT_AD_SEARCH_TERMS_GID,
+            amazonReviewsSheetId:  AUDIT_AMAZON_REVIEWS_SHEET_ID,
+            amazonReviewsGid:      AUDIT_AMAZON_REVIEWS_GID,
             uploadsSheetId: UPLOADS_SHEET_ID,
             uploadsGid:     UPLOADS_EVOLIS_GID,
             skuFilter:      skuList   // NEW: only audit these SKUs
