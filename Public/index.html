@@ -2906,30 +2906,31 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <!-- ── PRODUCTS TAB ── -->
     <div class="channel-page active" id="ins-products">
 
-      <!-- Just Bjorn has one product line, not évolis's hair-care categories
-           (Activators/Shampoos/Conditioners/Hair Masks/Dry Shampoo), so this
-           collapses to just Products + Bundles instead of 6 category tabs. -->
+      <!-- Split into Collagen / Collagen Stick Packs / Bundles 2026-09-25
+           per Jaclyn — Stick Packs get their own keyword targeting,
+           separate from the general Collagen line. -->
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('ins-products','pt-products',this)">Products</button>
+        <button class="sub-tab active" onclick="showSubTab('ins-products','pt-collagen',this)">Collagen</button>
+        <button class="sub-tab" onclick="showSubTab('ins-products','pt-collagen-stickpacks',this)">Collagen Stick Packs</button>
         <button class="sub-tab" onclick="showSubTab('ins-products','pt-bundles',this)">Bundles</button>
       </div>
 
-      <div class="sub-page active" id="pt-products">
+      <div class="sub-page active" id="pt-collagen">
 
         <!-- Performance -->
         <div class="card">
           <div class="card-title" style="margin-bottom:2px;" id="perf-act-title">Performance</div>
           <div style="overflow-x:auto;">
             <table class="perf-compare">
-              <thead><tr><th></th><th class="prodcol"><div class="prodcol-name">Stick Packs (10 Count)</div><div class="prodcol-sku">JBJ0001</div></th><th class="prodcol"><div class="prodcol-name">45 Serving Pouch</div><div class="prodcol-sku">JBJ0002</div></th><th class="prodcol"><div class="prodcol-name">Starter Kit</div><div class="prodcol-sku">JBJ0003</div></th><th class="prodcol"><div class="prodcol-name">30 Serving Pouch</div><div class="prodcol-sku">JBJ0004</div></th><th class="prodcol"><div class="prodcol-name">Stick Pack Sample Set (3 Count)</div><div class="prodcol-sku">JBJ0021</div></th></tr></thead>
+              <thead><tr><th></th><th class="prodcol"><div class="prodcol-name">45 Serving Pouch</div><div class="prodcol-sku">JBJ0002</div></th><th class="prodcol"><div class="prodcol-name">Starter Kit</div><div class="prodcol-sku">JBJ0003</div></th><th class="prodcol"><div class="prodcol-name">30 Serving Pouch</div><div class="prodcol-sku">JBJ0004</div></th></tr></thead>
               <tbody>
-                <tr><td>BSR</td><td id="perf-act-bsr-0001">—</td><td id="perf-act-bsr-0002">—</td><td id="perf-act-bsr-0003">—</td><td id="perf-act-bsr-0004">—</td><td id="perf-act-bsr-0021">—</td></tr>
-                <tr><td>Subcategory BSR</td><td id="perf-act-subbsr-0001">—</td><td id="perf-act-subbsr-0002">—</td><td id="perf-act-subbsr-0003">—</td><td id="perf-act-subbsr-0004">—</td><td id="perf-act-subbsr-0021">—</td></tr>
-                <tr><td>Sessions</td><td id="perf-act-sessions-0001">—</td><td id="perf-act-sessions-0002">—</td><td id="perf-act-sessions-0003">—</td><td id="perf-act-sessions-0004">—</td><td id="perf-act-sessions-0021">—</td></tr>
-                <tr><td id="perf-act-units-label">Units</td><td id="perf-act-units-0001">—</td><td id="perf-act-units-0002">—</td><td id="perf-act-units-0003">—</td><td id="perf-act-units-0004">—</td><td id="perf-act-units-0021">—</td></tr>
-                <tr><td>Revenue</td><td id="perf-act-revenue-0001">—</td><td id="perf-act-revenue-0002">—</td><td id="perf-act-revenue-0003">—</td><td id="perf-act-revenue-0004">—</td><td id="perf-act-revenue-0021">—</td></tr>
-                <tr><td>Conversion</td><td id="perf-act-conv-0001">—</td><td id="perf-act-conv-0002">—</td><td id="perf-act-conv-0003">—</td><td id="perf-act-conv-0004">—</td><td id="perf-act-conv-0021">—</td></tr>
-                <tr><td>Rating</td><td id="perf-act-rating-0001">—</td><td id="perf-act-rating-0002">—</td><td id="perf-act-rating-0003">—</td><td id="perf-act-rating-0004">—</td><td id="perf-act-rating-0021">—</td></tr>
+                <tr><td>BSR</td><td id="perf-act-bsr-0002">—</td><td id="perf-act-bsr-0003">—</td><td id="perf-act-bsr-0004">—</td></tr>
+                <tr><td>Subcategory BSR</td><td id="perf-act-subbsr-0002">—</td><td id="perf-act-subbsr-0003">—</td><td id="perf-act-subbsr-0004">—</td></tr>
+                <tr><td>Sessions</td><td id="perf-act-sessions-0002">—</td><td id="perf-act-sessions-0003">—</td><td id="perf-act-sessions-0004">—</td></tr>
+                <tr><td id="perf-act-units-label">Units</td><td id="perf-act-units-0002">—</td><td id="perf-act-units-0003">—</td><td id="perf-act-units-0004">—</td></tr>
+                <tr><td>Revenue</td><td id="perf-act-revenue-0002">—</td><td id="perf-act-revenue-0003">—</td><td id="perf-act-revenue-0004">—</td></tr>
+                <tr><td>Conversion</td><td id="perf-act-conv-0002">—</td><td id="perf-act-conv-0003">—</td><td id="perf-act-conv-0004">—</td></tr>
+                <tr><td>Rating</td><td id="perf-act-rating-0002">—</td><td id="perf-act-rating-0003">—</td><td id="perf-act-rating-0004">—</td></tr>
               </tbody>
             </table>
           </div>
@@ -2939,21 +2940,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <div class="card">
           <div class="card-title">Product Portfolio</div>
 
-          <div class="pcard-exec">
-            <div class="pcard-exec-hd"><div><b id="pcard-name-0001">Stick Packs (10 Count)</b><span class="meta"><span id="pcard-sku-0001">JBJ0001</span> · <span id="pcard-asin-0001">B0CH43DKT1</span> · <span id="pcard-price-0001">—</span> · <span id="pcard-size-0001">—</span></span><div class="pcard-itemtype" id="pcard-itemtype-0001"></div></div></div>
-            <div class="pcard-exec-body">
-              <div>
-                <div id="pcard-keying-0001"></div>
-                <details class="inci-toggle"><summary>View full INCI</summary><div class="inci-toggle-body" id="pcard-inci-0001"></div></details>
-                <div class="exec-fact"><b>Use</b><span id="pcard-use-0001">—</span></div>
-                <div class="exec-fact"><b>Benefits</b><span id="pcard-benefits-0001">—</span></div>
-                <div style="margin-top:8px;" id="pcard-freefrom-0001"></div>
-              </div>
-              <div id="pcard-pricecontext-0001">
-                <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Competitive Price Context</div>
-              </div>
-            </div>
-          </div>
           <div class="pcard-exec">
             <div class="pcard-exec-hd"><div><b id="pcard-name-0002">45 Serving Pouch</b><span class="meta"><span id="pcard-sku-0002">JBJ0002</span> · <span id="pcard-asin-0002">B0CH43TMBV</span> · <span id="pcard-price-0002">—</span> · <span id="pcard-size-0002">—</span></span><div class="pcard-itemtype" id="pcard-itemtype-0002"></div></div></div>
             <div class="pcard-exec-body">
@@ -2999,6 +2985,78 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
               </div>
             </div>
           </div>
+        </div>
+
+        <!-- Keywords -->
+        <div class="card" id="products-keywords">
+          <div class="card-title">Keyword Strategy — JBJ • Collagen</div>
+          <div id="collagen-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        </div>
+
+        <!-- Competitors -->
+        <div class="card">
+          <div class="card-title">Competitive Landscape</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Data: Helium 10 · Live from the competitor research sheet (JBJ • Collagen).</div>
+          <div class="sec-lbl" style="margin-top:0;">Current Competitors</div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr><th>ASIN</th><th>Brand / Product</th><th>Price</th><th>Rating</th><th>Reviews</th><th>BSR</th><th>Threat</th></tr></thead>
+              <tbody id="cl-collagen-current"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div class="sec-lbl">Category Leaders</div>
+          <div style="overflow-x:auto;">
+            <table class="data-table">
+              <thead><tr><th>ASIN</th><th>Brand / Product</th><th>Price</th><th>Rating</th><th>Reviews</th><th>BSR</th><th>Threat</th></tr></thead>
+              <tbody id="cl-collagen-leaders"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
+            </table>
+          </div>
+          <div style="background:rgba(0,31,96,.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-top:16px;font-size:12px;color:var(--navy);line-height:1.6;">
+            <strong>Key differentiation:</strong> <span id="cl-diff-collagen">Pending — no key-differentiation note available yet for Just Bjorn.</span>
+          </div>
+        </div>
+      </div><!-- /pt-collagen -->
+
+      <div class="sub-page" id="pt-collagen-stickpacks">
+
+        <!-- Performance -->
+        <div class="card">
+          <div class="card-title" style="margin-bottom:2px;">Performance</div>
+          <div style="overflow-x:auto;">
+            <table class="perf-compare">
+              <thead><tr><th></th><th class="prodcol"><div class="prodcol-name">Stick Packs (10 Count)</div><div class="prodcol-sku">JBJ0001</div></th><th class="prodcol"><div class="prodcol-name">Stick Pack Sample Set (3 Count)</div><div class="prodcol-sku">JBJ0021</div></th></tr></thead>
+              <tbody>
+                <tr><td>BSR</td><td id="perf-act-bsr-0001">—</td><td id="perf-act-bsr-0021">—</td></tr>
+                <tr><td>Subcategory BSR</td><td id="perf-act-subbsr-0001">—</td><td id="perf-act-subbsr-0021">—</td></tr>
+                <tr><td>Sessions</td><td id="perf-act-sessions-0001">—</td><td id="perf-act-sessions-0021">—</td></tr>
+                <tr><td>Units</td><td id="perf-act-units-0001">—</td><td id="perf-act-units-0021">—</td></tr>
+                <tr><td>Revenue</td><td id="perf-act-revenue-0001">—</td><td id="perf-act-revenue-0021">—</td></tr>
+                <tr><td>Conversion</td><td id="perf-act-conv-0001">—</td><td id="perf-act-conv-0021">—</td></tr>
+                <tr><td>Rating</td><td id="perf-act-rating-0001">—</td><td id="perf-act-rating-0021">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Products -->
+        <div class="card">
+          <div class="card-title">Product Portfolio</div>
+
+          <div class="pcard-exec">
+            <div class="pcard-exec-hd"><div><b id="pcard-name-0001">Stick Packs (10 Count)</b><span class="meta"><span id="pcard-sku-0001">JBJ0001</span> · <span id="pcard-asin-0001">B0CH43DKT1</span> · <span id="pcard-price-0001">—</span> · <span id="pcard-size-0001">—</span></span><div class="pcard-itemtype" id="pcard-itemtype-0001"></div></div></div>
+            <div class="pcard-exec-body">
+              <div>
+                <div id="pcard-keying-0001"></div>
+                <details class="inci-toggle"><summary>View full INCI</summary><div class="inci-toggle-body" id="pcard-inci-0001"></div></details>
+                <div class="exec-fact"><b>Use</b><span id="pcard-use-0001">—</span></div>
+                <div class="exec-fact"><b>Benefits</b><span id="pcard-benefits-0001">—</span></div>
+                <div style="margin-top:8px;" id="pcard-freefrom-0001"></div>
+              </div>
+              <div id="pcard-pricecontext-0001">
+                <div style="font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Competitive Price Context</div>
+              </div>
+            </div>
+          </div>
           <div class="pcard-exec">
             <div class="pcard-exec-hd"><div><b id="pcard-name-0021">Stick Pack Sample Set (3 Count)</b><span class="meta"><span id="pcard-sku-0021">JBJ0021</span> · <span id="pcard-asin-0021">B0GP93B5ZN</span> · <span id="pcard-price-0021">—</span> · <span id="pcard-size-0021">—</span></span><div class="pcard-itemtype" id="pcard-itemtype-0021"></div></div></div>
             <div class="pcard-exec-body">
@@ -3016,13 +3074,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
         </div>
 
-        <!-- Keywords — split 2026-09-25 per Jaclyn into 2 categories:
-             Stick Packs get their own keyword targeting separate from
-             the general Collagen line. -->
-        <div class="card" id="products-keywords">
-          <div class="card-title">Keyword Strategy — JBJ • Collagen</div>
-          <div id="collagen-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
-        </div>
+        <!-- Keywords -->
         <div class="card" id="products-keywords-stickpacks">
           <div class="card-title">Keyword Strategy — JBJ • Collagen Stick Packs</div>
           <div id="collagenstickpacks-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
@@ -3031,26 +3083,26 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <!-- Competitors -->
         <div class="card">
           <div class="card-title">Competitive Landscape</div>
-          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Data: Helium 10 · Live from the competitor research sheet (JBJ • Collagen).</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Data: Helium 10 · Live from the competitor research sheet (JBJ • Collagen Stick Packs).</div>
           <div class="sec-lbl" style="margin-top:0;">Current Competitors</div>
           <div style="overflow-x:auto;">
             <table class="data-table">
               <thead><tr><th>ASIN</th><th>Brand / Product</th><th>Price</th><th>Rating</th><th>Reviews</th><th>BSR</th><th>Threat</th></tr></thead>
-              <tbody id="cl-products-current"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
+              <tbody id="cl-collagenStickPacks-current"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
             </table>
           </div>
           <div class="sec-lbl">Category Leaders</div>
           <div style="overflow-x:auto;">
             <table class="data-table">
               <thead><tr><th>ASIN</th><th>Brand / Product</th><th>Price</th><th>Rating</th><th>Reviews</th><th>BSR</th><th>Threat</th></tr></thead>
-              <tbody id="cl-products-leaders"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
+              <tbody id="cl-collagenStickPacks-leaders"><tr><td colspan="7" style="color:var(--muted);">Loading…</td></tr></tbody>
             </table>
           </div>
           <div style="background:rgba(0,31,96,.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 16px;margin-top:16px;font-size:12px;color:var(--navy);line-height:1.6;">
-            <strong>Key differentiation:</strong> <span id="cl-diff-products">Pending — no key-differentiation note available yet for Just Bjorn.</span>
+            <strong>Key differentiation:</strong> <span id="cl-diff-collagenStickPacks">Pending — no key-differentiation note available yet for Just Bjorn.</span>
           </div>
         </div>
-      </div><!-- /pt-products -->
+      </div><!-- /pt-collagen-stickpacks -->
 
       <div class="sub-page" id="pt-bundles">
         <div id="pt-bundles-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
@@ -10594,7 +10646,8 @@ async function initSnsExternal() {
     if (typeof window.initInsightsOverview === 'function') window.initInsightsOverview();
     if (typeof window.initCompetitorLandscape === 'function') window.initCompetitorLandscape();
     if (typeof window.renderProductPortfolioCards === 'function') {
-      window.renderProductPortfolioCards('products', ['JBJ0001', 'JBJ0002', 'JBJ0003', 'JBJ0004', 'JBJ0021']);
+      window.renderProductPortfolioCards('collagen', ['JBJ0002', 'JBJ0003', 'JBJ0004']);
+      window.renderProductPortfolioCards('collagenStickPacks', ['JBJ0001', 'JBJ0021']);
       if (typeof window.renderBundlesInsightsTab === 'function') window.renderBundlesInsightsTab();
     }
     if (typeof window.renderSimpleKeywordStrategy === 'function') {
@@ -13333,17 +13386,13 @@ const SHEET_COMPETITOR_ID = window.SHEET_CFG.SHEET_COMPETITOR.fileId;
 // not 1: Stick Packs get their own keyword targeting separate from the
 // general Collagen line. Two keys now, matching the pattern évolis uses
 // for its own multiple categories (exactly what the old single-key
-// comment here predicted would eventually be needed). "collagen" still
-// routes through the existing SHEET_CFG value (unchanged — same tab as
-// before, just renamed from the old generic "products" key); the new
-// "collagenStickPacks" tab is a second tab within this SAME competitor
-// file, not a separate sheet, so there's no second SHEET_CONFIG entry
-// for it — same pattern already used elsewhere for other known,
-// additional tabs within an already-configured file (Report Insights'
-// "_events" tab, PPC Strategy's shared "ppc_strategy" tab).
+// comment here predicted would eventually be needed). Both gids route
+// through SHEET_CONFIG now — SHEET_COMPETITOR_STICK_PACKS is a new key,
+// same fileId as SHEET_COMPETITOR (same file, just a second tab), added
+// to sheet-config.example.json.
 const COMPETITOR_GID_BY_PRODUCT_TYPE = {
-  collagen: window.SHEET_CFG.SHEET_COMPETITOR.gid, // JBJ • Collagen (339499451)
-  collagenStickPacks: '1225113083',                // JBJ • Collagen Stick Packs
+  collagen: window.SHEET_CFG.SHEET_COMPETITOR.gid,            // JBJ • Collagen
+  collagenStickPacks: window.SHEET_CFG.SHEET_COMPETITOR_STICK_PACKS.gid, // JBJ • Collagen Stick Packs
 };
 
 function clFindSectionRow(rows, needle) {
