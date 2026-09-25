@@ -1470,6 +1470,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <thead>
           <tr style="background:var(--navy);color:#fff;">
             <th style="text-align:left;padding:8px 10px;">#</th>
+            <th style="text-align:left;padding:8px 10px;">SKU</th>
             <th style="text-align:left;padding:8px 10px;">Product</th>
             <th style="text-align:left;padding:8px 10px;">Amazon</th>
             <th style="text-align:left;padding:8px 10px;">Walmart</th>
@@ -1479,7 +1480,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <th style="text-align:left;padding:8px 10px;">Conv. %</th>
           </tr>
         </thead>
-        <tbody id="ov-products-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
+        <tbody id="ov-products-tbody"><tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
       </table>
     </div>
 
@@ -3015,10 +3016,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
         </div>
 
-        <!-- Keywords -->
+        <!-- Keywords — split 2026-09-25 per Jaclyn into 2 categories:
+             Stick Packs get their own keyword targeting separate from
+             the general Collagen line. -->
         <div class="card" id="products-keywords">
-          <div class="card-title">Keyword Strategy</div>
-          <div id="products-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+          <div class="card-title">Keyword Strategy — JBJ • Collagen</div>
+          <div id="collagen-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        </div>
+        <div class="card" id="products-keywords-stickpacks">
+          <div class="card-title">Keyword Strategy — JBJ • Collagen Stick Packs</div>
+          <div id="collagenstickpacks-keywords-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
         </div>
 
         <!-- Competitors -->
@@ -10591,7 +10598,8 @@ async function initSnsExternal() {
       if (typeof window.renderBundlesInsightsTab === 'function') window.renderBundlesInsightsTab();
     }
     if (typeof window.renderSimpleKeywordStrategy === 'function') {
-      window.renderSimpleKeywordStrategy('products-keywords-container', COMPETITOR_GID_BY_PRODUCT_TYPE.products);
+      window.renderSimpleKeywordStrategy('collagen-keywords-container', COMPETITOR_GID_BY_PRODUCT_TYPE.collagen);
+      window.renderSimpleKeywordStrategy('collagenstickpacks-keywords-container', COMPETITOR_GID_BY_PRODUCT_TYPE.collagenStickPacks);
     }
     if (typeof window.renderSearchQueryPerformance === 'function') {
       window.renderSearchQueryPerformance('ins-sqp-container');
@@ -13321,16 +13329,21 @@ window.initInsightsOverview = async function() {
 // ═══════════════════════════════════════════════════════════════════
 
 const SHEET_COMPETITOR_ID = window.SHEET_CFG.SHEET_COMPETITOR.fileId;
-// Just Bjorn has one product line today, not évolis's 5 hair-care
-// categories, so this collapses to a single 'products' key — kept generic
-// ('products', not 'collagen') since the underlying data spans whatever
-// category Just Bjorn is selling, and a second category is expected to
-// launch next year. The competitor tab itself is scoped by name only
-// ("JBJ • Collagen", gid confirmed 2026-08-26) — if/when a second
-// category launches, this will need its own key + gid + tab, same
-// pattern évolis uses for its own multiple categories.
+// UPDATED 2026-09-25 per Jaclyn — Just Bjorn now has 2 real categories,
+// not 1: Stick Packs get their own keyword targeting separate from the
+// general Collagen line. Two keys now, matching the pattern évolis uses
+// for its own multiple categories (exactly what the old single-key
+// comment here predicted would eventually be needed). "collagen" still
+// routes through the existing SHEET_CFG value (unchanged — same tab as
+// before, just renamed from the old generic "products" key); the new
+// "collagenStickPacks" tab is a second tab within this SAME competitor
+// file, not a separate sheet, so there's no second SHEET_CONFIG entry
+// for it — same pattern already used elsewhere for other known,
+// additional tabs within an already-configured file (Report Insights'
+// "_events" tab, PPC Strategy's shared "ppc_strategy" tab).
 const COMPETITOR_GID_BY_PRODUCT_TYPE = {
-  products: window.SHEET_CFG.SHEET_COMPETITOR.gid,
+  collagen: window.SHEET_CFG.SHEET_COMPETITOR.gid, // JBJ • Collagen (339499451)
+  collagenStickPacks: '1225113083',                // JBJ • Collagen Stick Packs
 };
 
 function clFindSectionRow(rows, needle) {
@@ -16912,7 +16925,7 @@ async function runListingAudit() {
   st.className = 'upload-status';
 
   try {
-    // ── Step 1: Read source sheet to group SKUs by item_type_keyword ──────────
+    // ── Step 1: Read source sheet + category assignment, group SKUs ────
     st.textContent = 'Reading listing sheet…';
     const srcUrl = 'https://docs.google.com/spreadsheets/d/' + SHEET_LISTINGS_ID +
       '/export?format=csv&id=' + SHEET_LISTINGS_ID +
@@ -16920,6 +16933,44 @@ async function runListingAudit() {
     const srcRes = await fetch(srcUrl);
     if (!srcRes.ok) throw new Error('Could not read source listings sheet');
     const srcRows = parseCsvToRows(await srcRes.text());
+
+    // Category assignment — added 2026-09-25 per Jaclyn: Just Bjorn now
+    // has 2 real categories (Stick Packs get their own keyword targeting,
+    // separate from the general Collagen line), tracked per-SKU on the
+    // Product Short Name sheet's column K. Read POSITIONALLY (by column
+    // index, not by header text) rather than trusting whatever that
+    // column happens to be labeled — the exact header text was never
+    // confirmed, and this codebase has hit real "the header lies" bugs
+    // more than once already (the Goal Tracker's own column-position
+    // gotchas). Column B = SKU, column K = category name, per Jaclyn.
+    const skuToCategory = {};
+    try {
+      const catUrl = 'https://docs.google.com/spreadsheets/d/' + window.SHEET_CFG.SHEET_MASTER_SKU_LIST.fileId +
+        '/export?format=csv&gid=' + window.SHEET_CFG.SHEET_MASTER_SKU_LIST.gid + '&_cb=' + Date.now();
+      const catRes = await fetch(catUrl);
+      if (catRes.ok) {
+        const catText = await catRes.text();
+        const catLines = catText.replace(/\r/g, '').split('\n').filter(l => l.trim());
+        function parseRow(line) {
+          const out = []; let cur = '', inQ = false;
+          for (let i = 0; i < line.length; i++) {
+            const c = line[i];
+            if (inQ) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+            else { if (c === '"') inQ = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
+          }
+          out.push(cur);
+          return out;
+        }
+        catLines.slice(1).forEach(line => {
+          const cells = parseRow(line);
+          const sku = (cells[1] || '').trim();       // column B
+          const category = (cells[10] || '').trim(); // column K
+          if (sku && category) skuToCategory[sku] = category;
+        });
+      }
+    } catch (err) {
+      console.warn('[listing-audit] category lookup failed, falling back to item_type_keyword grouping:', err.message);
+    }
 
     // Group SKUs by item_type_keyword (col 14 = index 14, 0-based)
     // FIXED 2026-09-04 per Jaclyn — srcRows is a DAILY snapshot sheet (one
@@ -16944,8 +16995,14 @@ async function runListingAudit() {
     for (const sku of Object.keys(latestRowBySku)) {
       const row  = latestRowBySku[sku];
       const name = (row['name'] || '').trim().toLowerCase();
-      // Determine group key — use item_type_keyword, fall back to name-based guess
-      let groupKey = (row['item_type_keyword'] || '').trim();
+      // UPDATED 2026-09-25 per Jaclyn — prefer the real category from the
+      // Product Short Name sheet (skuToCategory, built above) over
+      // item_type_keyword, since that's what actually distinguishes
+      // Stick Packs (their own keyword targeting) from the general
+      // Collagen line. Falls back to the old item_type_keyword/SKU logic
+      // only when a SKU has no category assignment yet, rather than
+      // failing the whole run.
+      let groupKey = skuToCategory[sku] || (row['item_type_keyword'] || '').trim();
       if (!groupKey) {
         // FIXED 2026-09-04 — this fallback chain was évolis's own hair-care
         // taxonomy (shampoo/conditioner/mask/dry-shampoo), defaulting to
@@ -19260,6 +19317,7 @@ async function loadAuditResultsFromSheet() {
       // Product names + SKU→ASIN crosswalk (see fetch comment above).
       let asinNameMap = {};
       let skuToAsinMap = {};
+      let asinToSkuMap = {}; // added 2026-09-25 per Jaclyn, for the Top Selling Products table's new SKU column
       let walmartItemIdToAsinMap = {}; // added 2026-08-06 per Jaclyn, for Walmart ad-units below
       try {
         if (isCsv(namesCsv)) {
@@ -19271,7 +19329,7 @@ async function loadAuditResultsFromSheet() {
             const name = (cols[2] || '').replace(/^"|"$/g, '').trim();
             const walmartItemId = (cols[8] || '').replace(/^"|"$/g, '').trim();
             if (asin && name) asinNameMap[asin] = name;
-            if (sku && asin) skuToAsinMap[sku] = asin;
+            if (sku && asin) { skuToAsinMap[sku] = asin; asinToSkuMap[asin] = sku; }
             if (walmartItemId && asin) walmartItemIdToAsinMap[walmartItemId] = asin;
           }
           console.log('[JustBjorn][overview] product name lookup: ', Object.keys(asinNameMap).length, 'ASINs,', Object.keys(skuToAsinMap).length, 'SKU→ASIN mappings,', Object.keys(walmartItemIdToAsinMap).length, 'Walmart Item ID→ASIN mappings');
@@ -19738,17 +19796,18 @@ async function loadAuditResultsFromSheet() {
         const orgUnits = total - adUnits;
         const biz = bizByAsin[asin];
         const convPct = (biz && biz.sessions > 0) ? (biz.unitsExVine / biz.sessions * 100) : null;
-        return { asin, name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits, convPct };
+        return { asin, sku: asinToSkuMap[asin] || '—', name: asinNameMap[asin] || asin, amazon: a, amazonPrev: aPrev, walmart: m, walmartPrev: mPrev, total, totalPrev, adUnits, orgUnits, convPct };
       }).sort((x, y) => y.total - x.total).slice(0, 15);
 
       const tbody = document.getElementById('ov-products-tbody');
       if (tbody) {
         if (!productRows.length) {
-          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
         } else {
           tbody.innerHTML = productRows.map((r, i) => `
             <tr>
               <td style="padding:7px 10px;">${i + 1}.</td>
+              <td style="padding:7px 10px;font-family:monospace;font-size:11px;">${r.sku}</td>
               <td style="padding:7px 10px;">${r.name}</td>
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.amazon, r.amazonPrev)}</div></td>
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.walmart, r.walmartPrev)}</div></td>
