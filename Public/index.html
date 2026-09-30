@@ -354,7 +354,7 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 .pdfx-momentum-tight .momentum-pcard-body{padding:9px 16px;}
 .pdfx-momentum-tight .momentum-pcard-label{font-size:9px;}
 .pdfx-momentum-tight .momentum-pcard-value{font-size:19px;}
-.pdfx-momentum-tight .momentum-pcard-subcategory{font-size:9.5px;}
+.pdfx-momentum-tight .momentum-pcard-subcategory{display:none;} /* removed from PDF per Jaclyn 2026-10-01 — live page still shows it */
 .pdfx-momentum-tight .momentum-pill{font-size:9px;padding:2px 7px;}
 .insight-editor-label{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;}
 .insight-editor input,.insight-editor textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);font-family:var(--font);font-size:12.5px;color:var(--navy);resize:vertical;min-height:72px;background:var(--white);outline:none;line-height:1.6;margin-bottom:10px;}
@@ -1061,6 +1061,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 /* flex:1 fills all remaining vertical space below the navy block (up to the full 11in page); justify-content:center vertically centers the pill/headline/columns within that remaining space, per the request to justify this content to the middle of the space below the navy area. */
 .pdfx-cover-white{padding:40px 60px;flex:1;display:flex;flex-direction:column;justify-content:center;}
 .pdfx-pill{display:inline-block;align-self:flex-start;background:rgba(36,233,163,.14);border:1px solid rgba(36,233,163,.35);border-radius:20px;padding:5px 16px;font-size:11.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--green);margin-bottom:24px;}
+.pdfx-pill-sand{background:#f4dfd0;border-color:rgba(200,125,47,.35);color:var(--warn);} /* What's Been Accomplished — sand per Jaclyn 2026-10-01, matches évolis's .pdfx-pill-sand */
 .pdfx-cover-headline{font-family:var(--font-subheader);font-size:20px;font-weight:600;color:var(--navy);line-height:1.35;margin-bottom:28px;}
 .pdfx-cover-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:8px;}
 .pdfx-cover-col{font-size:12px;color:#48557a;line-height:1.75;}
@@ -4648,7 +4649,13 @@ async function initSns() {
           try { items = Chart.defaults.plugins.legend.labels.generateLabels(chart) || []; } catch (e) { items = []; }
           el.innerHTML = items.map(it => {
             const color = it.strokeStyle || it.fillStyle || '#6B7BA2';
-            const label = escapeHtml(it.text == null ? '' : it.text);
+            // Local escape — escapeHtml elsewhere in this file lives inside
+            // an IIFE and is NOT reachable here. Using it threw a
+            // ReferenceError that aborted initSns() right after the chart
+            // drew, before the KPI numbers were set (the "123 / Loading…"
+            // placeholders). Fixed 2026-10-01.
+            const _d = document.createElement('div'); _d.textContent = it.text == null ? '' : String(it.text);
+            const label = _d.innerHTML;
             return '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:16px;font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;">' +
               '<span style="width:16px;height:3px;border-radius:2px;background:' + color + ';display:inline-block;flex-shrink:0;"></span>' +
               label + '</span>';
@@ -12356,12 +12363,16 @@ window.initBrandMomentum = async function () {
       console.warn('[BrandMomentum] Keyword Tracker Summary did not return CSV.');
     }
     function latestKwRow(asin) { const rows = kwSummaryByAsin[asin] || []; return rows.length ? rows[rows.length - 1] : null; }
+    // CHANGED 2026-10-01 per Jaclyn — subcategory BSR (e.g. rank within
+    // "Collagen"), not overall BSR (rank within all of Health &
+    // Household). Confirmed against the live Summary tab: subcategory_bsr
+    // is a plain integer column, subcategory holds the name separately.
     function earliestBsrRow(asin) {
-      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.bsr, 10) > 0);
+      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.subcategory_bsr, 10) > 0);
       return rows.length ? rows[0] : null;
     }
     function latestBsrRow(asin) {
-      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.bsr, 10) > 0);
+      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.subcategory_bsr, 10) > 0);
       return rows.length ? rows[rows.length - 1] : null;
     }
 
@@ -12444,10 +12455,13 @@ window.initBrandMomentum = async function () {
       const earliestBsr = earliestBsrRow(p.asin);
       let changePct = 0;
       if (earliestBsr && earliestBsr.date !== latestBsr.date) {
-        const earliestVal = parseInt(earliestBsr.bsr, 10), latestVal = parseInt(latestBsr.bsr, 10);
+        const earliestVal = parseInt(earliestBsr.subcategory_bsr, 10), latestVal = parseInt(latestBsr.subcategory_bsr, 10);
         if (earliestVal > 0) changePct = Math.round(((earliestVal - latestVal) / earliestVal) * 1000) / 10;
       }
-      window._bmBsrBySku[p.asin] = { latestBsr: parseInt(latestBsr.bsr, 10), changePct, subcategory: latestBsr.subcategory_bsr ? `Subcategory BSR #${latestBsr.subcategory_bsr}` : '' };
+      // subcategory = the category NAME (e.g. "Collagen"), shown as a
+      // small label under the rank on the live page only — removed from
+      // the PDF per Jaclyn (see .pdfx-momentum-tight rule).
+      window._bmBsrBySku[p.asin] = { latestBsr: parseInt(latestBsr.subcategory_bsr, 10), changePct, subcategory: (latestBsr.subcategory || '').trim() ? `in ${latestBsr.subcategory.trim()}` : '' };
     });
 
     window.bmRenderMomentumCards();
@@ -12505,7 +12519,7 @@ window.bmRenderMomentumCards = function () {
       <div class="momentum-pcard-body">
         <div class="momentum-pcard-row"><span class="momentum-pcard-label">Sessions</span><span class="momentum-pcard-value">${sessValue !== null ? sessValue : '—'}</span>${sessPillHtml}</div>
         <div class="momentum-pcard-row"><span class="momentum-pcard-label">Organic Keywords</span><span class="momentum-pcard-value">${kwOrganicCountByAsin[p.asin] || '—'}</span></div>
-        <div class="momentum-pcard-row"><span class="momentum-pcard-label">BSR</span><span class="momentum-pcard-value">${bsrValueHtml}</span>${bsrPillHtml}${bsrSubcatHtml}</div>
+        <div class="momentum-pcard-row"><span class="momentum-pcard-label">Subcategory BSR</span><span class="momentum-pcard-value">${bsrValueHtml}</span>${bsrPillHtml}${bsrSubcatHtml}</div>
         <div class="momentum-pcard-row"><span class="momentum-pcard-label">Reviews</span><span class="momentum-pcard-value">${reviewsCount || '—'}</span></div>
       </div>
     </div>`;
@@ -12629,11 +12643,23 @@ window.initSalesInsights = async function () {
       options: {
         responsive: true, maintainAspectRatio: false,
         // Grouped, not stacked — changed 2026-09-30 per Jaclyn: more
-        // categories are coming in the next few months, and grouped bars
-        // stay readable as that count grows (each category gets its own
-        // bar, side by side) where stacked segments would just keep
-        // getting thinner and harder to compare against each other.
-        scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.04)' }, beginAtZero: true } },
+        // categories are coming in the next few months. Styling below
+        // matched 2026-10-01 to évolis's own _insCategoryChart exactly
+        // (legend top-right, DM Sans, borderless axes, same tooltip).
+        plugins: {
+          legend: { position: 'top', align: 'end', labels: { boxWidth: 12, boxHeight: 12, font: { family: 'DM Sans, sans-serif', size: 11 }, color: '#001F60', padding: 10 } },
+          tooltip: {
+            backgroundColor: '#fff', borderColor: 'rgba(0,31,96,0.1)', borderWidth: 1,
+            titleColor: '#001F60', bodyColor: '#6B7BA2',
+            titleFont: { family: 'DM Sans, sans-serif', size: 11, weight: '600' },
+            bodyFont: { family: 'DM Sans, sans-serif', size: 11 },
+            padding: 12,
+          },
+        },
+        scales: {
+          x: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'DM Sans, sans-serif', size: 10 }, color: '#6B7BA2' } },
+          y: { border: { display: false }, grid: { color: 'rgba(0,31,96,0.05)' }, beginAtZero: true, ticks: { font: { family: 'DM Sans, sans-serif', size: 10 }, color: '#6B7BA2' } },
+        },
       },
     });
   } catch (err) {
@@ -18978,7 +19004,30 @@ async function loadAuditResultsFromSheet() {
       const PDFX_CAPTURE_TENSION = 0.3; // 2026-07-16: bumped from 0.22 — Jaclyn wanted more curve. Re-tested at 0.3 (the dashboard's own native value) with the corrected line-weight scaling and 0.9x height factor already in place, and it now reads clean rather than bulgy — the earlier over-exaggeration was compounded by the un-scaled thin lines, not tension alone.
       const PDFX_LINE_WIDTH_TARGET_PX = 3;   // dashboard's own is 2.5 — slightly heavier per Jaclyn's "increase the weight" ask
       const PDFX_POINT_RADIUS_TARGET_PX = 2.2; // dashboard's own is 2
-      const captureHeightPx = Math.round(originalWidthPx * ((dashboardHeightPx * PDFX_HEIGHT_FACTOR) / PDFX_CARD_WIDTH_PX));
+      // CHANGED 2026-10-01 per Jaclyn — ported from évolis:
+      // PDFX_CHART_TARGET_HEIGHT_PX (fixed per-chart PDF heights, so tall
+      // charts no longer stretch their page) + liveChart.stop() before
+      // resize(). The stop() matters: without it, a chart still mid-
+      // animation defers its real resize to the next draw, so capture
+      // reads the OLD canvas size — confirmed in Jaclyn's own console log,
+      // every chart showed "requested 2238x940" but got "2238x320". That
+      // mismatch is also what distorted the category chart. Width is
+      // untouched (always 686px in the PDF); only height changes.
+      const PDFX_CHART_TARGET_HEIGHT_PX = {
+        _amazonChart: 190,
+        _walmartChart: 190,
+        _categorySalesChart: 220,
+        _snsChart: 190,
+        _investChart: 170,
+        _impressChart: 150,
+        mfcShippedChartInstance: 150,
+      };
+      const captureHeightPx = Math.round(
+        PDFX_CHART_TARGET_HEIGHT_PX[varName]
+          ? originalWidthPx * (PDFX_CHART_TARGET_HEIGHT_PX[varName] / PDFX_CARD_WIDTH_PX)
+          : originalWidthPx * ((dashboardHeightPx * PDFX_HEIGHT_FACTOR) / PDFX_CARD_WIDTH_PX)
+      );
+      if (typeof liveChart.stop === 'function') liveChart.stop();
       liveChart.resize(originalWidthPx, captureHeightPx);
       console.log('[pdf-export][qa]', varName, '— canvas dims IMMEDIATELY after resize():', liveCanvas.width + 'x' + liveCanvas.height, '(requested', originalWidthPx + 'x' + captureHeightPx + ')');
 
@@ -19354,7 +19403,7 @@ async function loadAuditResultsFromSheet() {
     }).join('');
     return '' +
       '<div class="pdfx-page">' +
-        '<div class="pdfx-inner">' +
+        '<div class="pdfx-inner" style="padding-bottom:0;">' +
           pdfxHeaderBand(monthYear, 'Brand Stewardship') +
           '<div class="pdfx-chlabel">Key Performance Metrics</div>' +
           '<div class="pdfx-kpis" style="margin-top:6px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
@@ -19442,7 +19491,7 @@ async function loadAuditResultsFromSheet() {
     }).join('');
     if (!cards) return '';
     return '<div class="pdfx-card" style="margin-top:0;margin-bottom:22px;">' +
-      '<span class="pdfx-pill" style="margin-bottom:12px;">What&rsquo;s Been Accomplished</span>' +
+      '<span class="pdfx-pill pdfx-pill-sand" style="margin-bottom:12px;">What&rsquo;s Been Accomplished</span>' +
       '<div class="pdfx-cover-cols" style="gap:24px;">' + cards + '</div>' +
       '</div>';
   }
@@ -19536,7 +19585,7 @@ async function loadAuditResultsFromSheet() {
 
     return '' +
       '<div class="pdfx-page">' +
-        '<div class="pdfx-inner">' +
+        '<div class="pdfx-inner" style="padding-bottom:0;">' +
           pdfxHeaderBand(monthYear, 'Fulfillment & Customer Service') +
           '<div class="pdfx-chlabel">Fulfillment Performance</div>' +
           '<div class="pdfx-kpis" style="margin-top:6px;">' + topKpis.map(kpiCardPlain).join('') + '</div>' +
@@ -19546,7 +19595,10 @@ async function loadAuditResultsFromSheet() {
           '</div>' +
           '<div class="pdfx-chlabel" style="margin-top:16px;">Customer Service</div>' +
           '<div class="pdfx-kpis n3" style="margin-top:6px;">' + csKpis.map(kpiCardWithSub).join('') + '</div>' +
-          '<div class="pdfx-card" style="margin-top:14px;margin-bottom:0;">' +
+          // Map card: no border/padding (perimeter removed per Jaclyn
+          // 2026-10-01) — keeps this page under 11in so the render service
+          // doesn't zoom it down (which is what caused side whitespace).
+          '<div class="pdfx-card" style="margin-top:14px;margin-bottom:0;border:none;padding:0;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;">' +
               '<div class="pdfx-card-title" style="margin-bottom:0;">Orders by State · Last 30 Days</div>' +
               '<div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);">' +
@@ -19743,11 +19795,12 @@ async function loadAuditResultsFromSheet() {
     // possible. Worth a real check on the actual render before trusting
     // this looks clean rather than cramped — can't visually verify
     // page-break behavior from here.
+    // Strategic Outlook block and footer removed per Jaclyn 2026-10-01
+    // (outlook var above is still built but intentionally not placed).
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
       pdfxHeaderBand(monthYear, 'Events', pdfxText('#evs-headline'), pdfxText('#evs-dates')) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
-      leadUp + during + leadOut + outlook +
-      pdfxFooter(monthYear) +
+      leadUp + during + leadOut +
       '</div></div>';
     return page1;
   }
@@ -20007,6 +20060,31 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
     return { blob, mode: 'image' };
   }
 
+  // fetch() + FileReader, NOT canvas drawImage — per évolis's own
+  // finding, Drive's lh3.googleusercontent.com allows a normal
+  // cross-origin GET but doesn't reliably send the stricter headers a
+  // canvas pixel-read needs. One bad image never blocks the export.
+  async function pdfxRasterizeRemoteImages(rootEl) {
+    const imgs = Array.from(rootEl.querySelectorAll('img[src^="http"]'));
+    await Promise.all(imgs.map(async img => {
+      try {
+        const res = await fetch(img.src, { mode: 'cors' });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        const dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        img.src = dataUrl;
+        if (typeof img.decode === 'function') await img.decode().catch(() => {});
+      } catch (e) {
+        console.warn('[pdfxRasterizeRemoteImages] could not embed', img.src, '—', e.message);
+      }
+    }));
+  }
+
   function pdfxDownloadBlob(blob, filename) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -20121,7 +20199,14 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // never going to render because its page got excluded.
       const chartsBySection = {
         amazon: ['_amazonChart'], walmart: ['_walmartChart'],
-        stewardship: ['_investChart', '_impressChart'], opportunities: ['_snsChart'],
+        stewardship: ['_investChart', '_impressChart'],
+        // FIXED 2026-10-01 — _snsChart moved to Sales > Insights in Stage 2
+        // but was still listed under opportunities here; _categorySalesChart
+        // was never listed at all, so the export never waited for it to
+        // finish rendering before capture (matches évolis's own entry:
+        // insights: ['_snsChart', '_insCategoryChart']).
+        insights: ['_snsChart', '_categorySalesChart'],
+        fulfillment: ['mfcShippedChartInstance'],
       };
       const expectedCharts = Object.keys(chartsBySection)
         .filter(sec => includeSections[sec])
@@ -20153,15 +20238,18 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // Sales/Marketing pages — added 2026-08-05 per Jaclyn: previously
       // hardcoded into every export unconditionally; now gated on the same
       // checkbox pattern as the 5 event pages below.
+      // Order per Jaclyn 2026-10-01: Overview (cover) → Sales → Insights →
+      // Brand Momentum → Fulfillment & CS → Brand Stewardship →
+      // Opportunities → Events (Strategy first, then each event).
       const salesMarketingPages = [
         includeSections.amazon        ? buildAmazonPage(monthYear)        : '',
         includeSections.website       ? buildWebsitePage(monthYear)       : '',
         includeSections.walmart       ? buildWalmartPage(monthYear)       : '',
+        includeSections.insights      ? buildSalesInsightsPage(monthYear) : '',
+        includeSections.brandMomentum ? buildBrandMomentumPages(monthYear) : '',
         includeSections.fulfillment   ? buildFulfillmentCsPage(monthYear) : '',
         includeSections.stewardship   ? buildStewardshipPage(monthYear)   : '',
         includeSections.opportunities ? buildOpportunitiesPage(monthYear) : '',
-        includeSections.insights ? buildSalesInsightsPage(monthYear) : '',
-        includeSections.brandMomentum ? buildBrandMomentumPages(monthYear) : '',
       ].join('');
 
       const eventPages = [
@@ -20244,6 +20332,14 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       console.log('[pdf-export] .pdfx-page count:', pageEls.length);
       if (!pageEls.length) throw new Error('No .pdfx-page elements found — nothing to export.');
 
+      // Embed remote images (Accomplished-card uploads on Drive) as data:
+      // URLs BEFORE rendering — ported 2026-10-01 from évolis's
+      // pdfxRasterizeRemoteImages (which évolis defines but never actually
+      // calls). Fixes the blank-square image: the screenshot fallback's
+      // html2canvas can't paint a cross-origin Drive image, and the server
+      // path no longer needs to fetch Drive at all. Runs on #pdfx-root
+      // only (the off-screen export copy), never the live dashboard.
+      await pdfxRasterizeRemoteImages(root);
       const pdfResult = await pdfxRenderPagesToPdf(root, pageEls);
       if (pdfResult.mode === 'image') pdfxToast(PDFX_FALLBACK_TOAST);
 
