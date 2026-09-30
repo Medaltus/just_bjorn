@@ -4490,6 +4490,7 @@ async function initSns() {
 
       const monthAbbr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       const labels = [], values = [], years = [];
+      const yoyRows = []; // {month, year, revenue} — reuses the shared YOY chart shape, "revenue" repurposed as subscriber count
       const skipped = [];
       withDate.forEach(x => {
         const r = x.row;
@@ -4499,41 +4500,92 @@ async function initSns() {
         labels.push(label);
         values.push(total);
         years.push(x.y);
+        if (!isNaN(x.y) && !isNaN(x.m)) yoyRows.push({ month: x.m, year: x.y, revenue: total });
       });
       if (skipped.length) {
         console.warn('[JustBjorn][subscriptions] skipped', skipped.length, 'row(s) with no usable total_subscriptions value — these months are NOT in the chart:', skipped.join(', '));
       }
 
-      // Trailing 13 months only — chronologically sorted already, so this
-      // is just "keep the last 13 of however many months made it through
-      // the filtering above." Confirmed 2026-07-21.
-      const TRAILING_MONTHS = 13;
-      const trimmedLabels = labels.slice(-TRAILING_MONTHS);
-      const trimmedValues = values.slice(-TRAILING_MONTHS);
-      const trimmedYears  = years.slice(-TRAILING_MONTHS);
-
-      console.log('[JustBjorn][subscriptions] months actually plotted on the chart (trailing', TRAILING_MONTHS, 'of', labels.length, 'available):', trimmedLabels.join(', '));
-
       if (values.length) {
-        // Color by calendar year: 2024 sand, 2025 slate, 2026 navy. Falls
-        // back gracefully for any other year (older -> sand-ish, newer ->
-        // navy) so this doesn't quietly break once 2027 data shows up.
-        const YEAR_COLORS = { 2024: '#f4dfd0', 2025: '#6b7ba2', 2026: '#001f60' };
-        const distinctYears = [...new Set(trimmedYears)].sort((a, b) => a - b);
-        const bg = trimmedYears.map(y => {
-          if (YEAR_COLORS[y]) return YEAR_COLORS[y];
-          const idx = distinctYears.indexOf(y);
-          return idx <= 0 ? '#f4dfd0' : (idx === distinctYears.length - 1 ? '#001f60' : '#6b7ba2');
-        });
+        // Year-over-year line chart — changed 2026-09-30 per Jaclyn, from
+        // a trailing-13-months bar chart to match Dazzle Dry's styling:
+        // one line per year, plotted against a shared Jan-Dec axis, so
+        // this year's trajectory can be compared directly against last
+        // year's at the same point in the calendar rather than reading
+        // two different time windows side by side. yoyBuildDatasets/
+        // yoyChartOptions/renderYoyLegend are self-contained local copies
+        // of the reference dashboard's own generic YOY chart-building
+        // system (same logic, copied rather than shared across <script>
+        // tags per this file's standing cross-scope rule) — up to 4
+        // years shown (current + 3 prior), whichever have real data;
+        // current year's line fills a light highlight underneath it,
+        // matching the reference exactly.
+        const YOY_MONTHS = monthAbbr;
+        const YOY_LINE_DEFAULTS = { pointRadius: 2, tension: 0.3, borderWidth: 2.5 };
+        const YOY_COLORS = {
+          0: { border: '#24e9a3', bg: 'rgba(36,233,163,0.08)', fill: true },  // current year
+          1: { border: '#001f60', bg: 'transparent', fill: false },          // -1
+          2: { border: '#f4dfd0', bg: 'transparent', fill: false },          // -2
+          3: { border: '#ccd3d5', bg: 'transparent', fill: false },          // -3
+        };
+        function jbjMktMonthIdx(m) {
+          const n = parseInt(m, 10);
+          if (!isNaN(n) && n >= 1 && n <= 12) return n - 1;
+          return 0;
+        }
+        function jbjYoyBuildDatasets(data) {
+          const now = new Date();
+          const currentYear = now.getFullYear();
+          const stopMonth = now.getMonth(); // 0-indexed — excludes the current (incomplete) month
+          const datasets = [];
+          for (let offset = 0; offset <= 3; offset++) {
+            const yr = currentYear - offset;
+            const color = YOY_COLORS[offset];
+            const dataArr = YOY_MONTHS.map((_, idx) => {
+              const mo = idx + 1;
+              if (yr === currentYear && mo > stopMonth) return null;
+              const row = data.find(r => Number(r.year) === yr && jbjMktMonthIdx(r.month) + 1 === mo);
+              return row ? row.revenue : null;
+            });
+            if (dataArr.every(v => v === null)) continue;
+            datasets.push({ label: String(yr), data: dataArr, borderColor: color.border, backgroundColor: color.bg, fill: color.fill, ...YOY_LINE_DEFAULTS });
+          }
+          return datasets;
+        }
+        function jbjRenderYoyLegend(chart, containerId) {
+          const el = document.getElementById(containerId);
+          if (!el || !chart) return;
+          let items = [];
+          try { items = Chart.defaults.plugins.legend.labels.generateLabels(chart) || []; } catch (e) { items = []; }
+          el.innerHTML = items.map(it => {
+            const color = it.strokeStyle || it.fillStyle || '#6B7BA2';
+            const label = escapeHtml(it.text == null ? '' : it.text);
+            return '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:16px;font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;">' +
+              '<span style="width:16px;height:3px;border-radius:2px;background:' + color + ';display:inline-block;flex-shrink:0;"></span>' +
+              label + '</span>';
+          }).join('');
+        }
+        const yoyDatasets = jbjYoyBuildDatasets(yoyRows);
         window._snsChart = new Chart(canvas, {
-          type: 'bar',
-          data: { labels: trimmedLabels, datasets: [{ label: 'Active Subscriptions', data: trimmedValues, backgroundColor: bg }] },
+          type: 'line',
+          data: { labels: YOY_MONTHS, datasets: yoyDatasets },
           options: {
             responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.04)' }, beginAtZero: true } }
-          }
+            plugins: {
+              legend: { display: false }, // external legend instead — see jbjRenderYoyLegend below
+              tooltip: {
+                backgroundColor: '#fff', borderColor: 'rgba(0,31,96,0.1)', borderWidth: 1,
+                titleColor: '#001F60', bodyColor: '#6B7BA2', padding: 12, boxWidth: 8, boxHeight: 8,
+                callbacks: { label: ctx => ` ${ctx.dataset.label}: ${Math.round(ctx.parsed.y).toLocaleString()}` },
+              },
+            },
+            scales: {
+              x: { grid: { display: false } },
+              y: { grid: { color: 'rgba(0,31,96,0.05)' }, ticks: { callback: v => Math.round(v).toLocaleString() } },
+            },
+          },
         });
+        jbjRenderYoyLegend(window._snsChart, 'legend-sns');
         if (subsKpiEl) subsKpiEl.textContent = Math.round(values[values.length - 1]).toLocaleString();
         const subsMomEl = subsKpiEl ? subsKpiEl.nextElementSibling : null;
         if (subsMomEl) {
@@ -12444,15 +12496,29 @@ window.initSalesInsights = async function () {
       });
     }
 
-    // Amazon order-line-items — SHEET_ORDERS only (a rolling ~90-day
-    // cache), not blended with SHEET_ORDERS_HISTORICAL. Scoped this way
-    // deliberately: this chart shows the last ~3 months by category, not
-    // a multi-year trend — verifying the historical sheet's own column
-    // layout (likely different/more aggregated) was out of scope for
-    // this pass. Flagged clearly rather than silently guessed at.
-    const ordUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_ORDERS.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_ORDERS.gid}&_cb=${Date.now()}`;
+    // Amazon orders — switched 2026-09-30 per Jaclyn, from SHEET_ORDERS
+    // (a rolling ~90-day cache) to SHEET_ORDERS_HISTORICAL, for real
+    // multi-month trend data. Confirmed the real schema directly before
+    // building against it — it's genuinely different from SHEET_ORDERS,
+    // not just a longer version of the same shape:
+    //   - date IS real "YYYY-MM-DD" (confirmed from the live sheet).
+    //   - Column is "skus" (plural) and "asin" (also plural despite the
+    //     singular name) — for a multi-item order, both are COMMA-
+    //     SEPARATED lists in one row, not one row per line item. There's
+    //     no per-SKU quantity breakdown within a multi-item order, so
+    //     each listed SKU in a multi-item order is counted as 1 unit —
+    //     a reasonable approximation for a category MIX trend, not
+    //     something to treat as exact for orders with 2+ different SKUs.
+    //   - Quantity column is "quantity_ordered", not "quantity".
+    // The previous version's broken "undefined 'NN/20" x-axis labels
+    // were column-name mismatches on top of the wrong sheet entirely —
+    // r.sku/r.quantity never existed on this real schema at all, and on
+    // SHEET_ORDERS the actual date format wasn't the "YYYY-MM-DD" this
+    // code assumed either, which is what produced that specific garbled
+    // pattern (a slice() into a differently-formatted date string).
+    const ordUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_ORDERS_HISTORICAL.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_ORDERS_HISTORICAL.gid}&_cb=${Date.now()}`;
     const ordCsv = await fetch(ordUrl).then(r => r.ok ? r.text() : '').catch(() => '');
-    if (!isCsv(ordCsv)) { console.warn('[JustBjorn][SalesInsights] orders sheet did not return CSV.'); return; }
+    if (!isCsv(ordCsv)) { console.warn('[JustBjorn][SalesInsights] historical orders sheet did not return CSV.'); return; }
     const orders = parseCsv(ordCsv);
 
     // Group units by month + category, excluding cancelled orders and
@@ -12463,15 +12529,17 @@ window.initSalesInsights = async function () {
       const status = (r.status || '').toLowerCase().trim();
       if (status === 'cancelled') return;
       if ((r.promotion_ids || '').toLowerCase().includes('vine')) return;
-      const sku = (r.sku || '').trim().toUpperCase().replace(/-SF$/i, '');
-      const category = skuToCategory[sku];
-      if (!category) return;
       const dateStr = (r.date || '').trim();
-      const monthKey = dateStr.slice(0, 7); // "YYYY-MM"
-      if (!monthKey || monthKey.length !== 7) return;
-      if (!byMonth[monthKey]) byMonth[monthKey] = {};
-      const units = parseFloat(r.quantity ?? r.item_quantity ?? '1') || 1;
-      byMonth[monthKey][category] = (byMonth[monthKey][category] || 0) + units;
+      const monthKey = dateStr.slice(0, 7); // "YYYY-MM" — safe now, date is confirmed real ISO format on this sheet
+      if (!monthKey || monthKey.length !== 7 || monthKey[4] !== '-') return;
+      const skuList = (r.skus || '').split(',').map(s => s.trim().toUpperCase().replace(/-SF$/i, '')).filter(Boolean);
+      if (!skuList.length) return;
+      skuList.forEach(sku => {
+        const category = skuToCategory[sku];
+        if (!category) return; // not a known Just Bjorn SKU (or column K not assigned yet)
+        if (!byMonth[monthKey]) byMonth[monthKey] = {};
+        byMonth[monthKey][category] = (byMonth[monthKey][category] || 0) + 1; // 1 unit per listed SKU — see note above on multi-item orders
+      });
     });
 
     const monthKeys = Object.keys(byMonth).sort();
