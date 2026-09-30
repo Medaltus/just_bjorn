@@ -318,6 +318,40 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 
 /* ── Inline editor panel ── */
 .insight-editor{display:none;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-top:8px;}
+/* Brand Momentum — ported 2026-09-30 from Vivian Valenty's dashboard,
+   which itself ported these from Cosmette. Class names/values copied
+   verbatim, unmodified. */
+.momentum-cards-grid{display:grid;grid-template-columns:1fr;gap:28px;}
+.momentum-pcard{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.momentum-pcard-hd{background:var(--navy);padding:14px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.momentum-pcard-name{font-size:16px;font-weight:600;}
+.momentum-pcard-rating{display:flex;align-items:center;gap:6px;font-size:13px;}
+.momentum-pcard-rating-stars{color:#f5a623;letter-spacing:1px;}
+.momentum-pcard-rating-num{color:var(--green);font-weight:700;}
+.momentum-pcard-body{padding:26px 20px;display:flex;justify-content:space-between;}
+.momentum-pcard-row{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;text-align:center;}
+.momentum-pcard-label{color:var(--muted);font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+.momentum-pcard-value{font-weight:700;color:var(--navy);font-size:26px;font-family:var(--font-subheader);line-height:1;}
+.momentum-pcard-subcategory{font-size:11px;color:var(--muted);}
+.momentum-pill{display:inline-flex;align-items:center;gap:2px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:999px;white-space:nowrap;}
+.momentum-pill-up{background:rgba(36,233,163,.15);color:#1db88a;}
+.momentum-pill-dn{background:rgba(219,55,45,.12);color:var(--danger);}
+.momentum-tracking-card{background:var(--navy);border-radius:var(--radius);padding:20px 24px;}
+.momentum-tracking-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:14px;}
+.momentum-tracking-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+.momentum-tracking-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;}
+.momentum-tracking-item-title{font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;}
+.momentum-tracking-item-text{font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.55;}
+.insight-editor-label{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.insight-editor input,.insight-editor textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);font-family:var(--font);font-size:12.5px;color:var(--navy);resize:vertical;min-height:72px;background:var(--white);outline:none;line-height:1.6;margin-bottom:10px;}
+.insight-editor input{min-height:auto;}
+.insight-editor input:focus,.insight-editor textarea:focus{border-color:var(--navy);}
+.acc-image-inputs{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2);}
+.insight-image-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.insight-image-upload-btn{background:none;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);padding:4px 10px;font-size:10.5px;color:var(--muted);cursor:pointer;transition:all .13s;font-family:var(--font);white-space:nowrap;flex-shrink:0;}
+.insight-image-upload-btn.uploading{color:var(--muted);cursor:wait;}
+.insight-image-upload-btn.uploaded{border-color:#1db88a;color:#1db88a;}
+.insight-image-upload-btn.upload-error{border-color:var(--danger);color:var(--danger);}
 .insight-editor textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);font-family:var(--font);font-size:12.5px;color:var(--navy);resize:vertical;min-height:72px;background:var(--white);outline:none;line-height:1.6;}
 .insight-editor textarea:focus{border-color:var(--navy);}
 .editor-footer{display:flex;gap:8px;margin-top:8px;justify-content:flex-end;align-items:center;}
@@ -796,9 +830,11 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .ppc-kw-targets .rank-pill{font-size:12.5px;font-weight:600;padding:5px 12px;white-space:normal;line-height:1.4;max-width:100%;}
 .opp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;}
 .opp-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;}
-.opp-title{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;}
-.opp-subtitle{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:10px;}
-.opp-body{font-size:12.5px;color:var(--muted);line-height:1.6;}
+.opp-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+.opp-subtitle{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;}
+.opp-body{font-size:12px;color:var(--navy);line-height:1.6;}
+.opp-card-images{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap;}
+.opp-card-img{width:64px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--border);background:var(--bg2);}
 .ppc-opp-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:14px;overflow:hidden;}
 .ppc-opp-card.urgent{border-left:4px solid var(--danger);}
 .ppc-opp-card.high{border-left:4px solid var(--warn);}
@@ -1674,6 +1710,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <button class="ch-tab active" onclick="showChannel('sales','s-overview',this)">Overview</button>
         <button class="ch-tab" onclick="showChannel('sales','s-amazon',this)">Amazon</button>
         <button class="ch-tab" onclick="showChannel('sales','s-walmart',this)">Walmart</button>
+        <button class="ch-tab" onclick="showChannel('sales','s-insights',this)">Insights</button>
+        <button class="ch-tab" onclick="showChannel('sales','s-momentum',this)">Brand Momentum</button>
       </div>
       <!-- Shared period-selector row — added 2026-08-12 per Jaclyn, moved
            here (right-aligned next to the channel tabs) to match Skinuva's
@@ -1834,6 +1872,75 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <button class="btn-save-stage" id="wtp-insight-save">Save</button>
         </div>
       </div>
+    </div>
+
+    <!-- Insights — added 2026-09-30 per Jaclyn, matching Dazzle Dry's
+         Sales > Insights tab structure. Just Bjorn's version: Unit Sales
+         by Product Category (Collagen vs Collagen Stick Packs, using the
+         same column-K category assignment already wired up for Listing
+         Audit/Products) + an editable Key Insight card (category_key_insight,
+         reusing the SAME wireInsightBlock() infrastructure already live
+         for Exec Summary / Amazon+Walmart Key Insights / Ad Impressions
+         Note above — no new backend wiring needed, just one more field).
+         Deliberately does NOT include a Subscriptions card here the way
+         Dazzle Dry's does — Just Bjorn's Subscribe & Save section already
+         has a working home on Marketing > Opportunities (KPIs, chart, and
+         PDF export all wired to it there), and moving it risked breaking
+         several existing reference points for a purely cosmetic-parity
+         gain. Linked to instead, not duplicated. -->
+    <div class="channel-page" id="s-insights">
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Unit Sales by Product Category</div>
+        <div style="position:relative;height:320px;"><canvas id="chart-category-sales"></canvas></div>
+      </div>
+
+      <!-- Subscriptions — moved here 2026-09-30 per Jaclyn from Marketing >
+           Opportunities, restyled to match Dazzle Dry's dd-s-insights
+           structure exactly: one "Subscriptions" card wrapping a 2-col KPI
+           row + the trend chart, instead of the KPIs sitting outside the
+           card as their own top-level row. All IDs kept identical
+           (kpi-active-subs, kpi-retention, chart-sns, legend-sns) so
+           initSns() and every other reference to them (PDF export, MOM
+           calc via .nextElementSibling) keeps working unchanged — only
+           the surrounding HTML moved and got a new wrapper, not the
+           elements themselves. -->
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Subscriptions</div>
+        <div class="kpi-row" style="grid-template-columns:repeat(2,1fr);margin-bottom:16px;">
+          <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">123</div><div class="kpi-mom flat">Loading…</div></div>
+          <div class="kpi-card" id="kpi-retention"><div class="kpi-label">Subscribe &amp; Save Retention (90 Days)</div><div class="kpi-value" style="font-size:36px;">70%</div><div class="kpi-mom flat">Loading…</div></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:11px;color:var(--muted);font-weight:600;">Active Subscriptions by Month</div>
+          <div id="legend-sns" style="display:flex;align-items:center;"></div>
+        </div>
+        <div style="position:relative;height:260px;"><canvas id="chart-sns"></canvas></div>
+      </div>
+
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">Key Insight</div>
+          <button class="btn-edit" id="catinsight-edit-btn">✏️ Edit</button>
+        </div>
+        <div class="insight-text" id="catinsight-disp" data-placeholder="No insight added yet — click Edit to add one."></div>
+        <div class="insight-editor" id="catinsight-editor" style="display:none;">
+          <textarea id="catinsight-textarea"></textarea>
+          <div class="editor-footer">
+            <span class="editor-note">Saves directly to the report sheet as a draft.</span>
+            <button class="btn-cancel" id="catinsight-cancel">Cancel</button>
+            <button class="btn-save-stage" id="catinsight-save">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brand Momentum — added 2026-09-30 per Jaclyn, matching Vivian
+         Valenty's structure exactly. Entirely JS-generated at runtime
+         (loadBrandMomentum(), see script area near the other Sales
+         init functions) — this placeholder matches the reference
+         file's own pattern for this tab. -->
+    <div class="channel-page" id="s-momentum">
+      <div style="color:var(--muted);font-size:12px;">Loading…</div>
     </div>
   </div>
 
@@ -2127,20 +2234,152 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
     <div class="channel-page" id="m-opportunities">
 
-      <div class="section-label">Subscribe &amp; Save</div>
-      <div class="kpi-row" style="margin-bottom:20px;">
-        <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">123</div><div class="kpi-mom flat">Loading…</div></div>
-        <div class="kpi-card" id="kpi-retention"><div class="kpi-label">Subscribe &amp; Save Retention (90 Days)</div><div class="kpi-value" style="font-size:36px;">70%</div><div class="kpi-mom flat">Loading…</div></div>
-      </div>
-      <div class="card" style="margin-bottom:20px;">
+            <!-- What's Been Accomplished — added 2026-09-30 per Jaclyn, matching
+           Dazzle Dry's structure (4 entries, own fields on the same monthly
+           row, entries 1-2 get up to 6 image slots, 3-4 are text-only —
+           matches write-report-insights.js's real MONTHLY_HEADERS exactly:
+           acc1_title/subtitle/body/image1-6, acc2 the same, acc3/acc4
+           title/subtitle/body only). Field names deliberately do NOT match
+           the reference dashboard file's own JS, which reads/writes
+           accomplished${n}_title — that's a real mismatch against the
+           actual deployed backend's column names (acc{n}_title), and
+           copying it verbatim would mean this card silently never saves:
+           write-report-insights.js's upsertRow() only keeps fields whose
+           key is in its own headers list, so accomplished1_title would be
+           silently dropped on every save. Reuses the exact same
+           window.reportInsightsFetchRow/SaveFields already powering
+           Future Opportunities below, per-card show/hide pattern copied
+           from that same wireOpportunities() function. -->
+      <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Active Subscriptions by Month</div>
-          <div id="legend-sns" style="display:flex;align-items:center;"></div>
+          <div style="display:inline-block;background:rgba(0,31,96,.06);border:1px solid rgba(0,31,96,.15);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);">What's Been Accomplished</div>
+          <button class="btn-edit" id="acc-edit-btn">✏️ Edit</button>
         </div>
-        <div style="position:relative;height:320px;"><canvas id="chart-sns"></canvas></div>
+        <div class="insight-grid" id="acc-grid">
+          <div class="opp-card" id="acc-card-1" style="display:none;">
+            <div class="opp-title" id="acc-title-1"></div>
+            <div class="opp-subtitle" id="acc-subtitle-1"></div>
+            <div class="opp-body" id="acc-body-1"></div>
+            <div class="opp-card-images" id="acc1-images-disp" style="display:none;"></div>
+          </div>
+          <div class="opp-card" id="acc-card-2" style="display:none;">
+            <div class="opp-title" id="acc-title-2"></div>
+            <div class="opp-subtitle" id="acc-subtitle-2"></div>
+            <div class="opp-body" id="acc-body-2"></div>
+            <div class="opp-card-images" id="acc2-images-disp" style="display:none;"></div>
+          </div>
+          <div class="opp-card" id="acc-card-3" style="display:none;">
+            <div class="opp-title" id="acc-title-3"></div>
+            <div class="opp-subtitle" id="acc-subtitle-3"></div>
+            <div class="opp-body" id="acc-body-3"></div>
+            
+          </div>
+          <div class="opp-card" id="acc-card-4" style="display:none;">
+            <div class="opp-title" id="acc-title-4"></div>
+            <div class="opp-subtitle" id="acc-subtitle-4"></div>
+            <div class="opp-body" id="acc-body-4"></div>
+            
+          </div>
+        </div>
+        <div id="acc-empty-state" style="display:none;color:var(--muted);font-size:12px;font-style:italic;">Nothing added yet — click Edit to add what's been accomplished this month.</div>
+        <div class="insight-editor" id="acc-editor" style="display:none;">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div>
+          <div class="insight-editor-label">Accomplished 1 — Title</div><input type="text" id="acc1-title-input">
+          <div class="insight-editor-label">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div><input type="text" id="acc1-subtitle-input">
+          <div class="insight-editor-label">Body</div><textarea id="acc1-body-input"></textarea>
+            <div class="acc-image-inputs">
+              <div class="insight-editor-label">Images (up to 6)</div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image1-input" placeholder="Image 1 URL">
+                <label class="insight-image-upload-btn" id="acc1-image1-btn" for="acc1-image1-file">📤 Upload</label>
+                <input type="file" id="acc1-image1-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image1-input','acc1-image1-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image2-input" placeholder="Image 2 URL">
+                <label class="insight-image-upload-btn" id="acc1-image2-btn" for="acc1-image2-file">📤 Upload</label>
+                <input type="file" id="acc1-image2-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image2-input','acc1-image2-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image3-input" placeholder="Image 3 URL">
+                <label class="insight-image-upload-btn" id="acc1-image3-btn" for="acc1-image3-file">📤 Upload</label>
+                <input type="file" id="acc1-image3-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image3-input','acc1-image3-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image4-input" placeholder="Image 4 URL">
+                <label class="insight-image-upload-btn" id="acc1-image4-btn" for="acc1-image4-file">📤 Upload</label>
+                <input type="file" id="acc1-image4-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image4-input','acc1-image4-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image5-input" placeholder="Image 5 URL">
+                <label class="insight-image-upload-btn" id="acc1-image5-btn" for="acc1-image5-file">📤 Upload</label>
+                <input type="file" id="acc1-image5-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image5-input','acc1-image5-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc1-image6-input" placeholder="Image 6 URL">
+                <label class="insight-image-upload-btn" id="acc1-image6-btn" for="acc1-image6-file">📤 Upload</label>
+                <input type="file" id="acc1-image6-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc1-image6-input','acc1-image6-btn')">
+              </div>
+            </div>
+        </div>
+        <div>
+          <div class="insight-editor-label">Accomplished 2 — Title</div><input type="text" id="acc2-title-input">
+          <div class="insight-editor-label">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div><input type="text" id="acc2-subtitle-input">
+          <div class="insight-editor-label">Body</div><textarea id="acc2-body-input"></textarea>
+            <div class="acc-image-inputs">
+              <div class="insight-editor-label">Images (up to 6)</div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image1-input" placeholder="Image 1 URL">
+                <label class="insight-image-upload-btn" id="acc2-image1-btn" for="acc2-image1-file">📤 Upload</label>
+                <input type="file" id="acc2-image1-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image1-input','acc2-image1-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image2-input" placeholder="Image 2 URL">
+                <label class="insight-image-upload-btn" id="acc2-image2-btn" for="acc2-image2-file">📤 Upload</label>
+                <input type="file" id="acc2-image2-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image2-input','acc2-image2-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image3-input" placeholder="Image 3 URL">
+                <label class="insight-image-upload-btn" id="acc2-image3-btn" for="acc2-image3-file">📤 Upload</label>
+                <input type="file" id="acc2-image3-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image3-input','acc2-image3-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image4-input" placeholder="Image 4 URL">
+                <label class="insight-image-upload-btn" id="acc2-image4-btn" for="acc2-image4-file">📤 Upload</label>
+                <input type="file" id="acc2-image4-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image4-input','acc2-image4-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image5-input" placeholder="Image 5 URL">
+                <label class="insight-image-upload-btn" id="acc2-image5-btn" for="acc2-image5-file">📤 Upload</label>
+                <input type="file" id="acc2-image5-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image5-input','acc2-image5-btn')">
+              </div>
+              <div class="insight-image-row">
+                <input type="text" id="acc2-image6-input" placeholder="Image 6 URL">
+                <label class="insight-image-upload-btn" id="acc2-image6-btn" for="acc2-image6-file">📤 Upload</label>
+                <input type="file" id="acc2-image6-file" accept="image/*" style="display:none;" onchange="uploadInsightImage(this,'acc2-image6-input','acc2-image6-btn')">
+              </div>
+            </div>
+        </div>
+        <div>
+          <div class="insight-editor-label">Accomplished 3 — Title</div><input type="text" id="acc3-title-input">
+          <div class="insight-editor-label">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div><input type="text" id="acc3-subtitle-input">
+          <div class="insight-editor-label">Body</div><textarea id="acc3-body-input"></textarea>
+        </div>
+        <div>
+          <div class="insight-editor-label">Accomplished 4 — Title</div><input type="text" id="acc4-title-input">
+          <div class="insight-editor-label">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div><input type="text" id="acc4-subtitle-input">
+          <div class="insight-editor-label">Body</div><textarea id="acc4-body-input"></textarea>
+        </div>
+          </div>
+          <div class="editor-footer">
+            <span class="editor-note">Saves directly to the report sheet as a draft.</span>
+            <button class="btn-cancel" id="acc-cancel-btn">Cancel</button>
+            <button class="btn-save-stage" id="acc-save-btn">Save</button>
+          </div>
+        </div>
       </div>
 
-      <div class="card" style="margin-bottom:16px;">
+<div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div style="display:inline-block;background:rgba(36,233,163,.12);border:1px solid rgba(36,233,163,.3);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);">Future Opportunities</div>
           <button class="btn-edit" id="opp-edit-btn">✏️ Edit</button>
@@ -3883,7 +4122,7 @@ function showPage(id, btn) {
     if (cid && cid.indexOf('ix-') === 0) window.initInventoryExternalPage();
     if (cid==='m-stewardship')   window.initStewardshipLive();
     if (cid==='m-fulfillment-cs') window.initMarketingFulfillmentCS();
-    if (cid==='m-opportunities' && !window._snsChart) initSns();
+    if (cid==='s-insights' && !window._salesInsightsInit) { window._salesInsightsInit = true; if (typeof window.initSalesInsights === 'function') window.initSalesInsights(); }
   }
 }
 
@@ -3899,11 +4138,14 @@ function showChannel(page, channelId, btn) {
     // just a cheap early-return, not a duplicate fetch.
     if (channelId === 's-amazon')        initAmazonLive();
     if (channelId === 's-walmart')       initWalmartLive();
+    if (channelId === 's-insights' && !window._salesInsightsInit) { window._salesInsightsInit = true; if (typeof window.initSalesInsights === 'function') window.initSalesInsights(); }
+    if (channelId === 's-momentum' && !window._brandMomentumInit) { window._brandMomentumInit = true; if (typeof window.loadBrandMomentum === 'function') window.loadBrandMomentum(); }
     if (channelId.indexOf('x-') === 0)   window.initSalesExternalPage();
     if (channelId.indexOf('mx-') === 0)  window.initMarketingExternalPage();
     if (channelId.indexOf('ix-') === 0)  window.initInventoryExternalPage();
     if (channelId === 'm-stewardship')   window.initStewardshipLive();
-    if (channelId === 'm-opportunities' && !window._snsChart) initSns();
+    // Subscriptions card (initSns) moved to Sales > Insights 2026-09-30 —
+    // see the 's-insights' trigger above, which now covers it.
     if (channelId === 'ev-primeday')     window.initPrimeDayReport();
     if (channelId === 'ev-spring')       window.initBigSpringSaleReport();
     if (channelId === 'ev-pbdd')         window.initPBDDReport();
@@ -4213,8 +4455,13 @@ async function initSns() {
   const RETENTION_SHEET_ID = window.SHEET_CFG.SHEET_SUBSCRIPTIONS.fileId;  // Subscriptions cache — confirmed correct directly from Jaclyn's own URL text 2026-07-28 (my prior 'KR' correction was wrong — misread a screenshot; P and R look nearly identical in that font). The real bug was ONLY the gid below, which pointed at a tab with pbj's data instead of évolis's.
   const RETENTION_GID = window.SHEET_CFG.SHEET_SUBSCRIPTIONS.gid;                                   // 'just-bjorn' tab, confirmed directly from Jaclyn's screenshot 2026-07-28 (previous gid 1742224413 was also wrong — different tab in the wrong file entirely)
 
-  const kpiValues = document.querySelectorAll('#m-opportunities .kpi-value');
-  const subsKpiEl = kpiValues[0] || null;
+  // FIXED 2026-09-30 — was document.querySelectorAll('#m-opportunities
+  // .kpi-value')[0], a container-relative selector that broke the moment
+  // this card moved to a different container (Sales > Insights). Switched
+  // to the same safe, ID-based pattern retentionKpiEl already used below
+  // — resolves correctly regardless of which page/container the card
+  // lives in.
+  const subsKpiEl = document.querySelector('#kpi-active-subs .kpi-value') || null;
   const retentionKpiEl = document.querySelector('#kpi-retention .kpi-value') || null;
 
   try {
@@ -11838,6 +12085,421 @@ window.initEventStrategyHeader = async function () {
 
 </script>
 <script>
+// ── Sales > Brand Momentum — added 2026-09-30 per Jaclyn, matching
+// Vivian Valenty's structure exactly. Three real data sources (all
+// confirmed against the live sheets before building, not assumed):
+//   - Sessions: SHEET_BUSINESS_REPORT, per-ASIN per-month, same sheet
+//     already used for the Overview page's Conversion Rate work.
+//   - Keyword Tracker "Summary" tab (gid 579593778, already linked
+//     elsewhere in this file as "Keyword Tracker — Summary") — confirmed
+//     directly against the real sheet to have bsr, subcategory_bsr, and
+//     top50_organic_count columns per ASIN per date, exactly matching
+//     what VVS's own version reads. NOT assumed from the reference file;
+//     fetched and inspected first.
+//   - Reviews: SHEET_AMAZON_REVIEWS, same sheet the Reviews page uses.
+// Deliberately does NOT include VVS's "Context" callout (the TATCHA/
+// GOONGBE competitor comparison under Performance by Product) — that's
+// VVS's own competitive-positioning content, not a mechanism, and there's
+// no equivalent real data to build a Just Bjorn version of that specific
+// claim from.
+const JBJ_MOMENTUM_PRODUCTS = [
+  { sku: 'JBJ0001', asin: 'B0CH43DKT1', name: 'Stick Packs (10 Count)' },
+  { sku: 'JBJ0002', asin: 'B0CH43TMBV', name: '45 Serving Pouch' },
+  { sku: 'JBJ0003', asin: 'B0CH43J2RR', name: 'Starter Kit' },
+  { sku: 'JBJ0004', asin: 'B0CNBHK1K3', name: '30 Serving Pouch' },
+  { sku: 'JBJ0021', asin: 'B0GP93B5ZN', name: 'Stick Pack Sample Set (3 Count)' },
+];
+
+function jbjMoStarsHtml(rating) {
+  const r = Math.round(rating || 0);
+  return '★'.repeat(Math.max(0, Math.min(5, r))) + '☆'.repeat(5 - Math.max(0, Math.min(5, r)));
+}
+
+window.loadBrandMomentum = async function () {
+  const container = document.getElementById('s-momentum');
+  if (!container) return;
+  try {
+    function isCsv(t) { return !!t && t.trim().length > 0 && !t.trim().startsWith('<'); }
+    function parseCsvLine(line) {
+      const out = []; let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQ) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+        else { if (c === '"') inQ = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
+      }
+      out.push(cur);
+      return out;
+    }
+    function parseCsv(text) {
+      const lines = text.trim().split('\n');
+      const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g, '').trim());
+      return lines.slice(1).filter(l => l.trim()).map(line => {
+        const cells = parseCsvLine(line);
+        const row = {};
+        headers.forEach((h, i) => { row[h] = (cells[i] || '').replace(/^"|"$/g, '').trim(); });
+        return row;
+      });
+    }
+    function esc(s) { const d = document.createElement('div'); d.textContent = String(s == null ? '' : s); return d.innerHTML; }
+
+    const bizUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_BUSINESS_REPORT.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_BUSINESS_REPORT.gid}&_cb=${Date.now()}`;
+    const kwSummaryUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_KEYWORD_TRACKER.fileId}/export?format=csv&gid=579593778&_cb=${Date.now()}`;
+    const kwPerKeywordUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_KEYWORD_TRACKER.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_KEYWORD_TRACKER.gid}&_cb=${Date.now()}`;
+    const reviewsUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_AMAZON_REVIEWS.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_AMAZON_REVIEWS.gid}&_cb=${Date.now()}`;
+
+    const [bizCsv, kwSummaryCsv, kwPerKeywordCsv, reviewsCsv] = await Promise.all([
+      fetch(bizUrl).then(r => r.ok ? r.text() : '').catch(() => ''),
+      fetch(kwSummaryUrl).then(r => r.ok ? r.text() : '').catch(() => ''),
+      fetch(kwPerKeywordUrl).then(r => r.ok ? r.text() : '').catch(() => ''),
+      fetch(reviewsUrl).then(r => r.ok ? r.text() : '').catch(() => ''),
+    ]);
+
+    // ── Sessions: earliest vs latest available month per ASIN ────────────
+    const sessByAsin = {};
+    if (isCsv(bizCsv)) {
+      parseCsv(bizCsv).forEach(r => {
+        const asin = (r.ASIN || '').trim().toUpperCase();
+        const y = parseInt(r.YEAR, 10), m = parseInt(r.MONTH, 10);
+        const sess = parseInt(r.SESSIONS, 10) || 0;
+        if (!asin || !y || !m) return;
+        const key = y * 100 + m;
+        if (!sessByAsin[asin]) sessByAsin[asin] = {};
+        sessByAsin[asin][key] = sess;
+      });
+    } else {
+      console.warn('[BrandMomentum] Business Report did not return CSV.');
+    }
+    const skuSessions = JBJ_MOMENTUM_PRODUCTS.map(p => {
+      const d = sessByAsin[p.asin] || {};
+      const keys = Object.keys(d).map(Number).sort((a, b) => a - b);
+      const earliest = keys.length ? d[keys[0]] : undefined;
+      const latest = keys.length ? d[keys[keys.length - 1]] : undefined;
+      const pct = (earliest !== undefined && earliest > 0 && latest !== undefined)
+        ? Math.round(((latest - earliest) / earliest) * 100) : null;
+      return { asin: p.asin, name: p.name, earliest, latest, pct };
+    });
+    const totalEarliest = skuSessions.reduce((s, d) => s + (d.earliest || 0), 0);
+    const totalLatest = skuSessions.reduce((s, d) => s + (d.latest || 0), 0);
+    const totalPct = totalEarliest ? Math.round(((totalLatest - totalEarliest) / totalEarliest) * 100) : null;
+    // MoM: second-to-latest vs latest, per ASIN summed
+    let momPct = null;
+    {
+      let totalPrev = 0, havePrev = false;
+      JBJ_MOMENTUM_PRODUCTS.forEach(p => {
+        const d = sessByAsin[p.asin] || {};
+        const keys = Object.keys(d).map(Number).sort((a, b) => a - b);
+        if (keys.length >= 2) { totalPrev += d[keys[keys.length - 2]] || 0; havePrev = true; }
+      });
+      if (havePrev && totalPrev) momPct = Math.round(((totalLatest - totalPrev) / totalPrev) * 100);
+    }
+
+    // ── Keyword Tracker Summary: BSR + organic keyword count, earliest
+    // vs latest dated row per ASIN, filtered to just-bjorn only ─────────
+    const kwSummaryByAsin = {};
+    if (isCsv(kwSummaryCsv)) {
+      parseCsv(kwSummaryCsv).forEach(r => {
+        if ((r.brand || '').trim().toLowerCase() !== 'just-bjorn') return;
+        const asin = (r.asin || '').trim().toUpperCase();
+        if (!asin) return;
+        if (!kwSummaryByAsin[asin]) kwSummaryByAsin[asin] = [];
+        kwSummaryByAsin[asin].push(r);
+      });
+      Object.values(kwSummaryByAsin).forEach(rows => rows.sort((a, b) => (a.date || '').localeCompare(b.date || '')));
+    } else {
+      console.warn('[BrandMomentum] Keyword Tracker Summary did not return CSV.');
+    }
+    function latestKwRow(asin) { const rows = kwSummaryByAsin[asin] || []; return rows.length ? rows[rows.length - 1] : null; }
+    function earliestBsrRow(asin) {
+      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.bsr, 10) > 0);
+      return rows.length ? rows[0] : null;
+    }
+    function latestBsrRow(asin) {
+      const rows = (kwSummaryByAsin[asin] || []).filter(r => parseInt(r.bsr, 10) > 0);
+      return rows.length ? rows[rows.length - 1] : null;
+    }
+
+    // ── Per-keyword tracker — for the indexing-progress table ────────────
+    let rankedKws = [];
+    let kwFetchError = null;
+    if (isCsv(kwPerKeywordCsv)) {
+      const rows = parseCsv(kwPerKeywordCsv).filter(r => (r.asin || '').trim());
+      rankedKws = rows
+        .filter(r => { const rank = parseInt(r.organic_rank, 10); return rank > 0 && rank <= 100; })
+        .map(r => ({ kw: r.keyword || '', rank: parseInt(r.organic_rank, 10), vol: parseInt(r.search_volume, 10) || null, prod: JBJ_MOMENTUM_PRODUCTS.find(p => p.asin === (r.asin || '').trim().toUpperCase())?.name || '' }))
+        .sort((a, b) => a.rank - b.rank);
+    } else {
+      kwFetchError = 'Could not read the per-keyword tracker tab.';
+      console.warn('[BrandMomentum] Keyword Tracker (per-keyword) did not return CSV.');
+    }
+
+    // ── Reviews — count + avg rating, per ASIN ────────────────────────────
+    const revByAsin = {};
+    if (isCsv(reviewsCsv)) {
+      parseCsv(reviewsCsv).forEach(r => {
+        const asin = (r.asin || '').trim().toUpperCase();
+        const rating = parseFloat(r.star_rating || '0') || 0;
+        if (!asin) return;
+        if (!revByAsin[asin]) revByAsin[asin] = { count: 0, sum: 0 };
+        revByAsin[asin].count++; revByAsin[asin].sum += rating;
+      });
+    } else {
+      console.warn('[BrandMomentum] Reviews sheet did not return CSV.');
+    }
+    let totalReviews = 0, ratingWeightedSum = 0;
+    Object.values(revByAsin).forEach(v => { totalReviews += v.count; ratingWeightedSum += v.sum; });
+    const avgRating = totalReviews ? ratingWeightedSum / totalReviews : 0;
+
+    const kwCount = rankedKws.length;
+    const kwUpCount = 0; // no prior-period comparison available for per-keyword rank movement yet — see note below
+    const momStr = momPct !== null ? `${momPct > 0 ? '+' : ''}${momPct}%` : '—';
+    const momCls = momPct > 0 ? 'up' : momPct < 0 ? 'dn' : 'flat';
+
+    // ── Checkbox row ───────────────────────────────────────────────────
+    const cbLabel = (id, label) =>
+      `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">` +
+      `<input type="checkbox" id="${id}" checked style="margin:0;"` +
+      ` onchange="(function(cb){var s=document.getElementById('${id}-section');if(s)s.style.display=cb.checked?'':'none';})(this)">` +
+      ` ${label}</label>`;
+    const checkboxRow = `<div class="card" style="margin-bottom:18px;padding:12px 20px;">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
+        ${cbLabel('jbj-mo-cb-sessions', 'Sessions')}
+        ${cbLabel('jbj-mo-cb-keywords', 'Keyword Rankings')}
+        ${cbLabel('jbj-mo-cb-reviews', 'Review Velocity')}
+        ${cbLabel('jbj-mo-cb-next', "What We're Tracking")}
+      </div>
+    </div>`;
+
+    // ── Top 3 KPIs ─────────────────────────────────────────────────────
+    const top3 = `<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+      <div class="kpi-card">
+        <div class="kpi-label">Reviews collected</div>
+        <div class="kpi-value">${totalReviews}</div>
+        <div class="kpi-mom up">${avgRating.toFixed(1)}★ avg across ${JBJ_MOMENTUM_PRODUCTS.length} SKUs</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Keywords with organic rank (top 100)</div>
+        <div class="kpi-value">${kwCount || '—'}</div>
+        <div class="kpi-mom flat">${kwCount > 0 ? 'Tracked in top 100' : 'Tracker data loading'}</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Sessions</div>
+        <div class="kpi-value">${totalLatest}</div>
+        <div class="kpi-mom ${momCls}">${momStr} MoM</div>
+      </div>
+    </div>`;
+
+    // ── Per-product cards ────────────────────────────────────────────────
+    const productCards = JBJ_MOMENTUM_PRODUCTS.map(p => {
+      const sess = skuSessions.find(s => s.asin === p.asin);
+      const sessValue = sess && sess.latest !== undefined ? sess.latest : null;
+      const sessPillHtml = sess && sess.pct !== null
+        ? `<span class="momentum-pill ${sess.pct > 0 ? 'momentum-pill-up' : 'momentum-pill-dn'}">${sess.pct > 0 ? '▲' : '▼'} ${Math.abs(sess.pct)}% vs earliest tracked</span>`
+        : `<span class="momentum-pill" style="background:var(--bg2);color:var(--muted);">—</span>`;
+
+      const latestKw = latestKwRow(p.asin);
+      const kwOrganicCount = latestKw ? (parseInt(latestKw.top50_organic_count, 10) || 0) : 0;
+
+      const earliestBsr = earliestBsrRow(p.asin);
+      const latestBsr = latestBsrRow(p.asin);
+      let bsrValueHtml = '—', bsrPillHtml = '', bsrSubcatHtml = '';
+      if (latestBsr) {
+        bsrValueHtml = '#' + parseInt(latestBsr.bsr, 10).toLocaleString();
+        if (earliestBsr && earliestBsr.date !== latestBsr.date) {
+          const change = parseInt(earliestBsr.bsr, 10) - parseInt(latestBsr.bsr, 10);
+          if (change !== 0) {
+            const cls = change > 0 ? 'momentum-pill-up' : 'momentum-pill-dn';
+            const arrow = change > 0 ? '▲' : '▼';
+            bsrPillHtml = `<span class="momentum-pill ${cls}">${arrow} ${Math.abs(change).toLocaleString()}</span>`;
+          }
+        }
+        if (latestBsr.subcategory_bsr) bsrSubcatHtml = `<div class="momentum-pcard-subcategory">Subcategory BSR #${esc(latestBsr.subcategory_bsr)}</div>`;
+      }
+
+      const rev = revByAsin[p.asin];
+      const reviewsCount = rev ? rev.count : 0;
+      const ratingBadgeHtml = rev
+        ? `<div class="momentum-pcard-rating"><span class="momentum-pcard-rating-stars">${jbjMoStarsHtml(rev.sum / rev.count)}</span><span class="momentum-pcard-rating-num">${(rev.sum / rev.count).toFixed(1)}</span></div>`
+        : '';
+
+      return `<div class="momentum-pcard">
+        <div class="momentum-pcard-hd">
+          <div class="momentum-pcard-name">${esc(p.name)}</div>
+          ${ratingBadgeHtml}
+        </div>
+        <div class="momentum-pcard-body">
+          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Sessions</span><span class="momentum-pcard-value">${sessValue !== null ? sessValue : '—'}</span>${sessPillHtml}</div>
+          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Organic Keywords (Top 50)</span><span class="momentum-pcard-value">${kwOrganicCount || '—'}</span></div>
+          <div class="momentum-pcard-row"><span class="momentum-pcard-label">BSR</span><span class="momentum-pcard-value">${bsrValueHtml}</span>${bsrPillHtml}${bsrSubcatHtml}</div>
+          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Reviews</span><span class="momentum-pcard-value">${reviewsCount || '—'}</span></div>
+        </div>
+      </div>`;
+    }).join('');
+
+    const productCardsSection = `<div id="jbj-mo-cb-sessions-section" class="card" style="margin-bottom:18px;">
+      <div class="card-title" style="margin-bottom:2px;">Performance by Product</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+        Sessions measured vs. earliest tracked data point; BSR change reflects total movement since first recorded.
+      </div>
+      <div class="momentum-cards-grid">${productCards}</div>
+    </div>`;
+
+    // ── Targeted Keyword Indexing Progress ────────────────────────────────
+    let kwBody;
+    if (kwFetchError) {
+      kwBody = `<div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;">${esc(kwFetchError)}</div>`;
+    } else if (!rankedKws.length) {
+      kwBody = `<div style="padding:12px 0;color:var(--muted);font-size:12px;font-style:italic;">No keywords ranked in the top 100 found yet.</div>`;
+    } else {
+      const rows = rankedKws.slice(0, 20).map(({ kw, rank, vol, prod }) => `<tr>
+        <td style="font-weight:600;">${esc(kw)}</td>
+        <td style="color:var(--muted);font-weight:400;">${esc(prod)}</td>
+        <td style="font-weight:700;">#${rank}</td>
+        <td style="color:var(--muted);font-weight:400;">${vol ? vol.toLocaleString() : '—'}</td>
+      </tr>`).join('');
+      kwBody = `<table class="data-table" style="width:100%;"><thead><tr>
+        <th>Keyword</th><th>Product</th><th>Organic Rank</th><th>Search Volume</th>
+      </tr></thead><tbody>${rows}</tbody></table>`;
+    }
+    const kwSection = `<div id="jbj-mo-cb-keywords-section" class="card" style="margin-bottom:18px;">
+      <div class="card-title">Targeted Keyword Indexing Progress</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px;">
+        Organic rankings signal algorithm traction — new brands typically take 3–12 months to index.
+      </div>${kwBody}
+    </div>`;
+
+    // ── What We're Tracking Next — generic content, copied as-is ─────────
+    const nextSection = `<div id="jbj-mo-cb-next-section" class="momentum-tracking-card">
+      <div class="momentum-tracking-title">What We're Tracking Next</div>
+      <div class="momentum-tracking-grid">
+        <div class="momentum-tracking-item">
+          <div class="momentum-tracking-item-title">Keyword Rank Movement</div>
+          <div class="momentum-tracking-item-text">Weekly snapshots show which terms are climbing toward page 1 and where to activate PPC for maximum rank acceleration.</div>
+        </div>
+        <div class="momentum-tracking-item">
+          <div class="momentum-tracking-item-title">Review Velocity</div>
+          <div class="momentum-tracking-item-text">50+ reviews is the milestone where conversion rates reliably improve. We track month-over-month review count per SKU to measure progress toward that threshold across the line.</div>
+        </div>
+        <div class="momentum-tracking-item">
+          <div class="momentum-tracking-item-title">Session Trends</div>
+          <div class="momentum-tracking-item-text">Organic session growth is the clearest signal that the catalog is gaining discoverability. We track month-over-month changes per SKU to identify which products are building momentum and where to focus next.</div>
+        </div>
+      </div>
+    </div>`;
+
+    container.innerHTML = checkboxRow + top3 + productCardsSection + kwSection + nextSection;
+  } catch (err) {
+    console.error('[BrandMomentum]', err);
+    container.innerHTML = `<div style="color:var(--muted);font-size:12px;">Could not load — ${err.message || ''}</div>`;
+  }
+};
+
+// ── Sales > Insights tab — added 2026-09-30 per Jaclyn ──────────────────
+// Unit Sales by Product Category (Collagen vs Collagen Stick Packs, using
+// the same column-K category assignment already wired up for Listing
+// Audit/Products — see runListingAudit's skuToCategory for the original
+// build of this lookup) + triggers the now-relocated initSns() for the
+// Subscriptions card, moved here from Marketing > Opportunities.
+window.initSalesInsights = async function () {
+  initSns(); // Subscriptions card — moved here, function itself unchanged
+
+  const canvas = document.getElementById('chart-category-sales');
+  if (!canvas) return;
+  try {
+    function isCsv(t) { return !!t && t.trim().length > 0 && !t.trim().startsWith('<'); }
+    function parseCsvLine(line) {
+      const out = []; let cur = '', inQ = false;
+      for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+        if (inQ) { if (c === '"') { if (line[i + 1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
+        else { if (c === '"') inQ = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
+      }
+      out.push(cur);
+      return out;
+    }
+    function parseCsv(text) {
+      const lines = text.trim().split('\n');
+      const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g, '').trim());
+      return lines.slice(1).filter(l => l.trim()).map(line => {
+        const cells = parseCsvLine(line);
+        const row = {};
+        headers.forEach((h, i) => { row[h] = (cells[i] || '').replace(/^"|"$/g, '').trim(); });
+        return row;
+      });
+    }
+
+    // Category assignment — same column-K positional read as
+    // runListingAudit's skuToCategory, self-contained here per this
+    // codebase's standing rule not to assume cross-scope access to a
+    // same-named helper defined in a different <script> tag.
+    const skuToCategory = {};
+    const catUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_MASTER_SKU_LIST.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_MASTER_SKU_LIST.gid}&_cb=${Date.now()}`;
+    const catCsv = await fetch(catUrl).then(r => r.ok ? r.text() : '').catch(() => '');
+    if (isCsv(catCsv)) {
+      catCsv.trim().split('\n').slice(1).forEach(line => {
+        const cells = parseCsvLine(line);
+        const sku = (cells[1] || '').trim();       // column B
+        const category = (cells[10] || '').trim(); // column K
+        if (sku && category) skuToCategory[sku] = category;
+      });
+    }
+
+    // Amazon order-line-items — SHEET_ORDERS only (a rolling ~90-day
+    // cache), not blended with SHEET_ORDERS_HISTORICAL. Scoped this way
+    // deliberately: this chart shows the last ~3 months by category, not
+    // a multi-year trend — verifying the historical sheet's own column
+    // layout (likely different/more aggregated) was out of scope for
+    // this pass. Flagged clearly rather than silently guessed at.
+    const ordUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_ORDERS.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_ORDERS.gid}&_cb=${Date.now()}`;
+    const ordCsv = await fetch(ordUrl).then(r => r.ok ? r.text() : '').catch(() => '');
+    if (!isCsv(ordCsv)) { console.warn('[JustBjorn][SalesInsights] orders sheet did not return CSV.'); return; }
+    const orders = parseCsv(ordCsv);
+
+    // Group units by month + category, excluding cancelled orders and
+    // Vine (same validity rule as goalsIsValidAmazonRow — Vine units
+    // aren't representative of real category sales mix).
+    const byMonth = {}; // "YYYY-MM" -> { collagen: units, stickpacks: units }
+    orders.forEach(r => {
+      const status = (r.status || '').toLowerCase().trim();
+      if (status === 'cancelled') return;
+      if ((r.promotion_ids || '').toLowerCase().includes('vine')) return;
+      const sku = (r.sku || '').trim().toUpperCase().replace(/-SF$/i, '');
+      const category = skuToCategory[sku];
+      if (!category) return;
+      const dateStr = (r.date || '').trim();
+      const monthKey = dateStr.slice(0, 7); // "YYYY-MM"
+      if (!monthKey || monthKey.length !== 7) return;
+      if (!byMonth[monthKey]) byMonth[monthKey] = {};
+      const units = parseFloat(r.quantity ?? r.item_quantity ?? '1') || 1;
+      byMonth[monthKey][category] = (byMonth[monthKey][category] || 0) + units;
+    });
+
+    const monthKeys = Object.keys(byMonth).sort();
+    if (!monthKeys.length) { console.warn('[JustBjorn][SalesInsights] no order rows matched a known SKU category — check column K assignments.'); return; }
+    const monthAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const labels = monthKeys.map(k => { const [y, m] = k.split('-'); return `${monthAbbr[parseInt(m, 10) - 1]} '${y.slice(2)}`; });
+    const categories = [...new Set(Object.values(byMonth).flatMap(m => Object.keys(m)))];
+    const COLORS = ['#001f60', '#24e9a3', '#c87d2f', '#6b7ba2'];
+    const datasets = categories.map((cat, i) => ({
+      label: cat,
+      data: monthKeys.map(k => byMonth[k][cat] || 0),
+      backgroundColor: COLORS[i % COLORS.length],
+    }));
+
+    if (window._categorySalesChart) { window._categorySalesChart.destroy(); window._categorySalesChart = null; }
+    window._categorySalesChart = new Chart(canvas, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, grid: { color: 'rgba(0,0,0,0.04)' }, beginAtZero: true } },
+      },
+    });
+  } catch (err) {
+    console.warn('[JustBjorn][SalesInsights] category chart failed:', err.message);
+  }
+};
+
 // ── Wire all report-content blocks to SHEET_REPORT_INSIGHTS ────────────────
 // Per Jaclyn 2026-07-18 (revised): no Draft/Approve UI on individual blocks
 // at all — just Edit → Save, writes to the sheet as a draft. Exactly two
@@ -11846,6 +12508,15 @@ window.initEventStrategyHeader = async function () {
 // (approves whichever event tab is currently active).
 document.addEventListener('DOMContentLoaded', function() {
   if (typeof window.wireInsightBlock !== 'function') { console.warn('[ReportInsights] wireInsightBlock not loaded'); return; }
+
+  // Sales > Insights — Key Insight card, added 2026-09-30. Same
+  // wireInsightBlock() infrastructure as every block above, just a new
+  // field (category_key_insight) and new DOM ids.
+  window.wireInsightBlock({
+    scope: 'monthly',
+    fields: [{ key: 'category_key_insight', displayId: 'catinsight-disp', textareaId: 'catinsight-textarea', placeholder: 'No insight added yet — click Edit to add one.' }],
+    editBtnId: 'catinsight-edit-btn', saveBtnId: 'catinsight-save', cancelBtnId: 'catinsight-cancel', editorId: 'catinsight-editor',
+  });
 
   window.wireInsightBlock({
     scope: 'monthly',
@@ -12000,6 +12671,150 @@ document.addEventListener('DOMContentLoaded', function() {
           fields[`opp${n}_title`]    = (document.getElementById(`textarea-opp${n}-title`).value || '').trim();
           fields[`opp${n}_subtitle`] = (document.getElementById(`textarea-opp${n}-subtitle`).value || '').trim();
           fields[`opp${n}_body`]     = (document.getElementById(`textarea-opp${n}-body`).value || '').trim();
+        });
+        await window.reportInsightsSaveFields({ scope: 'monthly', year, month, fields, action: 'save' });
+        await load();
+        editorEl.style.display = 'none';
+      } catch (e) {
+        alert('Save failed: ' + e.message);
+      } finally {
+        saveBtn.disabled = false; saveBtn.textContent = origLabel;
+      }
+    });
+
+    load();
+  })();
+
+  // ── Image upload for Accomplished cards ────────────────────────────────
+  // Ported 2026-09-30, generic and unmodified — takes element ids as
+  // arguments, nothing hardcoded to a specific field, so it works for any
+  // image slot without needing a copy per field.
+  window.uploadInsightImage = async function (fileInputEl, targetInputId, statusBtnId) {
+    const file = fileInputEl.files && fileInputEl.files[0];
+    if (!file) return;
+    const targetInput = document.getElementById(targetInputId);
+    const statusBtn = document.getElementById(statusBtnId);
+    const originalLabel = statusBtn ? statusBtn.textContent : '📤 Upload';
+    const MAX_BYTES = 4 * 1024 * 1024; // stay comfortably under Vercel's 4.5MB body limit once base64-inflated ~33%
+    if (file.size > MAX_BYTES) {
+      if (statusBtn) { statusBtn.textContent = '✗ Too large (max 4MB)'; statusBtn.classList.remove('uploading', 'uploaded'); statusBtn.classList.add('upload-error'); }
+      fileInputEl.value = '';
+      return;
+    }
+    try {
+      if (statusBtn) { statusBtn.textContent = '⟳ Uploading…'; statusBtn.classList.remove('uploaded', 'upload-error'); statusBtn.classList.add('uploading'); }
+      const base64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+        reader.onerror = () => reject(new Error('Could not read file'));
+        reader.readAsDataURL(file);
+      });
+      const res = await fetch('/api/upload-insight-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, mimeType: file.type, imageBase64: base64 }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+      if (targetInput) targetInput.value = data.url;
+      if (statusBtn) { statusBtn.textContent = '✓ Uploaded'; statusBtn.classList.remove('uploading'); statusBtn.classList.add('uploaded'); }
+    } catch (err) {
+      console.error('[uploadInsightImage]', err);
+      if (statusBtn) { statusBtn.textContent = '✗ Upload failed'; statusBtn.classList.remove('uploading'); statusBtn.classList.add('upload-error'); }
+    } finally {
+      fileInputEl.value = '';
+    }
+  };
+
+  function renderAccImages(containerId, urls) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const valid = (urls || []).map(u => (u || '').trim()).filter(Boolean);
+    if (!valid.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
+    el.style.display = 'flex';
+    el.innerHTML = valid.map(u => `<img src="${escapeHtml(u)}" class="opp-card-img" alt="" onerror="this.style.display='none'">`).join('');
+  }
+
+  // ── What's Been Accomplished: up to 4 cards, entries 1-2 get up to 6
+  // image slots each ─────────────────────────────────────────────────────
+  // Same structure/pattern as wireOpportunities() directly above — copied
+  // deliberately rather than generalized into one shared function, since
+  // the image-handling makes the two genuinely different in a few places
+  // (renderAccImages calls, the extra image fields to read/write) and
+  // this file's own convention elsewhere has been one clear, readable
+  // copy per block rather than a config-driven abstraction over two
+  // slightly different shapes.
+  (function wireAccomplished() {
+    const BRAND = 'just-bjorn';
+    const editBtn = document.getElementById('acc-edit-btn');
+    const saveBtn = document.getElementById('acc-save-btn');
+    const cancelBtn = document.getElementById('acc-cancel-btn');
+    const editorEl = document.getElementById('acc-editor');
+    if (!editBtn || !saveBtn || !editorEl) return;
+
+    function getLastFullMonthLocal3() {
+      const now = new Date();
+      let year = now.getFullYear(), month = now.getMonth();
+      if (month === 0) { month = 12; year--; }
+      return { year, month };
+    }
+
+    async function load() {
+      const { year, month } = getLastFullMonthLocal3();
+      const row = await window.reportInsightsFetchRow(BRAND, { year: String(year), month: String(month) });
+      let anyVisible = false;
+      [1, 2, 3, 4].forEach(n => {
+        const title    = row ? (row[`acc${n}_title`]    || '') : '';
+        const subtitle = row ? (row[`acc${n}_subtitle`] || '') : '';
+        const body     = row ? (row[`acc${n}_body`]     || '') : '';
+        const card = document.getElementById(`acc-card-${n}`);
+        if (title) {
+          anyVisible = true;
+          card.style.display = '';
+          document.getElementById(`acc-title-${n}`).textContent = title;
+          const subEl = document.getElementById(`acc-subtitle-${n}`);
+          if (subtitle) { subEl.textContent = subtitle; subEl.style.display = ''; }
+          else { subEl.textContent = ''; subEl.style.display = 'none'; }
+          document.getElementById(`acc-body-${n}`).textContent = body;
+        } else {
+          card.style.display = 'none';
+        }
+        const taTitle = document.getElementById(`acc${n}-title-input`);
+        const taSub   = document.getElementById(`acc${n}-subtitle-input`);
+        const taBody  = document.getElementById(`acc${n}-body-input`);
+        if (taTitle) taTitle.value = title;
+        if (taSub)   taSub.value = subtitle;
+        if (taBody)  taBody.value = body;
+        if (n === 1 || n === 2) {
+          const imgUrls = [1,2,3,4,5,6].map(i => row ? (row[`acc${n}_image${i}`] || '') : '');
+          imgUrls.forEach((url, i) => { const inp = document.getElementById(`acc${n}-image${i+1}-input`); if (inp) inp.value = url; });
+          renderAccImages(`acc${n}-images-disp`, imgUrls);
+        }
+      });
+      document.getElementById('acc-empty-state').style.display = anyVisible ? 'none' : 'block';
+      return row;
+    }
+
+    editBtn.addEventListener('click', () => {
+      editorEl.style.display = editorEl.style.display === 'none' ? 'block' : 'none';
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', () => { editorEl.style.display = 'none'; });
+
+    saveBtn.addEventListener('click', async () => {
+      const origLabel = saveBtn.textContent;
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try {
+        const { year, month } = getLastFullMonthLocal3();
+        const fields = {};
+        [1, 2, 3, 4].forEach(n => {
+          fields[`acc${n}_title`]    = (document.getElementById(`acc${n}-title-input`).value || '').trim();
+          fields[`acc${n}_subtitle`] = (document.getElementById(`acc${n}-subtitle-input`).value || '').trim();
+          fields[`acc${n}_body`]     = (document.getElementById(`acc${n}-body-input`).value || '').trim();
+          if (n === 1 || n === 2) {
+            [1,2,3,4,5,6].forEach(i => {
+              fields[`acc${n}_image${i}`] = (document.getElementById(`acc${n}-image${i}-input`).value || '').trim();
+            });
+          }
         });
         await window.reportInsightsSaveFields({ scope: 'monthly', year, month, fields, action: 'save' });
         await load();
