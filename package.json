@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "googleapis": "^140.0.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "puppeteer-core": "^23.9.0",
+    "@sparticuz/chromium": "^131.0.1"
   }
 }
