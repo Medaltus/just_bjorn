@@ -342,6 +342,20 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 .momentum-tracking-item{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px 16px;}
 .momentum-tracking-item-title{font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;}
 .momentum-tracking-item-text{font-size:11.5px;color:rgba(255,255,255,.65);line-height:1.55;}
+/* PDF-only tighter spacing for Brand Momentum's product-card pages —
+   ported verbatim from évolis, fits more cards per page than the live
+   dashboard's roomier spacing without changing the live page at all
+   (only applies inside .pdfx-momentum-tight, added by
+   buildBrandMomentumPages). */
+.pdfx-momentum-tight .momentum-cards-grid{gap:8px;}
+.pdfx-momentum-tight .momentum-pcard-hd{padding:7px 14px;}
+.pdfx-momentum-tight .momentum-pcard-name{font-size:13px;}
+.pdfx-momentum-tight .momentum-pcard-rating{font-size:11px;}
+.pdfx-momentum-tight .momentum-pcard-body{padding:9px 16px;}
+.pdfx-momentum-tight .momentum-pcard-label{font-size:9px;}
+.pdfx-momentum-tight .momentum-pcard-value{font-size:19px;}
+.pdfx-momentum-tight .momentum-pcard-subcategory{font-size:9.5px;}
+.pdfx-momentum-tight .momentum-pill{font-size:9px;padding:2px 7px;}
 .insight-editor-label{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;}
 .insight-editor input,.insight-editor textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);font-family:var(--font);font-size:12.5px;color:var(--navy);resize:vertical;min-height:72px;background:var(--white);outline:none;line-height:1.6;margin-bottom:10px;}
 .insight-editor input{min-height:auto;}
@@ -1293,6 +1307,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-fulfillment" checked style="margin:0;"> Fulfillment &amp; CS</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-stewardship" checked style="margin:0;"> Stewardship</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-opportunities" checked style="margin:0;"> Opportunities</label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-insights" checked style="margin:0;"> Insights</label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-brand-momentum" checked style="margin:0;"> Brand Momentum</label>
         <!-- Events pages — existing checkboxes, unchanged; default UNCHECKED
              as before. -->
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-strategy" style="margin:0;"> Strategy</label>
@@ -1934,13 +1950,86 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
 
-    <!-- Brand Momentum — added 2026-09-30 per Jaclyn, matching Vivian
-         Valenty's structure exactly. Entirely JS-generated at runtime
-         (loadBrandMomentum(), see script area near the other Sales
-         init functions) — this placeholder matches the reference
-         file's own pattern for this tab. -->
+    <!-- Brand Momentum — rebuilt 2026-10-01 per Jaclyn, matching évolis's
+         OWN Brand Momentum page exactly (a refined evolution of the
+         original VBC/Dazzle Dry reference this was first built from —
+         adds the "Hide negative BSR changes" checkbox and a static HTML
+         shell with persistent IDs, rather than fully regenerating the
+         whole tab's innerHTML on every load). Static shell here, JS
+         populates it (window.initBrandMomentum fetches + caches data,
+         window.bmRenderMomentumCards re-renders just the product-card
+         grid — kept separate specifically so the BSR checkbox can
+         re-render instantly from cached data on toggle, matching
+         évolis's own reasoning for splitting these). Only 3 checkboxes,
+         not 4 — évolis's own comment at this exact point in their file
+         explains why: a 4th "Review Velocity" checkbox never actually
+         wrapped a real section, which Just Bjorn's own first version of
+         this page had too (same mistake, now fixed the same wayévolis
+         fixed theirs). -->
     <div class="channel-page" id="s-momentum">
-      <div style="color:var(--muted);font-size:12px;">Loading…</div>
+      <div class="card" style="margin-bottom:18px;padding:12px 20px;">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="bm-cb-products" checked style="margin:0;" onchange="(function(cb){var s=document.getElementById('bm-cb-products-section');if(s)s.style.display=cb.checked?'':'none';})(this)"> Performance by Product
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="bm-cb-keywords" checked style="margin:0;" onchange="(function(cb){var s=document.getElementById('bm-cb-keywords-section');if(s)s.style.display=cb.checked?'':'none';})(this)"> Keyword Rankings
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="bm-cb-next" checked style="margin:0;" onchange="(function(cb){var s=document.getElementById('bm-cb-next-section');if(s)s.style.display=cb.checked?'':'none';})(this)"> What We're Tracking
+          </label>
+        </div>
+      </div>
+
+      <div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+        <div class="kpi-card" id="bm-kpi-reviews"><div class="kpi-label">Reviews Collected</div><div class="kpi-value">—</div></div>
+        <div class="kpi-card" id="bm-kpi-ranked-keywords"><div class="kpi-label">Keywords with Organic Rank</div><div class="kpi-value">—</div></div>
+        <div class="kpi-card" id="bm-kpi-sessions"><div class="kpi-label">Sessions</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+      </div>
+
+      <div id="bm-cb-products-section" class="card" style="margin-bottom:18px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;">
+          <div class="card-title" style="margin-bottom:0;">Performance by Product</div>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;flex-shrink:0;">
+            <input type="checkbox" id="bm-hide-negative-bsr" style="margin:0;" onchange="window.bmRenderMomentumCards && window.bmRenderMomentumCards()">
+            Hide negative BSR changes
+          </label>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
+          Sessions measured vs. prior month; BSR change reflects total movement since first recorded.
+        </div>
+        <div class="momentum-cards-grid" id="bm-momentum-cards-grid"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      </div>
+
+      <div id="bm-cb-keywords-section" class="ppc-card">
+        <div class="ppc-card-title">Targeted Keyword Indexing Progress</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px;">Organic rankings signal algorithm traction — new brands typically take 3–12 months to index.</div>
+        <div style="overflow-x:auto;">
+          <table class="data-table">
+            <thead><tr><th>Keyword</th><th>Product</th><th>Organic Rank</th><th>Search Volume</th></tr></thead>
+            <tbody id="bm-keyword-tbody"><tr><td colspan="4" style="color:var(--muted);">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="bm-cb-next-section" class="momentum-tracking-card">
+        <div class="momentum-tracking-title">What We're Tracking Next</div>
+        <div class="momentum-tracking-grid">
+          <div class="momentum-tracking-item">
+            <div class="momentum-tracking-item-title">Keyword Rank Movement</div>
+            <div class="momentum-tracking-item-text">Organic rank movement for our top-priority keyword set, month over month.</div>
+          </div>
+          <div class="momentum-tracking-item">
+            <div class="momentum-tracking-item-title">Subcategory BSR Trends</div>
+            <div class="momentum-tracking-item-text">Subcategory BSR as a leading indicator of category-level momentum, independent of overall BSR.</div>
+          </div>
+          <div class="momentum-tracking-item">
+            <div class="momentum-tracking-item-title">Review Velocity</div>
+            <div class="momentum-tracking-item-text">Review velocity and rating trends as new products build up their own review base.</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -4139,7 +4228,7 @@ function showChannel(page, channelId, btn) {
     if (channelId === 's-amazon')        initAmazonLive();
     if (channelId === 's-walmart')       initWalmartLive();
     if (channelId === 's-insights' && !window._salesInsightsInit) { window._salesInsightsInit = true; if (typeof window.initSalesInsights === 'function') window.initSalesInsights(); }
-    if (channelId === 's-momentum' && !window._brandMomentumInit) { window._brandMomentumInit = true; if (typeof window.loadBrandMomentum === 'function') window.loadBrandMomentum(); }
+    if (channelId === 's-momentum' && !window._brandMomentumInit) { window._brandMomentumInit = true; if (typeof window.initBrandMomentum === 'function') window.initBrandMomentum(); }
     if (channelId.indexOf('x-') === 0)   window.initSalesExternalPage();
     if (channelId.indexOf('mx-') === 0)  window.initMarketingExternalPage();
     if (channelId.indexOf('ix-') === 0)  window.initInventoryExternalPage();
@@ -12167,9 +12256,22 @@ function jbjMoStarsHtml(rating) {
   return '★'.repeat(Math.max(0, Math.min(5, r))) + '☆'.repeat(5 - Math.max(0, Math.min(5, r)));
 }
 
-window.loadBrandMomentum = async function () {
-  const container = document.getElementById('s-momentum');
-  if (!container) return;
+// Split into a fetch-and-cache function (initBrandMomentum) plus a
+// separate re-render function (bmRenderMomentumCards) — restructured
+// 2026-10-01 to match évolis's own Brand Momentum page exactly, so the
+// "Hide negative BSR changes" checkbox can re-render instantly from
+// already-fetched data on toggle instead of re-fetching everything.
+// Also adopts two of évolis's refinements over this page's first
+// version: "vs prior month" instead of "vs earliest tracked" for the
+// Sessions comparison (a more useful, recent signal), and reading/
+// writing into the static KPI-card and table elements already in the
+// HTML rather than rebuilding their markup from scratch every time —
+// this is also what lets api's PDF export (buildBrandMomentumPages)
+// read real, stable DOM elements by id, matching évolis's own PDF page
+// for this exact tab.
+window.initBrandMomentum = async function () {
+  const grid = document.getElementById('bm-momentum-cards-grid');
+  if (!grid) return;
   try {
     function isCsv(t) { return !!t && t.trim().length > 0 && !t.trim().startsWith('<'); }
     function parseCsvLine(line) {
@@ -12206,7 +12308,7 @@ window.loadBrandMomentum = async function () {
       fetch(reviewsUrl).then(r => r.ok ? r.text() : '').catch(() => ''),
     ]);
 
-    // ── Sessions: earliest vs latest available month per ASIN ────────────
+    // ── Sessions: latest + prior month available per ASIN ────────────────
     const sessByAsin = {};
     if (isCsv(bizCsv)) {
       parseCsv(bizCsv).forEach(r => {
@@ -12224,24 +12326,17 @@ window.loadBrandMomentum = async function () {
     const skuSessions = JBJ_MOMENTUM_PRODUCTS.map(p => {
       const d = sessByAsin[p.asin] || {};
       const keys = Object.keys(d).map(Number).sort((a, b) => a - b);
-      const earliest = keys.length ? d[keys[0]] : undefined;
       const latest = keys.length ? d[keys[keys.length - 1]] : undefined;
-      const pct = (earliest !== undefined && earliest > 0 && latest !== undefined)
-        ? Math.round(((latest - earliest) / earliest) * 100) : null;
-      return { asin: p.asin, name: p.name, earliest, latest, pct };
+      const prevMonth = keys.length >= 2 ? d[keys[keys.length - 2]] : undefined;
+      const pct = (prevMonth !== undefined && prevMonth > 0 && latest !== undefined)
+        ? Math.round(((latest - prevMonth) / prevMonth) * 1000) / 10 : null;
+      return { asin: p.asin, name: p.name, latest, prevMonth, pct };
     });
-    const totalEarliest = skuSessions.reduce((s, d) => s + (d.earliest || 0), 0);
     const totalLatest = skuSessions.reduce((s, d) => s + (d.latest || 0), 0);
-    const totalPct = totalEarliest ? Math.round(((totalLatest - totalEarliest) / totalEarliest) * 100) : null;
-    // MoM: second-to-latest vs latest, per ASIN summed
     let momPct = null;
     {
       let totalPrev = 0, havePrev = false;
-      JBJ_MOMENTUM_PRODUCTS.forEach(p => {
-        const d = sessByAsin[p.asin] || {};
-        const keys = Object.keys(d).map(Number).sort((a, b) => a - b);
-        if (keys.length >= 2) { totalPrev += d[keys[keys.length - 2]] || 0; havePrev = true; }
-      });
+      skuSessions.forEach(d => { if (d.prevMonth !== undefined) { totalPrev += d.prevMonth; havePrev = true; } });
       if (havePrev && totalPrev) momPct = Math.round(((totalLatest - totalPrev) / totalPrev) * 100);
     }
 
@@ -12299,151 +12394,124 @@ window.loadBrandMomentum = async function () {
     }
     let totalReviews = 0, ratingWeightedSum = 0;
     Object.values(revByAsin).forEach(v => { totalReviews += v.count; ratingWeightedSum += v.sum; });
-    const avgRating = totalReviews ? ratingWeightedSum / totalReviews : 0;
 
     const kwCount = rankedKws.length;
-    const kwUpCount = 0; // no prior-period comparison available for per-keyword rank movement yet — see note below
     const momStr = momPct !== null ? `${momPct > 0 ? '+' : ''}${momPct}%` : '—';
     const momCls = momPct > 0 ? 'up' : momPct < 0 ? 'dn' : 'flat';
 
-    // ── Checkbox row ───────────────────────────────────────────────────
-    const cbLabel = (id, label) =>
-      `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">` +
-      `<input type="checkbox" id="${id}" checked style="margin:0;"` +
-      ` onchange="(function(cb){var s=document.getElementById('${id}-section');if(s)s.style.display=cb.checked?'':'none';})(this)">` +
-      ` ${label}</label>`;
-    const checkboxRow = `<div class="card" style="margin-bottom:18px;padding:12px 20px;">
-      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-        <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
-        ${cbLabel('jbj-mo-cb-sessions', 'Sessions')}
-        ${cbLabel('jbj-mo-cb-keywords', 'Keyword Rankings')}
-        ${cbLabel('jbj-mo-cb-reviews', 'Review Velocity')}
-        ${cbLabel('jbj-mo-cb-next', "What We're Tracking")}
-      </div>
-    </div>`;
-
-    // ── Top 3 KPIs ─────────────────────────────────────────────────────
-    const top3 = `<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
-      <div class="kpi-card">
-        <div class="kpi-label">Reviews collected</div>
-        <div class="kpi-value">${totalReviews}</div>
-        <div class="kpi-mom up">${avgRating.toFixed(1)}★ avg across ${JBJ_MOMENTUM_PRODUCTS.length} SKUs</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Keywords with organic rank (top 100)</div>
-        <div class="kpi-value">${kwCount || '—'}</div>
-        <div class="kpi-mom flat">${kwCount > 0 ? 'Tracked in top 100' : 'Tracker data loading'}</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Sessions</div>
-        <div class="kpi-value">${totalLatest}</div>
-        <div class="kpi-mom ${momCls}">${momStr} MoM</div>
-      </div>
-    </div>`;
-
-    // ── Per-product cards ────────────────────────────────────────────────
-    const productCards = JBJ_MOMENTUM_PRODUCTS.map(p => {
-      const sess = skuSessions.find(s => s.asin === p.asin);
-      const sessValue = sess && sess.latest !== undefined ? sess.latest : null;
-      const sessPillHtml = sess && sess.pct !== null
-        ? `<span class="momentum-pill ${sess.pct > 0 ? 'momentum-pill-up' : 'momentum-pill-dn'}">${sess.pct > 0 ? '▲' : '▼'} ${Math.abs(sess.pct)}% vs earliest tracked</span>`
-        : `<span class="momentum-pill" style="background:var(--bg2);color:var(--muted);">—</span>`;
-
-      const latestKw = latestKwRow(p.asin);
-      const kwOrganicCount = latestKw ? (parseInt(latestKw.top50_organic_count, 10) || 0) : 0;
-
-      const earliestBsr = earliestBsrRow(p.asin);
-      const latestBsr = latestBsrRow(p.asin);
-      let bsrValueHtml = '—', bsrPillHtml = '', bsrSubcatHtml = '';
-      if (latestBsr) {
-        bsrValueHtml = '#' + parseInt(latestBsr.bsr, 10).toLocaleString();
-        if (earliestBsr && earliestBsr.date !== latestBsr.date) {
-          const change = parseInt(earliestBsr.bsr, 10) - parseInt(latestBsr.bsr, 10);
-          if (change !== 0) {
-            const cls = change > 0 ? 'momentum-pill-up' : 'momentum-pill-dn';
-            const arrow = change > 0 ? '▲' : '▼';
-            bsrPillHtml = `<span class="momentum-pill ${cls}">${arrow} ${Math.abs(change).toLocaleString()}</span>`;
-          }
-        }
-        if (latestBsr.subcategory_bsr) bsrSubcatHtml = `<div class="momentum-pcard-subcategory">Subcategory BSR #${esc(latestBsr.subcategory_bsr)}</div>`;
-      }
-
-      const rev = revByAsin[p.asin];
-      const reviewsCount = rev ? rev.count : 0;
-      const ratingBadgeHtml = rev
-        ? `<div class="momentum-pcard-rating"><span class="momentum-pcard-rating-stars">${jbjMoStarsHtml(rev.sum / rev.count)}</span><span class="momentum-pcard-rating-num">${(rev.sum / rev.count).toFixed(1)}</span></div>`
-        : '';
-
-      return `<div class="momentum-pcard">
-        <div class="momentum-pcard-hd">
-          <div class="momentum-pcard-name">${esc(p.name)}</div>
-          ${ratingBadgeHtml}
-        </div>
-        <div class="momentum-pcard-body">
-          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Sessions</span><span class="momentum-pcard-value">${sessValue !== null ? sessValue : '—'}</span>${sessPillHtml}</div>
-          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Organic Keywords (Top 50)</span><span class="momentum-pcard-value">${kwOrganicCount || '—'}</span></div>
-          <div class="momentum-pcard-row"><span class="momentum-pcard-label">BSR</span><span class="momentum-pcard-value">${bsrValueHtml}</span>${bsrPillHtml}${bsrSubcatHtml}</div>
-          <div class="momentum-pcard-row"><span class="momentum-pcard-label">Reviews</span><span class="momentum-pcard-value">${reviewsCount || '—'}</span></div>
-        </div>
-      </div>`;
-    }).join('');
-
-    const productCardsSection = `<div id="jbj-mo-cb-sessions-section" class="card" style="margin-bottom:18px;">
-      <div class="card-title" style="margin-bottom:2px;">Performance by Product</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">
-        Sessions measured vs. earliest tracked data point; BSR change reflects total movement since first recorded.
-      </div>
-      <div class="momentum-cards-grid">${productCards}</div>
-    </div>`;
-
-    // ── Targeted Keyword Indexing Progress ────────────────────────────────
-    let kwBody;
-    if (kwFetchError) {
-      kwBody = `<div style="padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;">${esc(kwFetchError)}</div>`;
-    } else if (!rankedKws.length) {
-      kwBody = `<div style="padding:12px 0;color:var(--muted);font-size:12px;font-style:italic;">No keywords ranked in the top 100 found yet.</div>`;
-    } else {
-      const rows = rankedKws.slice(0, 20).map(({ kw, rank, vol, prod }) => `<tr>
-        <td style="font-weight:600;">${esc(kw)}</td>
-        <td style="color:var(--muted);font-weight:400;">${esc(prod)}</td>
-        <td style="font-weight:700;">#${rank}</td>
-        <td style="color:var(--muted);font-weight:400;">${vol ? vol.toLocaleString() : '—'}</td>
-      </tr>`).join('');
-      kwBody = `<table class="data-table" style="width:100%;"><thead><tr>
-        <th>Keyword</th><th>Product</th><th>Organic Rank</th><th>Search Volume</th>
-      </tr></thead><tbody>${rows}</tbody></table>`;
+    // ── Populate the static top-3 KPI cards ──────────────────────────────
+    const revEl = document.getElementById('bm-kpi-reviews');
+    if (revEl) revEl.querySelector('.kpi-value').textContent = totalReviews;
+    const kwEl = document.getElementById('bm-kpi-ranked-keywords');
+    if (kwEl) kwEl.querySelector('.kpi-value').textContent = kwCount || '—';
+    const sessEl = document.getElementById('bm-kpi-sessions');
+    if (sessEl) {
+      sessEl.querySelector('.kpi-value').textContent = totalLatest;
+      const momEl = sessEl.querySelector('.kpi-mom');
+      if (momEl) { momEl.className = 'kpi-mom ' + momCls; momEl.textContent = `${momStr} MoM`; }
     }
-    const kwSection = `<div id="jbj-mo-cb-keywords-section" class="card" style="margin-bottom:18px;">
-      <div class="card-title">Targeted Keyword Indexing Progress</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px;">
-        Organic rankings signal algorithm traction — new brands typically take 3–12 months to index.
-      </div>${kwBody}
-    </div>`;
 
-    // ── What We're Tracking Next — generic content, copied as-is ─────────
-    const nextSection = `<div id="jbj-mo-cb-next-section" class="momentum-tracking-card">
-      <div class="momentum-tracking-title">What We're Tracking Next</div>
-      <div class="momentum-tracking-grid">
-        <div class="momentum-tracking-item">
-          <div class="momentum-tracking-item-title">Keyword Rank Movement</div>
-          <div class="momentum-tracking-item-text">Weekly snapshots show which terms are climbing toward page 1 and where to activate PPC for maximum rank acceleration.</div>
-        </div>
-        <div class="momentum-tracking-item">
-          <div class="momentum-tracking-item-title">Review Velocity</div>
-          <div class="momentum-tracking-item-text">50+ reviews is the milestone where conversion rates reliably improve. We track month-over-month review count per SKU to measure progress toward that threshold across the line.</div>
-        </div>
-        <div class="momentum-tracking-item">
-          <div class="momentum-tracking-item-title">Session Trends</div>
-          <div class="momentum-tracking-item-text">Organic session growth is the clearest signal that the catalog is gaining discoverability. We track month-over-month changes per SKU to identify which products are building momentum and where to focus next.</div>
-        </div>
-      </div>
-    </div>`;
+    // ── Populate the static keyword indexing table ───────────────────────
+    const kwTbody = document.getElementById('bm-keyword-tbody');
+    if (kwTbody) {
+      if (kwFetchError) {
+        kwTbody.innerHTML = `<tr><td colspan="4" style="color:var(--navy);">${esc(kwFetchError)}</td></tr>`;
+      } else if (!rankedKws.length) {
+        kwTbody.innerHTML = `<tr><td colspan="4" style="color:var(--muted);font-style:italic;">No keywords ranked in the top 100 found yet.</td></tr>`;
+      } else {
+        kwTbody.innerHTML = rankedKws.slice(0, 20).map(({ kw, rank, vol, prod }) => `<tr>
+          <td style="font-weight:600;">${esc(kw)}</td>
+          <td style="color:var(--muted);font-weight:400;">${esc(prod)}</td>
+          <td style="font-weight:700;">#${rank}</td>
+          <td style="color:var(--muted);font-weight:400;">${vol ? vol.toLocaleString() : '—'}</td>
+        </tr>`).join('');
+      }
+    }
 
-    container.innerHTML = checkboxRow + top3 + productCardsSection + kwSection + nextSection;
+    // Cache for bmRenderMomentumCards (initial render below, and every
+    // "Hide negative BSR changes" toggle after this) — same reasoning as
+    // évolis's own window._bmCardData / window._bmBsrBySku caching.
+    const kwOrganicCountByAsin = {};
+    JBJ_MOMENTUM_PRODUCTS.forEach(p => {
+      const latestKw = latestKwRow(p.asin);
+      kwOrganicCountByAsin[p.asin] = latestKw ? (parseInt(latestKw.top50_organic_count, 10) || 0) : 0;
+    });
+    window._bmCardData = { skuSessions, revByAsin, kwOrganicCountByAsin };
+    window._bmBsrBySku = {};
+    JBJ_MOMENTUM_PRODUCTS.forEach(p => {
+      const latestBsr = latestBsrRow(p.asin);
+      if (!latestBsr) return;
+      const earliestBsr = earliestBsrRow(p.asin);
+      let changePct = 0;
+      if (earliestBsr && earliestBsr.date !== latestBsr.date) {
+        const earliestVal = parseInt(earliestBsr.bsr, 10), latestVal = parseInt(latestBsr.bsr, 10);
+        if (earliestVal > 0) changePct = Math.round(((earliestVal - latestVal) / earliestVal) * 1000) / 10;
+      }
+      window._bmBsrBySku[p.asin] = { latestBsr: parseInt(latestBsr.bsr, 10), changePct, subcategory: latestBsr.subcategory_bsr ? `Subcategory BSR #${latestBsr.subcategory_bsr}` : '' };
+    });
+
+    window.bmRenderMomentumCards();
   } catch (err) {
     console.error('[BrandMomentum]', err);
-    container.innerHTML = `<div style="color:var(--muted);font-size:12px;">Could not load — ${err.message || ''}</div>`;
+    grid.innerHTML = `<div style="color:var(--muted);font-size:12px;">Could not load — ${err.message || ''}</div>`;
   }
+};
+
+// Separate render function — matches évolis's own split exactly, so the
+// "Hide negative BSR changes" checkbox can re-render instantly from
+// window._bmCardData/window._bmBsrBySku without re-fetching anything.
+window.bmRenderMomentumCards = function () {
+  const grid = document.getElementById('bm-momentum-cards-grid');
+  if (!grid || !window._bmCardData) return;
+  const { skuSessions, revByAsin, kwOrganicCountByAsin } = window._bmCardData;
+  const hideNegativeBsr = document.getElementById('bm-hide-negative-bsr')?.checked;
+
+  const cardsHtml = JBJ_MOMENTUM_PRODUCTS.map(p => {
+    const sess = skuSessions.find(s => s.asin === p.asin);
+    const sessValue = sess && sess.latest !== undefined ? sess.latest : null;
+    const sessPillHtml = sess && sess.pct != null
+      ? `<span class="momentum-pill ${sess.pct > 0 ? 'momentum-pill-up' : 'momentum-pill-dn'}">${sess.pct > 0 ? '▲' : '▼'} ${Math.abs(sess.pct)}% vs prior month</span>`
+      : `<span class="momentum-pill" style="background:var(--bg2);color:var(--muted);">${sess && sess.prevMonth === undefined ? 'New SKU' : '—'}</span>`;
+
+    const bsr = window._bmBsrBySku ? window._bmBsrBySku[p.asin] : null;
+    let bsrValueHtml = '—', bsrPillHtml = '', bsrSubcatHtml = '';
+    if (bsr) {
+      bsrValueHtml = '#' + bsr.latestBsr.toLocaleString();
+      if (bsr.changePct !== 0) {
+        const cls = bsr.changePct > 0 ? 'momentum-pill-up' : 'momentum-pill-dn';
+        const arrow = bsr.changePct > 0 ? '▲' : '▼';
+        bsrPillHtml = `<span class="momentum-pill ${cls}">${arrow} ${Math.abs(bsr.changePct)}%</span>`;
+      }
+      if (bsr.subcategory) bsrSubcatHtml = `<div class="momentum-pcard-subcategory">${bsr.subcategory}</div>`;
+    }
+    // "Hide negative BSR changes" — hides the whole card if its only
+    // signal is a negative BSR change, matching évolis's exact reasoning:
+    // hiding just the pill on a card layout would leave a confusing
+    // half-empty card rather than a clean, honest omission.
+    if (hideNegativeBsr && bsr && bsr.changePct < 0) return '';
+
+    const rev = revByAsin[p.asin];
+    const reviewsCount = rev ? rev.count : 0;
+    const avgRating = rev && rev.count > 0 ? rev.sum / rev.count : 0;
+    const ratingBadgeHtml = rev && rev.count > 0
+      ? `<div class="momentum-pcard-rating"><span class="momentum-pcard-rating-stars">${jbjMoStarsHtml(avgRating)}</span><span class="momentum-pcard-rating-num">${avgRating.toFixed(1)}</span></div>`
+      : '';
+
+    return `<div class="momentum-pcard">
+      <div class="momentum-pcard-hd">
+        <div class="momentum-pcard-name">${p.name}</div>
+        ${ratingBadgeHtml}
+      </div>
+      <div class="momentum-pcard-body">
+        <div class="momentum-pcard-row"><span class="momentum-pcard-label">Sessions</span><span class="momentum-pcard-value">${sessValue !== null ? sessValue : '—'}</span>${sessPillHtml}</div>
+        <div class="momentum-pcard-row"><span class="momentum-pcard-label">Organic Keywords</span><span class="momentum-pcard-value">${kwOrganicCountByAsin[p.asin] || '—'}</span></div>
+        <div class="momentum-pcard-row"><span class="momentum-pcard-label">BSR</span><span class="momentum-pcard-value">${bsrValueHtml}</span>${bsrPillHtml}${bsrSubcatHtml}</div>
+        <div class="momentum-pcard-row"><span class="momentum-pcard-label">Reviews</span><span class="momentum-pcard-value">${reviewsCount || '—'}</span></div>
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  grid.innerHTML = cardsHtml || '<div style="color:var(--muted);font-size:12px;">No products left after filtering.</div>';
 };
 
 // ── Sales > Insights tab — added 2026-09-30 per Jaclyn ──────────────────
@@ -18671,6 +18739,12 @@ async function loadAuditResultsFromSheet() {
     _investChart: 'chart-invest',
     _impressChart: 'chart-impressions',
     _snsChart: 'chart-sns',
+    // Added 2026-10-01 — Sales > Insights' Unit Sales by Product Category
+    // chart, new this same round as the PDF page that displays it
+    // (buildSalesInsightsPage). Lives on the Sales page, same family as
+    // _amazonChart/_walmartChart above, which are already proven safe to
+    // force-visible from this same page.
+    _categorySalesChart: 'chart-category-sales',
     // Added 2026-07-21 — was never registered here at all, so it fell
     // through to the naive pdfxRawChartImg fallback (no force-visible
     // ancestors, no correct-size capture), which is exactly why it showed
@@ -19315,8 +19389,15 @@ async function loadAuditResultsFromSheet() {
       '</div>';
   }
 
+  // FIXED 2026-10-01 — was querying '#m-opportunities .opp-card', which
+  // matched BOTH Future Opportunities cards AND Accomplished cards (both
+  // use the .opp-card class, and both now live inside #m-opportunities
+  // since Stage 3 added Accomplished to this same page) — would have
+  // silently mixed the two sections together in the PDF. Scoped to
+  // #opp-grid specifically, the Future Opportunities cards' own
+  // container, not their shared parent page.
   function pdfxFutureOpportunitiesBlock() {
-    const cards = Array.prototype.map.call(document.querySelectorAll('#m-opportunities .opp-card'), function (card) {
+    const cards = Array.prototype.map.call(document.querySelectorAll('#opp-grid .opp-card'), function (card) {
       const title = pdfxText('.opp-title', card);
       if (!title) return ''; // blank Title = this slot is unused, per Jaclyn 2026-07-18
       const subtitle = pdfxText('.opp-subtitle', card);
@@ -19333,6 +19414,35 @@ async function loadAuditResultsFromSheet() {
     // exactly as designed on the live dashboard. Per Jaclyn 2026-07-14.
     return '<div class="pdfx-card" style="margin-top:0;">' +
       '<span class="pdfx-pill" style="margin-bottom:12px;">Future Opportunities</span>' +
+      '<div class="pdfx-cover-cols" style="gap:24px;">' + cards + '</div>' +
+      '</div>';
+  }
+
+  // What's Been Accomplished — added 2026-10-01, matching
+  // pdfxFutureOpportunitiesBlock's exact pattern, scoped to #acc-grid
+  // specifically (Accomplished cards' own container) so it can never
+  // pick up Future Opportunities cards even though both share the
+  // .opp-card class. Also renders each card's images, if any — acc1/
+  // acc2 can have up to 6; acc3/acc4 never do.
+  function pdfxAccomplishedBlock() {
+    const cards = Array.prototype.map.call(document.querySelectorAll('#acc-grid .opp-card'), function (card) {
+      const title = pdfxText('.opp-title', card);
+      if (!title) return ''; // blank Title = this slot is unused
+      const subtitle = pdfxText('.opp-subtitle', card);
+      const body = pdfxText('.opp-body', card);
+      const imgs = Array.prototype.map.call(card.querySelectorAll('.opp-card-img'), function (img) {
+        return '<img src="' + pdfxEscape(img.getAttribute('src') || '') + '" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin:6px 6px 0 0;">';
+      }).join('');
+      return '<div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">' + pdfxEscape(title) + '</div>' +
+        (subtitle ? '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;">' + pdfxEscape(subtitle) + '</div>' : '') +
+        '<div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + pdfxEscape(body) + '</div>' +
+        (imgs ? '<div style="display:flex;flex-wrap:wrap;margin-top:4px;">' + imgs + '</div>' : '') +
+        '</div>';
+    }).join('');
+    if (!cards) return '';
+    return '<div class="pdfx-card" style="margin-top:0;margin-bottom:22px;">' +
+      '<span class="pdfx-pill" style="margin-bottom:12px;">What&rsquo;s Been Accomplished</span>' +
       '<div class="pdfx-cover-cols" style="gap:24px;">' + cards + '</div>' +
       '</div>';
   }
@@ -19451,22 +19561,115 @@ async function loadAuditResultsFromSheet() {
       '</div>';
   }
 
+  // Brand Momentum PDF pages — ported 2026-10-01 per Jaclyn, matching
+  // évolis's own buildBrandMomentumPages exactly. Reads the live,
+  // already-rendered .momentum-pcard elements directly from the DOM
+  // (#bm-momentum-cards-grid) rather than rebuilding them independently
+  // — this is also what makes "Hide negative BSR changes" apply to the
+  // PDF automatically: bmRenderMomentumCards() already excludes those
+  // cards from the live DOM before this function ever runs, so there's
+  // nothing PDF-specific to build for that at all.
+  // Sales > Insights PDF page — added 2026-10-01, this page simply
+  // didn't exist in the PDF export at all before now. Mirrors the live
+  // tab exactly: Unit Sales by Product Category chart, Subscriptions
+  // (KPIs + YOY line chart — the same content that used to live on the
+  // Opportunities PDF page, now correctly relocated to match where it
+  // actually lives on the live dashboard since Stage 2), and the
+  // editable Key Insight text.
+  function buildSalesInsightsPage(monthYear) {
+    const subsKpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
+    const keyInsight = pdfxText('#catinsight-disp');
+    return '' +
+      '<div class="pdfx-page">' +
+        '<div class="pdfx-inner">' +
+          pdfxHeaderBand(monthYear, 'Sales') +
+          '<div class="pdfx-chlabel">Insights</div>' +
+          '<div class="pdfx-card" style="margin-top:6px;margin-bottom:14px;"><div class="pdfx-card-title">Unit Sales by Product Category</div>' + pdfxChartBlock('_categorySalesChart') + '</div>' +
+          '<div class="pdfx-card" style="margin-bottom:14px;">' +
+            '<div class="pdfx-card-title">Subscriptions</div>' +
+            '<div class="pdfx-kpis n2" style="margin-bottom:10px;">' + subsKpis.map(pdfxKpiCardHtml).join('') + '</div>' +
+            '<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;">Active Subscriptions by Month</div>' +
+            pdfxChartBlock('_snsChart') +
+          '</div>' +
+          (keyInsight ? '<div class="pdfx-card" style="margin-bottom:0;"><div class="pdfx-card-title">Key Insight</div><div class="pdfx-insight">' + pdfxEscape(keyInsight) + '</div></div>' : '') +
+          pdfxFooter(monthYear) +
+        '</div>' +
+      '</div>';
+  }
+
+  function buildBrandMomentumPages(monthYear) {
+    const cards = Array.from(document.querySelectorAll('#bm-momentum-cards-grid .momentum-pcard'));
+    const FIRST_PAGE_MAX = 4, OTHER_PAGE_MAX = 5;
+    const productChunks = [];
+    {
+      const remaining = cards.slice();
+      if (remaining.length) productChunks.push(remaining.splice(0, FIRST_PAGE_MAX));
+      while (remaining.length) productChunks.push(remaining.splice(0, OTHER_PAGE_MAX));
+    }
+
+    const top3Kpis = ['bm-kpi-reviews', 'bm-kpi-ranked-keywords', 'bm-kpi-sessions'].map(pdfxKpi);
+    let productPages = '';
+    if (productChunks.length) {
+      productPages = productChunks.map((chunk, i) => {
+        const headHtml = i === 0
+          ? pdfxHeaderBand(monthYear, 'Sales') +
+            '<div class="pdfx-chlabel">Brand Momentum</div>' +
+            '<div class="pdfx-kpis n3" style="margin-top:6px;margin-bottom:14px;">' + top3Kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
+            '<div class="pdfx-card-title" style="margin-bottom:10px;">Performance by Product</div>'
+          : pdfxHeaderBand(monthYear, 'Sales') +
+            '<div class="pdfx-chlabel">Performance by Product <span style="font-weight:400;color:var(--muted);">(continued)</span></div>';
+        return '<div class="pdfx-page">' +
+          '<div class="pdfx-inner pdfx-momentum-tight">' +
+            headHtml +
+            '<div class="momentum-cards-grid">' + chunk.map(c => c.outerHTML).join('') + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Keyword table — same top-20 data already rendered into the live
+    // #bm-keyword-tbody by initBrandMomentum, read directly rather than
+    // re-querying the sheets a second time.
+    const kwRows = pdfxTableRows('bm-keyword-tbody');
+    const kwHtml = kwRows.length
+      ? '<div class="pdfx-card" style="margin-bottom:0;">' +
+          '<div class="pdfx-card-title">Targeted Keyword Indexing Progress <span style="font-weight:400;color:var(--muted);">(Top 20)</span></div>' +
+          pdfxTableHtml(['Keyword', 'Product', 'Organic Rank', 'Search Volume'], kwRows) +
+        '</div>'
+      : '';
+
+    // "What We're Tracking Next" — same .momentum-tracking-* markup the
+    // live dashboard uses, read directly via outerHTML rather than
+    // rebuilt inline, so PDF and live dashboard can never drift apart.
+    const nextEl = pdfxById('bm-cb-next-section');
+    const nextHtml = nextEl ? nextEl.outerHTML : '';
+
+    const lastPage = (kwHtml || nextHtml) ? (
+      '<div class="pdfx-page">' +
+        '<div class="pdfx-inner">' +
+          pdfxHeaderBand(monthYear, 'Sales') +
+          kwHtml +
+          (nextHtml ? '<div style="margin-top:' + (kwHtml ? '22px' : '0') + ';">' + nextHtml + '</div>' : '') +
+        '</div>' +
+      '</div>'
+    ) : '';
+
+    return productPages + lastPage;
+  }
+
   function buildOpportunitiesPage(monthYear) {
-    const kpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
-    // Tightened 2026-09-17 per Jaclyn — this page only ever has 2 content
-    // blocks (the chart card + Future Opportunities), so the shared
-    // .pdfx-inner page padding and the default block margins (both tuned
-    // for pages with more content) left this one looking sparse. Overrides
-    // are scoped to THIS page's own inline styles only — .pdfx-inner and
-    // .pdfx-card's shared CSS rules are untouched, so no other PDF page is
-    // affected.
+    // Rebuilt 2026-10-01 per Jaclyn — this page's old content (Subscribe
+    // & Save KPIs + chart) moved to Sales > Insights back in Stage 2 of
+    // this project, but buildOpportunitiesPage itself was never updated
+    // to match — it kept building the OLD content every export since,
+    // pointing at kpi-active-subs/kpi-retention/_snsChart, which no
+    // longer live under #m-opportunities at all. Now shows What's Been
+    // Accomplished + Future Opportunities only, matching the live page.
     return '' +
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner" style="padding:22px 46px 26px;">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
-          '<div class="pdfx-chlabel" style="margin-top:14px;">Subscribe &amp; Save</div>' +
-          '<div class="pdfx-kpis n2" style="margin-top:6px;margin-bottom:10px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card" style="margin-bottom:10px;"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>' +
+          pdfxAccomplishedBlock() +
           pdfxFutureOpportunitiesBlock() +
           pdfxFooter(monthYear, true) +
         '</div>' +
@@ -19855,6 +20058,8 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
         fulfillment:   !!document.getElementById('pdf-include-fulfillment')   && document.getElementById('pdf-include-fulfillment').checked,
         stewardship:   !!document.getElementById('pdf-include-stewardship')   && document.getElementById('pdf-include-stewardship').checked,
         opportunities: !!document.getElementById('pdf-include-opportunities') && document.getElementById('pdf-include-opportunities').checked,
+        insights: !!document.getElementById('pdf-include-insights') && document.getElementById('pdf-include-insights').checked,
+        brandMomentum: !!document.getElementById('pdf-include-brand-momentum') && document.getElementById('pdf-include-brand-momentum').checked,
         strategy: !!document.getElementById('pdf-include-strategy') && document.getElementById('pdf-include-strategy').checked,
         bss:  !!document.getElementById('pdf-include-bss')  && document.getElementById('pdf-include-bss').checked,
         pd:   !!document.getElementById('pdf-include-pd')   && document.getElementById('pdf-include-pd').checked,
@@ -19871,7 +20076,8 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
         (includeSections.walmart       && typeof window.initWalmartLive === 'function')            ? window.initWalmartLive()            : null,
         (includeSections.stewardship   && typeof window.initStewardshipLive === 'function')        ? window.initStewardshipLive()        : null,
         (includeSections.fulfillment   && typeof window.initMarketingFulfillmentCS === 'function')  ? window.initMarketingFulfillmentCS() : null,
-        (includeSections.opportunities && !window._snsChart && typeof initSns === 'function')       ? initSns()                           : null,
+        (includeSections.insights && typeof window.initSalesInsights === 'function') ? window.initSalesInsights() : null,
+        (includeSections.brandMomentum && typeof window.initBrandMomentum === 'function') ? window.initBrandMomentum() : null,
         // Prime Day's KPIs/chart are lazy-loaded on tab click — if it's
         // checked for inclusion but the tab was never opened this session,
         // this is what actually builds the chart before capture below.
@@ -19954,6 +20160,8 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
         includeSections.fulfillment   ? buildFulfillmentCsPage(monthYear) : '',
         includeSections.stewardship   ? buildStewardshipPage(monthYear)   : '',
         includeSections.opportunities ? buildOpportunitiesPage(monthYear) : '',
+        includeSections.insights ? buildSalesInsightsPage(monthYear) : '',
+        includeSections.brandMomentum ? buildBrandMomentumPages(monthYear) : '',
       ].join('');
 
       const eventPages = [
