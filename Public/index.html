@@ -12491,18 +12491,17 @@ window.bmRenderMomentumCards = function () {
     let bsrValueHtml = '—', bsrPillHtml = '', bsrSubcatHtml = '';
     if (bsr) {
       bsrValueHtml = '#' + bsr.latestBsr.toLocaleString();
-      if (bsr.changePct !== 0) {
+      // "Hide negative BSR changes" — CHANGED 2026-10-01 per Jaclyn: hides
+      // ONLY the red ranking-change pill, not the whole product card. The
+      // card (sessions, keywords, current rank, reviews) always shows.
+      const hidePill = hideNegativeBsr && bsr.changePct < 0;
+      if (bsr.changePct !== 0 && !hidePill) {
         const cls = bsr.changePct > 0 ? 'momentum-pill-up' : 'momentum-pill-dn';
         const arrow = bsr.changePct > 0 ? '▲' : '▼';
         bsrPillHtml = `<span class="momentum-pill ${cls}">${arrow} ${Math.abs(bsr.changePct)}%</span>`;
       }
       if (bsr.subcategory) bsrSubcatHtml = `<div class="momentum-pcard-subcategory">${bsr.subcategory}</div>`;
     }
-    // "Hide negative BSR changes" — hides the whole card if its only
-    // signal is a negative BSR change, matching évolis's exact reasoning:
-    // hiding just the pill on a card layout would leave a confusing
-    // half-empty card rather than a clean, honest omission.
-    if (hideNegativeBsr && bsr && bsr.changePct < 0) return '';
 
     const rev = revByAsin[p.asin];
     const reviewsCount = rev ? rev.count : 0;
@@ -18861,7 +18860,28 @@ async function loadAuditResultsFromSheet() {
         ticks: Object.assign({}, origTicks, { font: Object.assign({}, origTicks.font, { size: scaledSize }) })
       });
     });
-    return Object.assign({}, options, { scales: newScales });
+    // ADDED 2026-10-01 per Jaclyn ("legend is still too small") — legend
+    // labels were never scaled here, only axis ticks, so an on-canvas
+    // legend (the category chart's) printed at its dashboard size divided
+    // by fontScale (~3.26x smaller). Same target size as the axis labels;
+    // swatch box/padding scaled proportionally so they stay in step.
+    const origPlugins = options.plugins || {};
+    const origLegend = origPlugins.legend || {};
+    let newPlugins = origPlugins;
+    if (origLegend.display !== false) {
+      const origLabels = origLegend.labels || {};
+      newPlugins = Object.assign({}, origPlugins, {
+        legend: Object.assign({}, origLegend, {
+          labels: Object.assign({}, origLabels, {
+            font: Object.assign({}, origLabels.font, { size: scaledSize }),
+            boxWidth: Math.round((origLabels.boxWidth || 12) * fontScale),
+            boxHeight: Math.round((origLabels.boxHeight || 12) * fontScale),
+            padding: Math.round((origLabels.padding || 10) * fontScale),
+          }),
+        }),
+      });
+    }
+    return Object.assign({}, options, { scales: newScales, plugins: newPlugins });
   }
 
 
@@ -19086,6 +19106,8 @@ async function loadAuditResultsFromSheet() {
       let capturedHeight = liveCanvas.height;
       const hasScales = !!(liveChart.options && liveChart.options.scales);
       const origScales = hasScales ? liveChart.options.scales : null;
+      // Legend snapshot — restored in finally, same pattern as origScales.
+      const origLegendOpts = (liveChart.options && liveChart.options.plugins) ? liveChart.options.plugins.legend : undefined;
       try {
         if (hasScales) {
           // pdfxWithScaledAxisFonts only ever READS options.scales to build a
@@ -19093,6 +19115,9 @@ async function loadAuditResultsFromSheet() {
           // so origScales stays a pristine reference to swap back in below.
           const scaled = pdfxWithScaledAxisFonts(liveChart.options, targetW);
           liveChart.options.scales = scaled.scales;
+          if (scaled.plugins && scaled.plugins.legend && liveChart.options.plugins) {
+            liveChart.options.plugins.legend = scaled.plugins.legend;
+          }
         }
         console.log('[pdf-export][qa]', varName, '— canvas dims right before update():', liveCanvas.width + 'x' + liveCanvas.height);
         liveChart.update('none'); // synchronous, no animation — picks up both the scale/font change above and the tension change above
@@ -19120,6 +19145,9 @@ async function loadAuditResultsFromSheet() {
         }
         if (hasScales) {
           liveChart.options.scales = origScales; // restore the exact original reference
+        }
+        if (origLegendOpts !== undefined && liveChart.options.plugins) {
+          liveChart.options.plugins.legend = origLegendOpts;
         }
         if (liveChart.data && liveChart.data.datasets) {
           liveChart.data.datasets.forEach(function (ds, i) {
@@ -19921,7 +19949,10 @@ async function loadAuditResultsFromSheet() {
     im.src = src;
     await im.decode();
     const w0 = im.naturalWidth || 1200, h0 = im.naturalHeight || 300;
-    const k = 1600 / Math.max(w0, h0);
+    // 800 max (was 1600) — CHANGED 2026-10-01: this PNG is repeated in
+    // every page header (11 pages), and the header logo only prints ~80px
+    // tall, so 1600px was multiplying payload size for no visible gain.
+    const k = 800 / Math.max(w0, h0);
     const c = document.createElement('canvas');
     c.width = Math.round(w0 * k); c.height = Math.round(h0 * k);
     c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
@@ -19993,7 +20024,17 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       body = await new Response(body.stream().pipeThrough(new CompressionStream('gzip'))).blob();
       headers['X-Pdfx-Encoding'] = 'gzip';
     }
-    if (body.size > PDFX_RENDER_MAX_BODY_BYTES) throw new Error(`render payload ${(body.size / 1048576).toFixed(1)}MB is over the upload limit`);
+    if (body.size > PDFX_RENDER_MAX_BODY_BYTES) {
+      // Diagnostic — ADDED 2026-10-01: name the biggest embedded images so
+      // an over-limit export says what to shrink, not just the total.
+      const big = Array.from(root.querySelectorAll('img'))
+        .map(im => ({ src: (im.getAttribute('src') || ''), cls: im.className || '(no class)' }))
+        .filter(x => x.src.startsWith('data:'))
+        .sort((a, b) => b.src.length - a.src.length).slice(0, 8)
+        .map(x => `${x.cls}: ${(x.src.length / 1024).toFixed(0)}KB`);
+      console.warn('[pdf-export] payload over limit — raw HTML', (html.length / 1048576).toFixed(1) + 'MB, largest embedded images:', big.join(' | '));
+      throw new Error(`render payload ${(body.size / 1048576).toFixed(1)}MB is over the upload limit`);
+    }
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), PDFX_RENDER_TIMEOUT_MS);
     try {
@@ -20064,6 +20105,27 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
   // finding, Drive's lh3.googleusercontent.com allows a normal
   // cross-origin GET but doesn't reliably send the stricter headers a
   // canvas pixel-read needs. One bad image never blocks the export.
+  async function pdfxDownscaleDataUrl(dataUrl, maxDim) {
+    try {
+      const im = new Image();
+      im.src = dataUrl;
+      await im.decode();
+      const w0 = im.naturalWidth, h0 = im.naturalHeight;
+      if (!w0 || !h0) return dataUrl;
+      const k = Math.min(1, maxDim / Math.max(w0, h0));
+      const c = document.createElement('canvas');
+      c.width = Math.round(w0 * k); c.height = Math.round(h0 * k);
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#ffffff'; // JPEG has no alpha — white, not black, behind any transparency
+      ctx.fillRect(0, 0, c.width, c.height);
+      ctx.drawImage(im, 0, 0, c.width, c.height);
+      const out = c.toDataURL('image/jpeg', 0.85);
+      return out.length < dataUrl.length ? out : dataUrl;
+    } catch (e) {
+      return dataUrl;
+    }
+  }
+
   async function pdfxRasterizeRemoteImages(rootEl) {
     const imgs = Array.from(rootEl.querySelectorAll('img[src^="http"]'));
     await Promise.all(imgs.map(async img => {
@@ -20077,7 +20139,14 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
           reader.onerror = reject;
           reader.readAsDataURL(blob);
         });
-        img.src = dataUrl;
+        // Downscale before embedding — ADDED 2026-10-01. Embedding uploads
+        // at full size (up to 4MB each, +33% as base64) pushed the render
+        // payload over Vercel's 4.5MB request limit and forced the
+        // screenshot fallback. These print at ~56px, so 600px max is still
+        // sharp. Drawing a data: URL to canvas is same-origin, so this
+        // canvas never gets tainted (the cross-origin problem only applied
+        // to the original remote URL, which fetch() already got around).
+        img.src = await pdfxDownscaleDataUrl(dataUrl, 600);
         if (typeof img.decode === 'function') await img.decode().catch(() => {});
       } catch (e) {
         console.warn('[pdfxRasterizeRemoteImages] could not embed', img.src, '—', e.message);
