@@ -3,11 +3,11 @@
  * POST /api/write-report-insights
  *
  * Backend for the internal dashboard's editable report content (Executive
- * Summary, Amazon/Website/Walmart Key Insights, Opportunity cards, and the
+ * Summary, Amazon/Website/Walmart Key Insights, Opportunity and Accomplished cards, and the
  * per-event summaries on the Events page). Reads/writes SHEET_REPORT_INSIGHTS,
  * one pair of tabs per brand:
  *   {brand}         — one row per month.  Exec Summary, 3 Key Insights,
- *                     4 Opportunity card slots, plus status/approval.
+ *                     4 Opportunity and 4 Accomplished card slots, plus status/approval.
  *   {brand}_events  — one row per (event_name, event_year). Per-event
  *                     summary title/body, plus its own status/approval.
  *
@@ -55,6 +55,16 @@ const MONTHLY_HEADERS = [
   // field HAS to go at the end to match wherever the real sheet's header
   // row physically has its own newest column, or every existing row's data
   // silently shifts into the wrong columns on the next save.
+  // Accomplished cards: append after all existing physical sheet columns.
+  'acc1_title', 'acc1_subtitle', 'acc1_body',
+  'acc1_image1', 'acc1_image2', 'acc1_image3',
+  'acc1_image4', 'acc1_image5', 'acc1_image6',
+  'acc2_title', 'acc2_subtitle', 'acc2_body',
+  'acc2_image1', 'acc2_image2', 'acc2_image3',
+  'acc2_image4', 'acc2_image5', 'acc2_image6',
+  'acc3_title', 'acc3_subtitle', 'acc3_body',
+  'acc4_title', 'acc4_subtitle', 'acc4_body',
+  'category_key_insight',
 ];
 
 const EVENT_HEADERS = [
