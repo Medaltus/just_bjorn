@@ -12799,13 +12799,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   };
 
+  // FIXED 2026-09-30 — "Save failed: escapeHtml is not defined". This
+  // whole block (wireOpportunities/wireAccomplished/renderAccImages) sits
+  // in a separate <script> tag from wherever escapeHtml was originally
+  // declared elsewhere in this file, so it was never actually reachable
+  // here — confirmed by walking the real <script> tag boundaries, not
+  // assumed. The failure surfaced as a SAVE error specifically because
+  // renderAccImages() (which throws here) runs inside load(), which
+  // save's own success path calls to refresh the display — so a save
+  // that actually succeeded on the backend still showed as "failed" to
+  // the user. Small local copy, scoped to just this block.
+  function accEscapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = String(s == null ? '' : s);
+    return d.innerHTML;
+  }
+
   function renderAccImages(containerId, urls) {
     const el = document.getElementById(containerId);
     if (!el) return;
     const valid = (urls || []).map(u => (u || '').trim()).filter(Boolean);
     if (!valid.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
     el.style.display = 'flex';
-    el.innerHTML = valid.map(u => `<img src="${escapeHtml(u)}" class="opp-card-img" alt="" onerror="this.style.display='none'">`).join('');
+    el.innerHTML = valid.map(u => `<img src="${accEscapeHtml(u)}" class="opp-card-img" alt="" onerror="this.style.display='none'">`).join('');
   }
 
   // ── What's Been Accomplished: up to 4 cards, entries 1-2 get up to 6
