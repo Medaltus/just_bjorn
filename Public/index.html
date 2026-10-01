@@ -19512,7 +19512,9 @@ async function loadAuditResultsFromSheet() {
       const subtitle = pdfxText('.opp-subtitle', card);
       const body = pdfxText('.opp-body', card);
       const imgs = Array.prototype.map.call(card.querySelectorAll('.opp-card-img'), function (img) {
-        return '<img src="' + pdfxEscape(img.getAttribute('src') || '') + '" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin:6px 6px 0 0;">';
+        // class pdfx-acc-img: lets pdfxGrowAccomplishedImages() enlarge these
+        // when the Opportunities page has spare room (56px is the floor).
+        return '<img class="pdfx-acc-img" src="' + pdfxEscape(img.getAttribute('src') || '') + '" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin:6px 6px 0 0;">';
       }).join('');
       return '<div>' +
         '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">' + pdfxEscape(title) + '</div>' +
@@ -20109,6 +20111,33 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
   // finding, Drive's lh3.googleusercontent.com allows a normal
   // cross-origin GET but doesn't reliably send the stricter headers a
   // canvas pixel-read needs. One bad image never blocks the export.
+  // Adaptive Accomplished image size — ADDED 2026-10-01 per Jaclyn ("if
+  // there's a bunch of space, can the images be larger?"). Runs after the
+  // export pages are laid out (off-screen) but before rendering: measures
+  // the Opportunities page's real content height, then tries image sizes
+  // from largest to smallest and keeps the first that still fits on one
+  // 11in page with a safety margin. A light month gets big images; a busy
+  // month falls back to the original 56px. Measures .pdfx-inner (which has
+  // no min-height) rather than .pdfx-page (min-height:11in, so it would
+  // always read as "full"). Images are already downscaled to 600px max,
+  // so even the largest size here stays sharp.
+  function pdfxGrowAccomplishedImages(rootEl) {
+    const imgs = Array.from(rootEl.querySelectorAll('img.pdfx-acc-img'));
+    if (!imgs.length) return;
+    const inner = imgs[0].closest('.pdfx-inner');
+    if (!inner) return;
+    const PAGE_PX = 11 * 96, SAFETY_PX = 24;
+    const SIZES = [200, 170, 140, 115, 90, 72, 56];
+    const setSize = px => imgs.forEach(im => { im.style.width = px + 'px'; im.style.height = px + 'px'; });
+    let chosen = 56;
+    for (const px of SIZES) {
+      setSize(px);
+      if (inner.scrollHeight <= PAGE_PX - SAFETY_PX) { chosen = px; break; }
+    }
+    setSize(chosen);
+    console.log('[pdf-export] Accomplished images sized to', chosen + 'px (page content height', inner.scrollHeight + 'px of', PAGE_PX + 'px)');
+  }
+
   async function pdfxDownscaleDataUrl(dataUrl, maxDim) {
     try {
       const im = new Image();
@@ -20413,6 +20442,7 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // path no longer needs to fetch Drive at all. Runs on #pdfx-root
       // only (the off-screen export copy), never the live dashboard.
       await pdfxRasterizeRemoteImages(root);
+      pdfxGrowAccomplishedImages(root);
       const pdfResult = await pdfxRenderPagesToPdf(root, pageEls);
       if (pdfResult.mode === 'image') pdfxToast(PDFX_FALLBACK_TOAST);
 
