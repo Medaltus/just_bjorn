@@ -18860,28 +18860,7 @@ async function loadAuditResultsFromSheet() {
         ticks: Object.assign({}, origTicks, { font: Object.assign({}, origTicks.font, { size: scaledSize }) })
       });
     });
-    // ADDED 2026-10-01 per Jaclyn ("legend is still too small") — legend
-    // labels were never scaled here, only axis ticks, so an on-canvas
-    // legend (the category chart's) printed at its dashboard size divided
-    // by fontScale (~3.26x smaller). Same target size as the axis labels;
-    // swatch box/padding scaled proportionally so they stay in step.
-    const origPlugins = options.plugins || {};
-    const origLegend = origPlugins.legend || {};
-    let newPlugins = origPlugins;
-    if (origLegend.display !== false) {
-      const origLabels = origLegend.labels || {};
-      newPlugins = Object.assign({}, origPlugins, {
-        legend: Object.assign({}, origLegend, {
-          labels: Object.assign({}, origLabels, {
-            font: Object.assign({}, origLabels.font, { size: scaledSize }),
-            boxWidth: Math.round((origLabels.boxWidth || 12) * fontScale),
-            boxHeight: Math.round((origLabels.boxHeight || 12) * fontScale),
-            padding: Math.round((origLabels.padding || 10) * fontScale),
-          }),
-        }),
-      });
-    }
-    return Object.assign({}, options, { scales: newScales, plugins: newPlugins });
+    return Object.assign({}, options, { scales: newScales });
   }
 
 
@@ -19106,8 +19085,21 @@ async function loadAuditResultsFromSheet() {
       let capturedHeight = liveCanvas.height;
       const hasScales = !!(liveChart.options && liveChart.options.scales);
       const origScales = hasScales ? liveChart.options.scales : null;
-      // Legend snapshot — restored in finally, same pattern as origScales.
-      const origLegendOpts = (liveChart.options && liveChart.options.plugins) ? liveChart.options.plugins.legend : undefined;
+      // Legend scaling — FIXED 2026-10-01. First attempt copied pieces of
+      // liveChart.options (a Chart.js resolver PROXY, not a plain object)
+      // and assigned them back, which made the proxy resolve into itself:
+      // "Recursion detected: _scriptable->_scriptable", thrown in finally,
+      // killing the whole export. Now edits only the chart's RAW config
+      // (liveChart.config.options — the plain object originally passed to
+      // new Chart) with plain values, saved and restored exactly. Charts
+      // with no raw legend labels object (every chart here except the
+      // category chart) are skipped entirely — nothing touched.
+      const rawLegend = liveChart.config && liveChart.config.options && liveChart.config.options.plugins && liveChart.config.options.plugins.legend;
+      const rawLegendLabels = (rawLegend && rawLegend.display !== false && rawLegend.labels && typeof rawLegend.labels === 'object') ? rawLegend.labels : null;
+      const origLegendLabelVals = rawLegendLabels ? {
+        font: rawLegendLabels.font, boxWidth: rawLegendLabels.boxWidth,
+        boxHeight: rawLegendLabels.boxHeight, padding: rawLegendLabels.padding,
+      } : null;
       try {
         if (hasScales) {
           // pdfxWithScaledAxisFonts only ever READS options.scales to build a
@@ -19115,9 +19107,14 @@ async function loadAuditResultsFromSheet() {
           // so origScales stays a pristine reference to swap back in below.
           const scaled = pdfxWithScaledAxisFonts(liveChart.options, targetW);
           liveChart.options.scales = scaled.scales;
-          if (scaled.plugins && scaled.plugins.legend && liveChart.options.plugins) {
-            liveChart.options.plugins.legend = scaled.plugins.legend;
-          }
+        }
+        if (rawLegendLabels) {
+          const fs = targetW / PDFX_CARD_WIDTH_PX;
+          const o = origLegendLabelVals;
+          rawLegendLabels.font = Object.assign({}, (o.font && typeof o.font === 'object') ? o.font : {}, { size: Math.max(6, Math.round(PDFX_CHART_AXIS_TARGET_PX * fs)) });
+          rawLegendLabels.boxWidth = Math.round((o.boxWidth || 12) * fs);
+          rawLegendLabels.boxHeight = Math.round((o.boxHeight || 12) * fs);
+          rawLegendLabels.padding = Math.round((o.padding || 10) * fs);
         }
         console.log('[pdf-export][qa]', varName, '— canvas dims right before update():', liveCanvas.width + 'x' + liveCanvas.height);
         liveChart.update('none'); // synchronous, no animation — picks up both the scale/font change above and the tension change above
@@ -19146,8 +19143,11 @@ async function loadAuditResultsFromSheet() {
         if (hasScales) {
           liveChart.options.scales = origScales; // restore the exact original reference
         }
-        if (origLegendOpts !== undefined && liveChart.options.plugins) {
-          liveChart.options.plugins.legend = origLegendOpts;
+        if (rawLegendLabels) {
+          ['font', 'boxWidth', 'boxHeight', 'padding'].forEach(function (k) {
+            if (origLegendLabelVals[k] === undefined) delete rawLegendLabels[k];
+            else rawLegendLabels[k] = origLegendLabelVals[k];
+          });
         }
         if (liveChart.data && liveChart.data.datasets) {
           liveChart.data.datasets.forEach(function (ds, i) {
@@ -19158,7 +19158,11 @@ async function loadAuditResultsFromSheet() {
             if (typeof orig.pointRadius === 'number') ds.pointRadius = orig.pointRadius;
           });
         }
-        liveChart.update('none');
+        // Guarded 2026-10-01 — an exception here used to abort the ENTIRE
+        // export (and left the live chart erroring). One chart's restore
+        // failing should only cost that chart, never the whole PDF.
+        try { liveChart.update('none'); }
+        catch (restoreErr) { console.warn('[pdf-export] restore update() failed for', varName, '—', restoreErr.message); }
       }
 
       const result = { img: img, width: capturedWidth, height: capturedHeight, displayHeightPx: dashboardHeightPx * PDFX_HEIGHT_FACTOR };
