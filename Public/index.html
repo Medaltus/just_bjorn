@@ -21485,7 +21485,7 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
   // RESTYLED 2026-10-05, ported from MiGuard: optional track color, size,
   // stroke and a shaded center circle; rounded arc ends. Defaults keep the
   // old 140px/14px look for any caller that passes only (pct, color).
-  function buildGaugeSvg(pct, colorHex, trackColor, size, stroke, centerFill) {
+  function buildGaugeSvg(pct, colorHex, trackColor, size, stroke, centerFill, linecap) {
     size = size || 140; stroke = stroke || 14;
     const r = (size - stroke) / 2, c = size / 2;
     const circumference = 2 * Math.PI * r;
@@ -21495,7 +21495,7 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       ${centerFill ? `<circle cx="${c}" cy="${c}" r="${r - stroke / 2}" fill="${centerFill}"/>` : ''}
       <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${trackColor || 'var(--border)'}" stroke-width="${stroke}"/>
       <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${colorHex}" stroke-width="${stroke}"
-        stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="round"/>
+        stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="${linecap || 'round'}"/>
     </svg>`;
   }
 
@@ -22322,6 +22322,38 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
               // (MTD run rate, discounted by the cancel rate) or, for Last
               // Month, whether the goal was hit.
               const GT_GREEN = '#1db88a', GT_RED = '#db372d';
+              // Original (pre-2026-10-05) ring style — Organic Sales and Ad
+              // Sales stay on this per Jaclyn; only Total Sales gets the new
+              // MiGuard style (gtRing below with hero=true).
+              const gtRingClassic = (actual, goal, label) => {
+                const hasGoal = goal != null && goal > 0;
+                const actualPct = hasGoal ? Math.round((actual / goal) * 100) : 0;
+                const rawProjected = actual * projectionFactor;
+                const projected = (periodKey !== 'lastFull' && cancelRate != null) ? rawProjected * (1 - cancelRate) : rawProjected;
+                const projectedPct = hasGoal ? Math.round((projected / goal) * 100) : 0;
+                const color = !hasGoal ? 'var(--muted)' : (projectedPct >= 100 ? 'var(--green)' : 'var(--danger)');
+                const resultLine = !hasGoal
+                  ? 'No goal set'
+                  : periodKey === 'lastFull'
+                    ? (actualPct >= 100 ? 'Hit goal' : 'Missed goal')
+                    : `Projecting $${Math.round(projected).toLocaleString()}`;
+                const cancelNote = (hasGoal && periodKey !== 'lastFull')
+                  ? (cancelRate != null
+                      ? `<div style="font-size:10px;color:var(--muted);margin-top:2px;">adj. for ${Math.round(cancelRate * 100)}% avg. cancel rate</div>`
+                      : `<div style="font-size:10px;color:var(--muted);margin-top:2px;">no cancel-rate history yet</div>`)
+                  : '';
+                return `<div style="text-align:center;">
+                  <div style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px;">${label}</div>
+                  <div style="position:relative;display:inline-block;">
+                    ${buildGaugeSvg(actualPct, color, null, null, null, null, 'butt')}
+                    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:20px;font-weight:700;color:var(--navy);">${actualPct}%</div>
+                  </div>
+                  <div style="font-size:14px;font-weight:700;color:var(--navy);margin-top:8px;">${resultLine}</div>
+                  ${cancelNote}
+                  <div style="font-size:14px;font-weight:700;color:var(--navy);">Goal ${hasGoal ? '$' + Math.round(goal).toLocaleString() : '—'}</div>
+                </div>`;
+              };
+
               const gtRing = (actual, goal, label) => {
                 const size = 170, stroke = 16;
                 const fmtD = n => '$' + Math.round(n).toLocaleString();
@@ -22358,12 +22390,12 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
 
               gtWrap.innerHTML = `
                 <div class="org-section-title" style="margin-bottom:10px;font-size:22px;font-weight:700;">Goal Tracker</div>
-                <div class="card" style="background:var(--sand);border:none;border-top:3px solid var(--navy);margin-bottom:22px;">
+                <div class="card" style="background:var(--sand);border-top:3px solid var(--navy);margin-bottom:22px;">
                   <div class="card-title" style="margin-bottom:14px;font-size:19px;font-weight:700;">Amazon</div>
                   <div style="display:flex;align-items:flex-start;justify-content:space-around;flex-wrap:wrap;gap:24px;width:100%;">
                     ${gtRing(totalActual, totalGoal, 'Total Sales')}
-                    ${gtRing(organicActual, organicGoal, 'Organic Sales')}
-                    ${gtRing(adsActual, adsGoal, 'Ad Sales')}
+                    ${gtRingClassic(organicActual, organicGoal, 'Organic Sales')}
+                    ${gtRingClassic(adsActual, adsGoal, 'Ads Sales')}
                   </div>
                 </div>`;
             }
