@@ -156,8 +156,11 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 
 
 /* ── Topbar ── */
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
-.topbar-title{font-size:14px;font-weight:600;color:var(--navy);letter-spacing:-.2px;}
+/* CHANGED 2026-10-06 per Jaclyn: no white header bar and no page name — the bar
+   sits on the page's grey background. Kept (right-aligned) because it holds the
+   PDF export controls and the account menu. */
+.topbar{background:transparent;border-bottom:none;padding:0 28px;height:52px;display:flex;align-items:center;justify-content:flex-end;flex-shrink:0;}
+.topbar-title{display:none;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .topbar-date{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;}
 /* ── Clerk user button — ADDED 2026-08-21, ported from Cosmette's dashboard ── */
