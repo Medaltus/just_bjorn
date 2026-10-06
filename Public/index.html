@@ -21922,15 +21922,24 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // cancelled" flag, so there was no clean way to net an order COUNT
       // against them).
 
-      // Pending Orders — a live snapshot, intentionally NOT date-scoped
-      // (an order still sitting in Pending from any date is still open and
-      // worth surfacing, not just ones placed this month). Amazon only,
-      // per Jaclyn's source (SHEET_ORDERS).
+      // Pending Orders — CHANGED 2026-10-06 to match Cosmette: orders placed
+      // in the TOGGLED month (MTD = current month, Last Month = last full
+      // month) whose status is still "pending" as of the latest sync. Was
+      // all-time "Currently open". Reads amzRows before any validity filter
+      // (that filter removes pending orders). Kept Just Bjorn's existing
+      // unique-order_id count rather than Cosmette's row count — the sheet
+      // has one row per item, so rows would double-count multi-item orders.
+      // No MoM comparison; a live status read, so Last Month's number
+      // shrinks toward 0 as Amazon resolves those orders on later syncs.
+      const pendingRefPrefix = `${refYear}-${String(refMonth).padStart(2, '0')}`;
       const pendingOrderIds = new Set(
-        amzRows.filter(r => (r.status || '').trim().toLowerCase() === 'pending')
-               .map(r => r.order_id).filter(Boolean)
+        amzRows.filter(r => {
+          const d = normalizeDate(r.date);
+          if (!d || d.substring(0, 7) !== pendingRefPrefix) return false;
+          return (r.status || '').trim().toLowerCase() === 'pending';
+        }).map(r => r.order_id).filter(Boolean)
       );
-      setKpiPlain('ov-kpi-pending', pendingOrderIds.size.toLocaleString(), 'Currently open');
+      setKpiPlain('ov-kpi-pending', pendingOrderIds.size.toLocaleString(), periodKey === 'lastFull' ? 'Last month' : 'Current month');
 
       const heroRevEl = document.getElementById('ov-hero-revenue');
       if (heroRevEl) heroRevEl.textContent = mtd.revenue >= 1000 ? '$' + (mtd.revenue / 1000).toFixed(1) + 'K' : '$' + mtd.revenue.toFixed(0);
