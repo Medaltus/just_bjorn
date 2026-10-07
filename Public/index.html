@@ -2188,6 +2188,25 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <div style="position:relative;height:260px;"><canvas id="chart-sns"></canvas></div>
       </div>
 
+      <!-- Subscriptions Key Insight — added 2026-10-06 per Jaclyn; same markup
+           and wiring as the Key Insight card below, saved to the
+           subscriptions_key_insight column. -->
+      <div class="card" style="margin-bottom:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div class="card-title" style="margin-bottom:0;">Subscriptions Key Insight</div>
+          <button class="btn-edit" id="subsinsight-edit-btn">✏️ Edit</button>
+        </div>
+        <div class="insight-text" id="subsinsight-disp" data-placeholder="No insight added yet — click Edit to add one."></div>
+        <div class="insight-editor" id="subsinsight-editor" style="display:none;">
+          <textarea id="subsinsight-textarea"></textarea>
+          <div class="editor-footer">
+            <span class="editor-note">Saves directly to the report sheet as a draft.</span>
+            <button class="btn-cancel" id="subsinsight-cancel">Cancel</button>
+            <button class="btn-save-stage" id="subsinsight-save">Save</button>
+          </div>
+        </div>
+      </div>
+
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div class="card-title" style="margin-bottom:0;">Key Insight</div>
@@ -2449,22 +2468,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
     <div class="channel-page" id="m-opportunities">
 
-            <!-- What's Been Accomplished — added 2026-09-30 per Jaclyn, matching
-           Dazzle Dry's structure (4 entries, own fields on the same monthly
-           row, entries 1-2 get up to 6 image slots, 3-4 are text-only —
-           matches write-report-insights.js's real MONTHLY_HEADERS exactly:
-           acc1_title/subtitle/body/image1-6, acc2 the same, acc3/acc4
-           title/subtitle/body only). Field names deliberately do NOT match
-           the reference dashboard file's own JS, which reads/writes
-           accomplished${n}_title — that's a real mismatch against the
-           actual deployed backend's column names (acc{n}_title), and
-           copying it verbatim would mean this card silently never saves:
-           write-report-insights.js's upsertRow() only keeps fields whose
-           key is in its own headers list, so accomplished1_title would be
-           silently dropped on every save. Reuses the exact same
-           window.reportInsightsFetchRow/SaveFields already powering
-           Future Opportunities below, per-card show/hide pattern copied
-           from that same wireOpportunities() function. -->
+            <!-- What's Been Accomplished — 4 entries; 1 and 2 have up to 6 image
+           slots, 3 and 4 are text only. CORRECTED 2026-10-06: field names are
+           accomplished1_title / accomplished1_image1 … (the real column
+           names on the just-bjorn Report Insights tab), NOT acc1_title. The
+           earlier acc1_* names matched an older backend schema that wrote
+           by position and put this content in the wrong columns. Reuses
+           window.reportInsightsFetchRow/SaveFields like Future
+           Opportunities below. -->
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div style="display:inline-block;background:rgba(0,31,96,.06);border:1px solid rgba(0,31,96,.15);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--navy);">What's Been Accomplished</div>
@@ -12813,6 +12824,13 @@ document.addEventListener('DOMContentLoaded', function() {
     editBtnId: 'catinsight-edit-btn', saveBtnId: 'catinsight-save', cancelBtnId: 'catinsight-cancel', editorId: 'catinsight-editor',
   });
 
+  // Subscriptions Key Insight — added 2026-10-06, same wiring as above.
+  window.wireInsightBlock({
+    scope: 'monthly',
+    fields: [{ key: 'subscriptions_key_insight', displayId: 'subsinsight-disp', textareaId: 'subsinsight-textarea', placeholder: 'No insight added yet — click Edit to add one.' }],
+    editBtnId: 'subsinsight-edit-btn', saveBtnId: 'subsinsight-save', cancelBtnId: 'subsinsight-cancel', editorId: 'subsinsight-editor',
+  });
+
   window.wireInsightBlock({
     scope: 'monthly',
     fields: [
@@ -13075,9 +13093,9 @@ document.addEventListener('DOMContentLoaded', function() {
       const row = await window.reportInsightsFetchRow(BRAND, { year: String(year), month: String(month) });
       let anyVisible = false;
       [1, 2, 3, 4].forEach(n => {
-        const title    = row ? (row[`acc${n}_title`]    || '') : '';
-        const subtitle = row ? (row[`acc${n}_subtitle`] || '') : '';
-        const body     = row ? (row[`acc${n}_body`]     || '') : '';
+        const title    = row ? (row[`accomplished${n}_title`]    || '') : '';
+        const subtitle = row ? (row[`accomplished${n}_subtitle`] || '') : '';
+        const body     = row ? (row[`accomplished${n}_body`]     || '') : '';
         const card = document.getElementById(`acc-card-${n}`);
         if (title) {
           anyVisible = true;
@@ -13097,7 +13115,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (taSub)   taSub.value = subtitle;
         if (taBody)  taBody.value = body;
         if (n === 1 || n === 2) {
-          const imgUrls = [1,2,3,4,5,6].map(i => row ? (row[`acc${n}_image${i}`] || '') : '');
+          const imgUrls = [1,2,3,4,5,6].map(i => row ? (row[`accomplished${n}_image${i}`] || '') : '');
           imgUrls.forEach((url, i) => { const inp = document.getElementById(`acc${n}-image${i+1}-input`); if (inp) inp.value = url; });
           renderAccImages(`acc${n}-images-disp`, imgUrls);
         }
@@ -13118,12 +13136,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const { year, month } = getLastFullMonthLocal3();
         const fields = {};
         [1, 2, 3, 4].forEach(n => {
-          fields[`acc${n}_title`]    = (document.getElementById(`acc${n}-title-input`).value || '').trim();
-          fields[`acc${n}_subtitle`] = (document.getElementById(`acc${n}-subtitle-input`).value || '').trim();
-          fields[`acc${n}_body`]     = (document.getElementById(`acc${n}-body-input`).value || '').trim();
+          fields[`accomplished${n}_title`]    = (document.getElementById(`acc${n}-title-input`).value || '').trim();
+          fields[`accomplished${n}_subtitle`] = (document.getElementById(`acc${n}-subtitle-input`).value || '').trim();
+          fields[`accomplished${n}_body`]     = (document.getElementById(`acc${n}-body-input`).value || '').trim();
           if (n === 1 || n === 2) {
             [1,2,3,4,5,6].forEach(i => {
-              fields[`acc${n}_image${i}`] = (document.getElementById(`acc${n}-image${i}-input`).value || '').trim();
+              fields[`accomplished${n}_image${i}`] = (document.getElementById(`acc${n}-image${i}-input`).value || '').trim();
             });
           }
         });
@@ -20641,6 +20659,7 @@ async function loadAuditResultsFromSheet() {
   function buildSalesInsightsPage(monthYear) {
     const subsKpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
     const keyInsight = pdfxText('#catinsight-disp');
+    const subsInsight = pdfxText('#subsinsight-disp'); // added 2026-10-06; empty = omitted
     return '' +
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner">' +
@@ -20652,6 +20671,7 @@ async function loadAuditResultsFromSheet() {
             '<div class="pdfx-kpis n2" style="margin-bottom:10px;">' + subsKpis.map(pdfxKpiCardHtml).join('') + '</div>' +
             '<div style="font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px;">Active Subscriptions by Month</div>' +
             pdfxChartBlock('_snsChart') +
+            (subsInsight ? '<div class="pdfx-insight" style="margin-top:10px;">' + pdfxEscape(subsInsight) + '</div>' : '') +
           '</div>' +
           (keyInsight ? '<div class="pdfx-card" style="margin-bottom:0;"><div class="pdfx-card-title">Key Insight</div><div class="pdfx-insight">' + pdfxEscape(keyInsight) + '</div></div>' : '') +
           pdfxFooter(monthYear) +
