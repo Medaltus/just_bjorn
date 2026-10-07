@@ -20009,8 +20009,8 @@ async function loadAuditResultsFromSheet() {
       const PDFX_CHART_TARGET_HEIGHT_PX = {
         _amazonChart: 190,
         _walmartChart: 190,
-        _categorySalesChart: 220,
-        _snsChart: 190,
+        _categorySalesChart: 170, // was 220; Insights page ran over 11in (2026-10-06)
+        _snsChart: 110, // was 190; Insights page ran over 11in (2026-10-06)
         _investChart: 170,
         _impressChart: 150,
         mfcShippedChartInstance: 150,
@@ -20662,7 +20662,7 @@ async function loadAuditResultsFromSheet() {
     const subsInsight = pdfxText('#subsinsight-disp'); // added 2026-10-06; empty = omitted
     return '' +
       '<div class="pdfx-page">' +
-        '<div class="pdfx-inner">' +
+        '<div class="pdfx-inner" style="padding:22px 46px 0;">' + // tighter, like Opportunities (2026-10-06)
           pdfxHeaderBand(monthYear, 'Sales') +
           '<div class="pdfx-chlabel">Insights</div>' +
           '<div class="pdfx-card" style="margin-top:6px;margin-bottom:14px;"><div class="pdfx-card-title">Unit Sales by Product Category</div>' + pdfxChartBlock('_categorySalesChart') + '</div>' +
@@ -20674,7 +20674,7 @@ async function loadAuditResultsFromSheet() {
             (subsInsight ? '<div class="pdfx-insight" style="margin-top:10px;">' + pdfxEscape(subsInsight) + '</div>' : '') +
           '</div>' +
           (keyInsight ? '<div class="pdfx-card" style="margin-bottom:0;"><div class="pdfx-card-title">Key Insight</div><div class="pdfx-insight">' + pdfxEscape(keyInsight) + '</div></div>' : '') +
-          pdfxFooter(monthYear) +
+          pdfxFooter(monthYear, true) + // compact footer, like Opportunities
         '</div>' +
       '</div>';
   }
@@ -20690,25 +20690,6 @@ async function loadAuditResultsFromSheet() {
     }
 
     const top3Kpis = ['bm-kpi-reviews', 'bm-kpi-ranked-keywords', 'bm-kpi-sessions'].map(pdfxKpi);
-    let productPages = '';
-    if (productChunks.length) {
-      productPages = productChunks.map((chunk, i) => {
-        const headHtml = i === 0
-          ? pdfxHeaderBand(monthYear, 'Sales') +
-            '<div class="pdfx-chlabel">Brand Momentum</div>' +
-            '<div class="pdfx-kpis n3" style="margin-top:6px;margin-bottom:14px;">' + top3Kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-            '<div class="pdfx-card-title" style="margin-bottom:10px;">Performance by Product</div>'
-          : pdfxHeaderBand(monthYear, 'Sales') +
-            '<div class="pdfx-chlabel">Performance by Product <span style="font-weight:400;color:var(--muted);">(continued)</span></div>';
-        return '<div class="pdfx-page">' +
-          '<div class="pdfx-inner pdfx-momentum-tight">' +
-            headHtml +
-            '<div class="momentum-cards-grid">' + chunk.map(c => c.outerHTML).join('') + '</div>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
     // Keyword table — same top-20 data already rendered into the live
     // #bm-keyword-tbody by initBrandMomentum, read directly rather than
     // re-querying the sheets a second time.
@@ -20726,7 +20707,33 @@ async function loadAuditResultsFromSheet() {
     const nextEl = pdfxById('bm-cb-next-section');
     const nextHtml = nextEl ? nextEl.outerHTML : '';
 
-    const lastPage = (kwHtml || nextHtml) ? (
+    const tailBlock = (kwHtml ? '<div style="margin-top:16px;">' + kwHtml + '</div>' : '') +
+      (nextHtml ? '<div style="margin-top:' + (kwHtml ? '16px' : '16px') + ';">' + nextHtml + '</div>' : '');
+
+    let productPages = '';
+    if (productChunks.length) {
+      productPages = productChunks.map((chunk, i) => {
+        const headHtml = i === 0
+          ? pdfxHeaderBand(monthYear, 'Sales') +
+            '<div class="pdfx-chlabel">Brand Momentum</div>' +
+            '<div class="pdfx-kpis n3" style="margin-top:6px;margin-bottom:14px;">' + top3Kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
+            '<div class="pdfx-card-title" style="margin-bottom:10px;">Performance by Product</div>'
+          : pdfxHeaderBand(monthYear, 'Sales') +
+            '<div class="pdfx-chlabel">Performance by Product <span style="font-weight:400;color:var(--muted);">(continued)</span></div>';
+        // Keyword table + What We're Tracking Next go on the LAST product page
+        // (CHANGED 2026-10-06 per Jaclyn: page 2 only had one product card).
+        const tailHtml = (i === productChunks.length - 1) ? tailBlock : '';
+        return '<div class="pdfx-page">' +
+          '<div class="pdfx-inner pdfx-momentum-tight">' +
+            headHtml +
+            '<div class="momentum-cards-grid">' + chunk.map(c => c.outerHTML).join('') + '</div>' +
+            tailHtml +
+          '</div>' +
+        '</div>';
+      }).join('');
+    }
+
+    const lastPage = (!productChunks.length && (kwHtml || nextHtml)) ? (
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner">' +
           pdfxHeaderBand(monthYear, 'Sales') +
