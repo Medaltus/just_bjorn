@@ -3071,10 +3071,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
       </div>
 
-      <div class="evs-outlook">
-        <div class="evs-outlook-lbl">Strategic Outlook</div>
-        <div class="evs-outlook-text">Prime Day is the highest-traffic sales event of the year on Amazon. The brands that win invest in the 2–3 weeks prior and capitalize in the week after. <strong>Preparation, real-time agility, and disciplined follow-through are the three variables we control.</strong></div>
-      </div>
+      <!-- Strategic Outlook card removed 2026-10-06 per Jaclyn. -->
     </div>
 
     <div class="channel-page" id="ev-spring">
@@ -20896,7 +20893,16 @@ async function loadAuditResultsFromSheet() {
         '</div>'
       : '';
     const chartHtml = hasKpis
-      ? '<div class="pdfx-card" style="margin-top:14px;"><div class="pdfx-card-title">Top Sellers — Units Sold</div>' + pdfxChartBlock('_' + prefix + 'TopSellersChart') + '</div>'
+      // 2025 / 2026 legend — copied from the live chart's legend element
+      // (#<prefix>-legend), so colors always match. Added 2026-10-06; it was
+      // missing because only the chart image was copied.
+      ? '<div class="pdfx-card" style="margin-top:14px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">' +
+            '<div class="pdfx-card-title" style="margin-bottom:0;">Top Sellers — Units Sold</div>' +
+            (pdfxById(prefix + '-legend') ? '<div class="pd-legend">' + pdfxHTML('#' + prefix + '-legend') + '</div>' : '') +
+          '</div>' +
+          pdfxChartBlock('_' + prefix + 'TopSellersChart') +
+        '</div>'
       : '';
 
     return '' +
