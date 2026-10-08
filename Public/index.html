@@ -1348,6 +1348,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <!-- Sales pages — added 2026-08-05 per Jaclyn. Default CHECKED so
              anyone who doesn't touch these gets today's existing behavior
              (all three Sales channels always included). -->
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-overview" checked style="margin:0;"> Overview</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-amazon" checked style="margin:0;"> Amazon</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-walmart" checked style="margin:0;"> Walmart</label>
         <!-- Marketing pages — same default-checked reasoning as Sales above. -->
@@ -21236,6 +21237,9 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // doesn't touch the picker gets today's existing "always included"
       // behavior; Events keys still default unchecked, unchanged.
       const includeSections = {
+        // Overview = the cover / executive summary page. Added 2026-10-06 so an
+        // event page (or any single page) can be exported on its own.
+        overview:      !document.getElementById('pdf-include-overview') || document.getElementById('pdf-include-overview').checked,
         amazon:        !!document.getElementById('pdf-include-amazon')        && document.getElementById('pdf-include-amazon').checked,
         walmart:       !!document.getElementById('pdf-include-walmart')       && document.getElementById('pdf-include-walmart').checked,
         fulfillment:   !!document.getElementById('pdf-include-fulfillment')   && document.getElementById('pdf-include-fulfillment').checked,
@@ -21357,15 +21361,17 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
         includeSections.opportunities ? buildOpportunitiesPage(monthYear) : '',
       ].join('');
 
+      // Strategy goes AFTER the event pages (changed 2026-10-06 per Jaclyn), so
+      // exporting one event + Strategy gives event = page 1, Strategy = page 2.
       const eventPages = [
-        includeSections.strategy ? buildStrategyPage(monthYear) : '',
         includeSections.bss  ? buildEventPage('bss',  'Big Spring Sale',             monthYear) : '',
         includeSections.pd   ? buildEventPage('pd',   'Prime Day',                   monthYear) : '',
         includeSections.pbdd ? buildEventPage('pbdd', 'Prime Big Deal Days',         monthYear) : '',
         includeSections.bfcm ? buildEventPage('bfcm', 'Black Friday & Cyber Monday', monthYear) : '',
+        includeSections.strategy ? buildStrategyPage(monthYear) : '',
       ].join('');
 
-      root.innerHTML = buildCoverPage(monthYear) + salesMarketingPages + eventPages;
+      root.innerHTML = (includeSections.overview ? buildCoverPage(monthYear) : '') + salesMarketingPages + eventPages;
 
       // Positioned off-screen (not display:none, so it still has real layout
       // for html2canvas to measure/paint) rather than visible on top of
