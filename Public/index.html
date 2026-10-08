@@ -11918,6 +11918,8 @@ window.initEventStrategyHeader = async function () {
 
     const isTbd = v => { const s = (v || '').trim(); return !s || /^tbd$/i.test(s); };
     const startRaw = lastRow['start_date'], endRaw = lastRow['end_date'];
+    // Raw row for the PDF header's compact date ("Oct 6-7, 2026"), 2026-10-06.
+    window._strategyEventRow = { name: eventName, start_date: startRaw, end_date: endRaw };
     if (isTbd(startRaw) || isTbd(endRaw)) {
       datesEl.textContent = 'Dates TBD';
     } else {
@@ -20289,7 +20291,12 @@ async function loadAuditResultsFromSheet() {
     // call sites, so this falls straight through to the original
     // "Brand Performance Report" / monthYear behavior.
     const tagHtml = customValue
-      ? '<div class="pdfx-hdr-tag">' + pdfxEscape(customValue) + '</div>' + (customSubValue ? '<div class="pdfx-hdr-month" style="font-size:11px;">' + pdfxEscape(customSubValue) + '</div>' : '')
+      // Event pages + Strategy (restyled 2026-10-06 to match Cloud Café): keep the
+      // "Brand Performance Report" label, event name in the large serif
+      // (where the month normally sits), compact dates underneath in grey.
+      ? '<div class="pdfx-hdr-tag">Brand Performance Report</div>' +
+        '<div class="pdfx-hdr-month">' + pdfxEscape(customValue) + '</div>' +
+        (customSubValue ? '<div style="font-family:var(--font);font-size:11px;color:rgba(255,255,255,.6);margin-top:5px;">' + pdfxEscape(customSubValue) + '</div>' : '')
       : '<div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div>';
     return '<div class="pdfx-topband">' +
       // min-height:80px added 2026-09-17 — makes explicit what was
@@ -20837,7 +20844,8 @@ async function loadAuditResultsFromSheet() {
     // Strategic Outlook block and footer removed per Jaclyn 2026-10-01
     // (outlook var above is still built but intentionally not placed).
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner" style="padding-bottom:16px;">' +
-      pdfxHeaderBand(monthYear, 'Events', pdfxText('#evs-headline'), pdfxText('#evs-dates')) +
+      pdfxHeaderBand(monthYear, 'Events', pdfxEventHeaderName(pdfxText('#evs-headline')),
+        window._strategyEventRow ? pdfxEventDateRangeCompact(window._strategyEventRow) : pdfxText('#evs-dates')) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
       leadUp + during + leadOut +
       pdfxFooter(monthYear, true) + // footer moved here from the event pages (2026-10-06)
@@ -20858,6 +20866,27 @@ async function loadAuditResultsFromSheet() {
     pbdd: 'Amazon Prime Big Deal Days',
     bfcm: 'Black Friday & Cyber Monday',
   };
+  // Compact range like Cloud Café's header: "Oct 6-7, 2026", "Sep 30 - Oct 2,
+  // 2026", or "Dec 30, 2026 - Jan 2, 2027". Built as local dates (no UTC shift).
+  function pdfxEventDateRangeCompact(row) {
+    if (!row) return '';
+    const parse = v => { const m = String(v || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? new Date(+m[1], +m[2] - 1, +m[3]) : null; };
+    const a = parse(row.start_date), b = parse(row.end_date);
+    if (!a || !b) return 'Dates TBD';
+    const mon = d => d.toLocaleDateString('en-US', { month: 'short' });
+    if (a.getFullYear() === b.getFullYear()) {
+      if (a.getMonth() === b.getMonth()) {
+        return a.getDate() === b.getDate()
+          ? `${mon(a)} ${a.getDate()}, ${a.getFullYear()}`
+          : `${mon(a)} ${a.getDate()}-${b.getDate()}, ${a.getFullYear()}`;
+      }
+      return `${mon(a)} ${a.getDate()} - ${mon(b)} ${b.getDate()}, ${a.getFullYear()}`;
+    }
+    return `${mon(a)} ${a.getDate()}, ${a.getFullYear()} - ${mon(b)} ${b.getDate()}, ${b.getFullYear()}`;
+  }
+  // Header shows the event name without the "Amazon " prefix, like Cloud Café.
+  function pdfxEventHeaderName(name) { return String(name || '').replace(/^amazon\s+/i, ''); }
+
   function pdfxEventDateRange(row) {
     if (!row) return '';
     const fmt = v => {
@@ -20910,8 +20939,8 @@ async function loadAuditResultsFromSheet() {
         '<div class="pdfx-inner" style="padding-bottom:0;">' + // no footer here any more (2026-10-06)
           // Strategy-style header: event title + its most recent dates
           // (2026-10-06). Footer moved to the Strategy page.
-          pdfxHeaderBand(monthYear, 'Events', PDFX_EVENT_HEADER_TITLES[prefix] || eventLabel,
-            pdfxEventDateRange((window._eventCurrentDates || {})[prefix])) +
+          pdfxHeaderBand(monthYear, 'Events', pdfxEventHeaderName(PDFX_EVENT_HEADER_TITLES[prefix] || eventLabel),
+            pdfxEventDateRangeCompact((window._eventCurrentDates || {})[prefix])) +
           '<div class="pdfx-chlabel">' + pdfxEscape(eventLabel) + '</div>' +
           datesHtml +
           '<div class="pdfx-card"><div class="pdfx-card-title">' + pdfxEscape(headline) + '</div><div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + body + '</div></div>' +
