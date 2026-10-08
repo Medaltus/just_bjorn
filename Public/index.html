@@ -11807,6 +11807,8 @@ async function initSnsExternal() {
         ]);
 
         const dateEl = document.getElementById('pd-event-dates');
+        // Most recent dates, read by the PDF event-page header (2026-10-06).
+        (window._eventCurrentDates = window._eventCurrentDates || {}).pd = dates.current || null;
         if (dates.current) {
           if (dateEl) dateEl.innerHTML = eventDatesHtml(dates.current, dates.previous);
         } else if (dateEl) {
@@ -12312,6 +12314,8 @@ window.initEventStrategyHeader = async function () {
           ]);
 
           const dateEl = document.getElementById(`${cfg.prefix}-event-dates`);
+          // Most recent dates, read by the PDF event-page header (2026-10-06).
+          (window._eventCurrentDates = window._eventCurrentDates || {})[cfg.prefix] = dates.current || null;
           if (dates.current) {
             if (dateEl) dateEl.innerHTML = eventDatesHtml(dates.current, dates.previous);
           } else if (dateEl) {
@@ -20835,10 +20839,11 @@ async function loadAuditResultsFromSheet() {
     // page-break behavior from here.
     // Strategic Outlook block and footer removed per Jaclyn 2026-10-01
     // (outlook var above is still built but intentionally not placed).
-    const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
+    const page1 = '<div class="pdfx-page"><div class="pdfx-inner" style="padding-bottom:16px;">' +
       pdfxHeaderBand(monthYear, 'Events', pdfxText('#evs-headline'), pdfxText('#evs-dates')) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
       leadUp + during + leadOut +
+      pdfxFooter(monthYear, true) + // footer moved here from the event pages (2026-10-06)
       '</div></div>';
     return page1;
   }
@@ -20848,6 +20853,26 @@ async function loadAuditResultsFromSheet() {
   // element actually exists in the DOM, so Big Spring Sale/PBDD/BFCM pages
   // automatically pick up their KPIs+chart the moment those get built,
   // with no changes needed here. Until then they're exec-summary-only.
+  // PDF header titles per event — hardcoded per Jaclyn 2026-10-06 (each report
+  // is for one event). Dates come from that event's most recent Events-tab row.
+  const PDFX_EVENT_HEADER_TITLES = {
+    bss: 'Amazon Big Spring Sale',
+    pd: 'Amazon Prime Day',
+    pbdd: 'Amazon Prime Big Deal Days',
+    bfcm: 'Black Friday & Cyber Monday',
+  };
+  function pdfxEventDateRange(row) {
+    if (!row) return '';
+    const fmt = v => {
+      const m = String(v || '').trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (!m) return null;
+      // Local date (not new Date('YYYY-MM-DD'), which is UTC and shows a day early).
+      return new Date(+m[1], +m[2] - 1, +m[3]).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    };
+    const a = fmt(row.start_date), b = fmt(row.end_date);
+    return (a && b) ? a + ' – ' + b : 'Dates TBD';
+  }
+
   function buildEventPage(prefix, eventLabel, monthYear) {
     const headline = pdfxText('#' + prefix + '-exec-summary-headline') || eventLabel;
     const body = pdfxHTML('#' + prefix + '-exec-summary-body') || '<span style="color:var(--muted);font-style:italic;">No summary added yet.</span>';
@@ -20876,13 +20901,15 @@ async function loadAuditResultsFromSheet() {
 
     return '' +
       '<div class="pdfx-page">' +
-        '<div class="pdfx-inner">' +
-          pdfxHeaderBand(monthYear, 'Events') +
+        '<div class="pdfx-inner" style="padding-bottom:0;">' + // no footer here any more (2026-10-06)
+          // Strategy-style header: event title + its most recent dates
+          // (2026-10-06). Footer moved to the Strategy page.
+          pdfxHeaderBand(monthYear, 'Events', PDFX_EVENT_HEADER_TITLES[prefix] || eventLabel,
+            pdfxEventDateRange((window._eventCurrentDates || {})[prefix])) +
           '<div class="pdfx-chlabel">' + pdfxEscape(eventLabel) + '</div>' +
           datesHtml +
           '<div class="pdfx-card"><div class="pdfx-card-title">' + pdfxEscape(headline) + '</div><div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + body + '</div></div>' +
           kpisHtml + chartHtml +
-          pdfxFooter(monthYear) +
         '</div>' +
       '</div>';
   }
@@ -21269,6 +21296,10 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
         // checked for inclusion but the tab was never opened this session,
         // this is what actually builds the chart before capture below.
         (includeSections.pd && typeof window.initPrimeDayReport === 'function') ? window.initPrimeDayReport() : null,
+        // FIXED 2026-10-06: the Strategy header only loaded when the Events page
+        // was opened, so exporting without visiting it printed the HTML
+        // placeholder ("Amazon Prime Day / June 23 – 26, 2026").
+        (includeSections.strategy && typeof window.initEventStrategyHeader === 'function') ? window.initEventStrategyHeader() : null,
         (includeSections.bss  && typeof window.initBigSpringSaleReport === 'function') ? window.initBigSpringSaleReport() : null,
         (includeSections.pbdd && typeof window.initPBDDReport === 'function')          ? window.initPBDDReport()          : null,
         (includeSections.bfcm && typeof window.initBFCMReport === 'function')          ? window.initBFCMReport()          : null,
