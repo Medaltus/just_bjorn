@@ -826,7 +826,11 @@ BULLET FORMATTING RULES (apply to all bullet rewrites):
 - Flag any bullet that does NOT follow this ALL-CAPS header: detail format as a violation.
 - Across the catalog, align parallel bullets by position where products are related: B1 = hero claim/clinical proof, B2 = science/mechanism, B3 = key ingredients, B4 = who it is for/hair types, B5 = brand credentials/clean formula. Rewrites should follow this structure consistently.
 - Within a single SKU, bullet headers should not repeat the same keyword root — vary to maximize keyword coverage.
-- Bullet rewrites must be max 200 chars including the ALL-CAPS header.
+- BULLET LENGTH (beauty & wellness standard, Jaclyn 2026-10-09 — replaces the old 200-char max). Count characters including the ALL-CAPS header:
+  - 200–250 characters: the preferred writing range. Aim here by default.
+  - 250–300 characters: use when the bullet genuinely needs the extra space for ingredients, product benefits or differentiators.
+  - 300+ characters: only when truly necessary and the product type's bullet limit allows it; never exceed 500 characters.
+  - A bullet under 200 characters is usually underusing the space — expand it with real, supported benefits, ingredients or differentiators (never filler or unsupported claims).
 
 HOLD STEADY vs. PROCEED — read the LISTING AGE line in the user message, if present:
 - Rankings take time to reflect any change we ship — re-editing a listing every audit cycle means we're never actually measuring what we last shipped, only ever reacting to noise.
@@ -841,11 +845,11 @@ TITLE_REWRITE: [compliant rewrite, max 75 chars. If clean, repeat original trimm
 IH_NOTES: [violations found, or generated if missing. Max 300 chars.]
 IH_REWRITE: [compliant rewrite or new copy, max 125 chars.]
 BULLETS_NOTES: [key violations across all bullets, noted by bullet number. Max 500 chars. Empty string if travel SKU.]
-BULLET_1_REWRITE: [compliant rewrite of bullet 1, max 200 chars. Empty string if travel SKU.]
-BULLET_2_REWRITE: [compliant rewrite of bullet 2, max 200 chars. Empty string if travel SKU.]
-BULLET_3_REWRITE: [compliant rewrite of bullet 3, max 200 chars. Empty string if travel SKU.]
-BULLET_4_REWRITE: [compliant rewrite of bullet 4, max 200 chars. Empty string if travel SKU.]
-BULLET_5_REWRITE: [compliant rewrite of bullet 5, max 200 chars. Empty string if travel SKU.]
+BULLET_1_REWRITE: [compliant rewrite of bullet 1, 200–250 chars preferred, up to 300 when needed, 300+ only if necessary. Empty string if travel SKU.]
+BULLET_2_REWRITE: [compliant rewrite of bullet 2, 200–250 chars preferred, up to 300 when needed, 300+ only if necessary. Empty string if travel SKU.]
+BULLET_3_REWRITE: [compliant rewrite of bullet 3, 200–250 chars preferred, up to 300 when needed, 300+ only if necessary. Empty string if travel SKU.]
+BULLET_4_REWRITE: [compliant rewrite of bullet 4, 200–250 chars preferred, up to 300 when needed, 300+ only if necessary. Empty string if travel SKU.]
+BULLET_5_REWRITE: [compliant rewrite of bullet 5, 200–250 chars preferred, up to 300 when needed, 300+ only if necessary. Empty string if travel SKU.]
 DESC_NOTES: [violations found in description, or "No violations" if clean. Max 300 chars. Empty string if travel SKU.]
 DESC_REWRITE: [compliant rewrite of description, max 400 chars, plain sentences no bullets. Empty string if travel SKU.]
 BACKEND_NOTES: [violations found, or "No violations" if clean. Max 300 chars.]
@@ -1039,7 +1043,7 @@ Ingredients: ${ingredients || 'NOT AVAILABLE'}${kwContext}${ppcTermContext}${unt
           },
           body: JSON.stringify({
             model: 'claude-sonnet-4-6',
-            max_tokens: travel ? 600 : 2500,
+            max_tokens: travel ? 600 : 3200, // raised from 2500 — bullets now run 200–300+ chars each
             system: systemPrompt,
             messages: [{ role: 'user', content: userPrompt }]
           })
