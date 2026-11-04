@@ -12721,51 +12721,29 @@ window.initSalesInsights = async function () {
       });
     }
 
-    // Amazon orders — switched 2026-09-30 per Jaclyn, from SHEET_ORDERS
-    // (a rolling ~90-day cache) to SHEET_ORDERS_HISTORICAL, for real
-    // multi-month trend data. Confirmed the real schema directly before
-    // building against it — it's genuinely different from SHEET_ORDERS,
-    // not just a longer version of the same shape:
-    //   - date IS real "YYYY-MM-DD" (confirmed from the live sheet).
-    //   - Column is "skus" (plural) and "asin" (also plural despite the
-    //     singular name) — for a multi-item order, both are COMMA-
-    //     SEPARATED lists in one row, not one row per line item. There's
-    //     no per-SKU quantity breakdown within a multi-item order, so
-    //     each listed SKU in a multi-item order is counted as 1 unit —
-    //     a reasonable approximation for a category MIX trend, not
-    //     something to treat as exact for orders with 2+ different SKUs.
-    //   - Quantity column is "quantity_ordered", not "quantity".
-    // The previous version's broken "undefined 'NN/20" x-axis labels
-    // were column-name mismatches on top of the wrong sheet entirely —
-    // r.sku/r.quantity never existed on this real schema at all, and on
-    // SHEET_ORDERS the actual date format wasn't the "YYYY-MM-DD" this
-    // code assumed either, which is what produced that specific garbled
-    // pattern (a slice() into a differently-formatted date string).
-    const ordUrl = `https://docs.google.com/spreadsheets/d/${window.SHEET_CFG.SHEET_ORDERS_HISTORICAL.fileId}/export?format=csv&gid=${window.SHEET_CFG.SHEET_ORDERS_HISTORICAL.gid}&_cb=${Date.now()}`;
-    const ordCsv = await fetch(ordUrl).then(r => r.ok ? r.text() : '').catch(() => '');
-    if (!isCsv(ordCsv)) { console.warn('[JustBjorn][SalesInsights] historical orders sheet did not return CSV.'); return; }
-    const orders = parseCsv(ordCsv);
-
-    // Group units by month + category, excluding cancelled orders and
-    // Vine (same validity rule as goalsIsValidAmazonRow — Vine units
-    // aren't representative of real category sales mix).
-    const byMonth = {}; // "YYYY-MM" -> { collagen: units, stickpacks: units }
-    orders.forEach(r => {
-      const status = (r.status || '').toLowerCase().trim();
-      if (status === 'cancelled') return;
-      if ((r.promotion_ids || '').toLowerCase().includes('vine')) return;
-      const dateStr = (r.date || '').trim();
-      const monthKey = dateStr.slice(0, 7); // "YYYY-MM" — safe now, date is confirmed real ISO format on this sheet
-      if (!monthKey || monthKey.length !== 7 || monthKey[4] !== '-') return;
-      const skuList = (r.skus || '').split(',').map(s => s.trim().toUpperCase().replace(/-SF$/i, '')).filter(Boolean);
-      if (!skuList.length) return;
-      skuList.forEach(sku => {
-        const category = skuToCategory[sku];
-        if (!category) return; // not a known Just Bjorn SKU (or column K not assigned yet)
-        if (!byMonth[monthKey]) byMonth[monthKey] = {};
-        byMonth[monthKey][category] = (byMonth[monthKey][category] || 0) + 1; // 1 unit per listed SKU — see note above on multi-item orders
+    // Monthly units — CHANGED 2026-11-04 per Jaclyn: October was missing because
+    // this chart read only SHEET_ORDERS_HISTORICAL, which lags (it ended Sep 30).
+    // Now uses window.getAmazonMonthlySales(), the same helper as Overview >
+    // Projections & Goals: sync sheet for months it fully covers, historical
+    // otherwise; both date formats; Sales > Amazon order filters (no cancelled,
+    // pending or Vine); multi-ASIN rows split. Units are real unit counts.
+    // Always ends at the LAST COMPLETED month (the current month is left out).
+    const sales = await window.getAmazonMonthlySales();
+    const nowD = new Date();
+    const currentYm = `${nowD.getFullYear()}-${String(nowD.getMonth() + 1).padStart(2, '0')}`;
+    const catBySku = {};
+    Object.keys(skuToCategory).forEach(k => { catBySku[k.trim().toUpperCase().replace(/-SF$/i, '')] = skuToCategory[k]; });
+    const byMonth = {}; // "YYYY-MM" -> { category: units }
+    Object.keys(sales.bySkuMonth).forEach(ym => {
+      if (ym >= currentYm) return; // completed months only
+      Object.entries(sales.bySkuMonth[ym]).forEach(([sku, v]) => {
+        const category = catBySku[sku];
+        if (!category) return; // SKU has no column K category yet
+        if (!byMonth[ym]) byMonth[ym] = {};
+        byMonth[ym][category] = (byMonth[ym][category] || 0) + v.units;
       });
     });
+    Object.values(byMonth).forEach(m => Object.keys(m).forEach(c => { m[c] = Math.round(m[c]); }));
 
     const monthKeys = Object.keys(byMonth).sort();
     if (!monthKeys.length) { console.warn('[JustBjorn][SalesInsights] no order rows matched a known SKU category — check column K assignments.'); return; }
@@ -13101,10 +13079,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const subtitle = row ? (row[`accomplished${n}_subtitle`] || '') : '';
         const body     = row ? (row[`accomplished${n}_body`]     || '') : '';
         const card = document.getElementById(`acc-card-${n}`);
-        if (title) {
+        // Show the card when ANY part is filled in (CHANGED 2026-10-06): October's
+        // 4th entry had only a subtitle + body, so a title-only rule hid it.
+        const hasImages = (n === 1 || n === 2) && [1,2,3,4,5,6].some(i => row && String(row[`accomplished${n}_image${i}`] || '').trim());
+        if (title || subtitle || body || hasImages) {
           anyVisible = true;
           card.style.display = '';
-          document.getElementById(`acc-title-${n}`).textContent = title;
+          const titleEl = document.getElementById(`acc-title-${n}`);
+          titleEl.textContent = title;
+          titleEl.style.display = title ? '' : 'none';
           const subEl = document.getElementById(`acc-subtitle-${n}`);
           if (subtitle) { subEl.textContent = subtitle; subEl.style.display = ''; }
           else { subEl.textContent = ''; subEl.style.display = 'none'; }
@@ -19797,6 +19780,79 @@ async function loadAuditResultsFromSheet() {
   };
   let PDFX_CHART_CACHE = null; // populated once per export by pdfxCaptureAllChartImages() — now {varName: {img, width, height}}
 
+  // ── Vector (SVG) charts — added 2026-11-04 per Jaclyn ("all exports in vector
+  // format, not images"). Each chart is redrawn by Chart.js itself into an SVG
+  // drawing context (svgcanvas, the maintained fork of canvas2svg), so bars,
+  // lines and text print as real vector shapes and selectable text. Built at
+  // the same 686px width and height the PNG capture uses. The PNG stays as a
+  // per-chart backup only if an SVG can't be built (e.g. the library fails to
+  // load). Proven in a headless test before shipping; two quirks handled:
+  // line datasets get segment:{} so Chart.js skips Path2D (which svgcanvas
+  // can't record — the line itself went missing without it), and the live
+  // chart's options are deep-copied first because Chart.js rewrites the
+  // options object it's given.
+  let PDFX_CHART_SVG = {};
+  const PDFX_SVG_LIB_URL = 'https://cdn.jsdelivr.net/npm/svgcanvas@2.6.0/dist/svgcanvas.esm.js';
+  let pdfxSvgLibPromise = null;
+  function pdfxCloneChartOpts(o) {
+    if (Array.isArray(o)) return o.map(pdfxCloneChartOpts);
+    if (o && typeof o === 'object' && Object.getPrototypeOf(o) === Object.prototype) {
+      const out = {};
+      Object.keys(o).forEach(k => { out[k] = pdfxCloneChartOpts(o[k]); });
+      return out;
+    }
+    return o; // functions, numbers, strings, colors, gradients stay as-is
+  }
+  async function pdfxBuildChartSvgs(varNames) {
+    PDFX_CHART_SVG = {};
+    try {
+      if (!pdfxSvgLibPromise) pdfxSvgLibPromise = import(PDFX_SVG_LIB_URL);
+      const mod = await pdfxSvgLibPromise;
+      const SvgCtx = mod.Context || mod.default;
+      varNames.forEach(varName => {
+        const live = window[varName];
+        if (!live || !live.config) return;
+        try {
+          const w = 686;
+          const aspect = pdfxChartAspect(varName);
+          // Same height the image version used: its captured shape when there is
+          // one, otherwise the image path's fixed 230px (the event Top Sellers
+          // charts), so every page lays out exactly as before.
+          let h = Math.round(aspect ? w * aspect : 230);
+          // Event Top Sellers charts: capped so a longer event summary still
+          // fits on one page (Prime Big Deal Days ran 7px over at full height).
+          if (/TopSellersChart$/.test(varName)) h = Math.min(h, 340);
+          const ctx = new SvgCtx({ width: w, height: h });
+          const fake = { width: w, height: h, style: {}, getContext: () => ctx, addEventListener() {}, removeEventListener() {} };
+          ctx.canvas = fake;
+          const type = live.config.type;
+          const data = {
+            labels: (live.data.labels || []).slice(),
+            datasets: (live.data.datasets || []).map(d => {
+              const c = Object.assign({}, d, { data: Array.isArray(d.data) ? d.data.slice() : d.data });
+              if ((d.type || type) === 'line' && !d.segment) c.segment = {};
+              return c;
+            }),
+          };
+          const options = Object.assign(pdfxCloneChartOpts(live.config.options || {}), {
+            responsive: false, maintainAspectRatio: false, animation: false, devicePixelRatio: 1, events: [],
+          });
+          const chart = new Chart(fake, { type, data, options, plugins: (live.config.plugins || []).slice(), platform: Chart.BasicPlatform });
+          chart.draw();
+          let svg = ctx.getSerializedSvg(true);
+          chart.destroy();
+          svg = svg.replace('<svg ', `<svg viewBox="0 0 ${w} ${h}" style="display:block;" `);
+          PDFX_CHART_SVG[varName] = { svg, w, h };
+        } catch (e) {
+          console.warn('[pdf-export] SVG chart failed for', varName, '— using the image instead:', e.message);
+        }
+      });
+    } catch (e) {
+      console.warn('[pdf-export] SVG chart library failed to load — charts will be images:', e.message);
+    }
+    console.log('[pdf-export] vector charts built:', Object.keys(PDFX_CHART_SVG).join(', ') || '(none)');
+  }
+
   function pdfxRawChartImg(varName) {
     try {
       const chart = window[varName];
@@ -20234,6 +20290,10 @@ async function loadAuditResultsFromSheet() {
   }
 
   function pdfxChartBlock(varName, fallbackLabel) {
+    const vec = PDFX_CHART_SVG[varName];
+    if (vec) {
+      return '<div style="display:block;width:' + vec.w + 'px;height:' + vec.h + 'px;">' + vec.svg + '</div>';
+    }
     const img = pdfxChartImg(varName);
     if (img) {
       // Height computed from the chart's OWN real captured aspect ratio at
@@ -20510,19 +20570,22 @@ async function loadAuditResultsFromSheet() {
   // acc2 can have up to 6; acc3/acc4 never do.
   function pdfxAccomplishedBlock() {
     const cards = Array.prototype.map.call(document.querySelectorAll('#acc-grid .opp-card'), function (card) {
+      // Same rule as the dashboard (CHANGED 2026-10-06): include the card if the
+      // dashboard shows it, i.e. any of title / subtitle / body / photos is set.
+      if (card.style.display === 'none') return '';
       const title = pdfxText('.opp-title', card);
-      if (!title) return ''; // blank Title = this slot is unused
       const subtitle = pdfxText('.opp-subtitle', card);
       const body = pdfxText('.opp-body', card);
+      if (!title && !subtitle && !body && !card.querySelector('.opp-card-img')) return '';
       const imgs = Array.prototype.map.call(card.querySelectorAll('.opp-card-img'), function (img) {
         // class pdfx-acc-img: lets pdfxGrowAccomplishedImages() enlarge these
         // when the Opportunities page has spare room (56px is the floor).
         return '<img class="pdfx-acc-img" src="' + pdfxEscape(img.getAttribute('src') || '') + '" style="width:56px;height:56px;object-fit:cover;border-radius:6px;border:1px solid var(--border);margin:6px 6px 0 0;">';
       }).join('');
       return '<div>' +
-        '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">' + pdfxEscape(title) + '</div>' +
+        (title ? '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">' + pdfxEscape(title) + '</div>' : '') +
         (subtitle ? '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;">' + pdfxEscape(subtitle) + '</div>' : '') +
-        '<div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + pdfxEscape(body) + '</div>' +
+        (body ? '<div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + pdfxEscape(body) + '</div>' : '') +
         (imgs ? '<div style="display:flex;flex-wrap:wrap;margin-top:4px;">' + imgs + '</div>' : '') +
         '</div>';
     }).join('');
@@ -21166,11 +21229,12 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       console.log('[pdf-export] real-text PDF rendered server-side:', (blob.size / 1048576).toFixed(2) + 'MB');
       return { blob, mode: 'text' };
     } catch (err) {
-      console.warn('[pdf-export] server render failed — using screenshot fallback:', err.message);
+      // CHANGED 2026-11-04 per Jaclyn: no screenshot fallback. It produced an
+      // image-only PDF (no real text) whenever the PDF service failed. Now the
+      // export stops and says why, so every PDF that downloads is vector.
+      console.error('[pdf-export] server render failed — export stopped (no image fallback):', err.message);
+      throw new Error('The PDF service did not respond, so no PDF was made (exports are vector-only now). Try again in a minute. Details: ' + err.message);
     }
-    const blob = await pdfxScreenshotPagesToPdf(pageEls);
-    console.log('[pdf-export] screenshot-fallback PDF:', (blob.size / 1048576).toFixed(2) + 'MB');
-    return { blob, mode: 'image' };
   }
 
   // fetch() + FileReader, NOT canvas drawImage — per évolis's own
@@ -21398,6 +21462,8 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // Force-render + snapshot every chart's canvas BEFORE any page HTML is
       // built, since buildXPage() calls read from the cache synchronously.
       PDFX_CHART_CACHE = await pdfxCaptureAllChartImages();
+      await pdfxBuildChartSvgs(Object.keys(PDFX_CHART_CANVAS_IDS).concat(
+        ['_bssTopSellersChart', '_pdTopSellersChart', '_pbddTopSellersChart', '_bfcmTopSellersChart']));
 
       const rangeText = pdfxText('#amazon-hdr-date') || pdfxText('#page-sales .page-sub') || '';
       const monthYear = pdfxMonthYear(rangeText) || pdfxMonthYear(document.title) || '';
@@ -21538,7 +21604,7 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       if (_amazonPeriodKeyBeforeExport && _amazonPeriodKeyBeforeExport !== 'lastFull' && typeof window.__amazonSelectPeriod === 'function') {
         window.__amazonSelectPeriod(_amazonPeriodKeyBeforeExport);
       }
-      alert('PDF export failed — check the console for details.');
+      alert(err && err.message ? 'PDF export failed. ' + err.message : 'PDF export failed — check the console for details.');
     }
   };
 
