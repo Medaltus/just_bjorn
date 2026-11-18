@@ -21460,7 +21460,7 @@ async function loadAuditResultsFromSheet() {
     // longer live under #m-opportunities at all. Now shows What's Been
     // Accomplished + Future Opportunities only, matching the live page.
     return '' +
-      '<div class="pdfx-page">' +
+      '<div class="pdfx-page pdfx-pin-footer">' + // footer pinned to the page bottom (2026-11-18)
         '<div class="pdfx-inner" style="padding:22px 46px 26px;">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
           pdfxAccomplishedBlock() +
@@ -21884,6 +21884,24 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
   // no min-height) rather than .pdfx-page (min-height:11in, so it would
   // always read as "full"). Images are already downscaled to 600px max,
   // so even the largest size here stays sharp.
+  // Pin the footer to the bottom of the page — added 2026-11-18 per Jaclyn
+  // ("sit at the bottom of the page so it looks like a true footer"). Runs
+  // AFTER pdfxGrowAccomplishedImages: measures the page's real content height
+  // and adds the leftover space above the footer. Done this way rather than
+  // with a full-height flex column because that would make every page
+  // measure as full, and the photo sizing above depends on that measurement.
+  // Only pages marked .pdfx-pin-footer (Opportunities). If the content
+  // already fills the page there is no gap and nothing changes.
+  function pdfxPinFooters(rootEl) {
+    const PAGE_PX = 11 * 96;
+    rootEl.querySelectorAll('.pdfx-page.pdfx-pin-footer').forEach(pg => {
+      const inner = pg.querySelector('.pdfx-inner'), foot = inner && inner.querySelector('.pdfx-footer');
+      if (!foot) return;
+      const gap = PAGE_PX - inner.scrollHeight - 2; // 2px slack for rounding
+      if (gap > 0) foot.style.marginTop = ((parseFloat(foot.style.marginTop) || 0) + gap) + 'px';
+    });
+  }
+
   function pdfxGrowAccomplishedImages(rootEl) {
     const imgs = Array.from(rootEl.querySelectorAll('img.pdfx-acc-img'));
     if (!imgs.length) return;
@@ -22217,6 +22235,7 @@ html,body{height:auto!important;margin:0!important;padding:0!important;backgroun
       // only (the off-screen export copy), never the live dashboard.
       await pdfxRasterizeRemoteImages(root);
       pdfxGrowAccomplishedImages(root);
+      pdfxPinFooters(root);
       const pdfResult = await pdfxRenderPagesToPdf(root, pageEls);
       if (pdfResult.mode === 'image') pdfxToast(PDFX_FALLBACK_TOAST);
 
