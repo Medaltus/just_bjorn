@@ -4800,7 +4800,7 @@ async function initSns() {
       const useRows = brandRows.length ? brandRows : rows;
       console.log('[JustBjorn][subscriptions] rows after brand filter:', useRows.length, '(', rows.length - useRows.length, 'dropped by brand filter )');
 
-      const withDate = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) }));
+      const withDate = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) })).filter(x => isNaN(x.y) || isNaN(x.m) || (x.y * 12 + x.m) < (new Date().getFullYear() * 12 + new Date().getMonth() + 1)); // completed months only (2026-11-18): the cards were showing the month in progress (Nov) while the chart ends at the last full month (Oct)
       const sortable = withDate.length > 0 && withDate.every(x => !isNaN(x.y) && !isNaN(x.m));
       if (sortable) withDate.sort((a, b) => (a.y - b.y) || (a.m - b.m));
       if (withDate.length) {
@@ -4955,7 +4955,7 @@ async function initSns() {
       // per brand (i.e. it's historical, not a single current snapshot).
       // Detecting that rather than assuming it, so this doesn't silently
       // show a fabricated MOM if the sheet turns out to be snapshot-only.
-      const withDateR = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) }));
+      const withDateR = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) })).filter(x => isNaN(x.y) || isNaN(x.m) || (x.y * 12 + x.m) < (new Date().getFullYear() * 12 + new Date().getMonth() + 1)); // completed months only (2026-11-18): the cards were showing the month in progress (Nov) while the chart ends at the last full month (Oct)
       const hasHistory = withDateR.length > 1 && withDateR.every(x => !isNaN(x.y) && !isNaN(x.m));
       if (!hasHistory) {
         console.warn('[JustBjorn][subscriptions] hasHistory=false — reason:', withDateR.length <= 1 ? ('only ' + withDateR.length + ' row(s) after brand filter, need 2+') : 'year/month not parsing as numbers on every row — check column names/values above');
@@ -9768,7 +9768,7 @@ async function initSnsExternal() {
       const useRows = brandRows.length ? brandRows : rows;
       console.log('[JustBjorn][subscriptions] rows after brand filter:', useRows.length, '(', rows.length - useRows.length, 'dropped by brand filter )');
 
-      const withDate = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) }));
+      const withDate = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) })).filter(x => isNaN(x.y) || isNaN(x.m) || (x.y * 12 + x.m) < (new Date().getFullYear() * 12 + new Date().getMonth() + 1)); // completed months only (2026-11-18): the cards were showing the month in progress (Nov) while the chart ends at the last full month (Oct)
       const sortable = withDate.length > 0 && withDate.every(x => !isNaN(x.y) && !isNaN(x.m));
       if (sortable) withDate.sort((a, b) => (a.y - b.y) || (a.m - b.m));
       if (withDate.length) {
@@ -9865,7 +9865,7 @@ async function initSnsExternal() {
       // per brand (i.e. it's historical, not a single current snapshot).
       // Detecting that rather than assuming it, so this doesn't silently
       // show a fabricated MOM if the sheet turns out to be snapshot-only.
-      const withDateR = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) }));
+      const withDateR = useRows.map(r => ({ row: r, y: parseInt(r.year, 10), m: parseInt(r.month, 10) })).filter(x => isNaN(x.y) || isNaN(x.m) || (x.y * 12 + x.m) < (new Date().getFullYear() * 12 + new Date().getMonth() + 1)); // completed months only (2026-11-18): the cards were showing the month in progress (Nov) while the chart ends at the last full month (Oct)
       const hasHistory = withDateR.length > 1 && withDateR.every(x => !isNaN(x.y) && !isNaN(x.m));
       if (!hasHistory) {
         console.warn('[JustBjorn][subscriptions] hasHistory=false — reason:', withDateR.length <= 1 ? ('only ' + withDateR.length + ' row(s) after brand filter, need 2+') : 'year/month not parsing as numbers on every row — check column names/values above');
