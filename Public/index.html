@@ -1163,6 +1163,9 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .pdfx-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-bottom:18px;}
 .pdfx-kpis.n3{grid-template-columns:repeat(3,1fr);}
 .pdfx-kpis.n2{grid-template-columns:repeat(2,1fr);}
+/* Fulfillment PDF top row (2026-11-19): equal columns that can't grow past the page, labels may wrap. */
+.pdfx-kpis.pdfx-kpis-fit{grid-template-columns:repeat(5,minmax(0,1fr));}
+.pdfx-kpis.pdfx-kpis-fit .pdfx-kpi-lbl{white-space:normal;line-height:1.35;}
 .pdfx-kpi{border:1px solid var(--border);border-radius:0;padding:20px 16px;background:#fbfbfd;margin-left:-1px;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;}
 .pdfx-kpi:first-child{margin-left:0;}
 .pdfx-kpi-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.02em;margin-bottom:9px;white-space:nowrap;}
@@ -2445,25 +2448,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <div class="ppc-note" id="mfc-chart-footer">Loading…</div>
       </div>
 
-      <div class="section-label" style="margin-top:4px;">Customer Service</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;margin-top:4px;">
-        <div class="kpi-card">
-          <div class="kpi-label">Reviews Requested</div>
-          <div class="kpi-value" id="mfc-kpi-reviews">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-reviews-sub">Helium 10 Follow Up</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Compliance Cases Resolved</div>
-          <div class="kpi-value" id="mfc-kpi-compliance">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-compliance-sub">Open Cases: —</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label" id="mfc-lbl-returns">Returns Processed</div>
-          <div class="kpi-value" id="mfc-kpi-returns">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-returns-sub">Return rate: —</div>
-        </div>
-      </div>
-
+      <!-- Map moved above Customer Service (2026-11-19 per Jaclyn). -->
       <div class="ppc-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <div class="ppc-card-title" style="margin-bottom:0;">Website Orders by State · Last 30 Days</div>
@@ -2493,6 +2478,26 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </table>
         </div>
       </div>
+
+      <div class="section-label" style="margin-top:4px;">Customer Service</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;margin-top:4px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Reviews Requested</div>
+          <div class="kpi-value" id="mfc-kpi-reviews">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-reviews-sub">Helium 10 Follow Up</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Compliance Cases Resolved</div>
+          <div class="kpi-value" id="mfc-kpi-compliance">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-compliance-sub">Open Cases: —</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label" id="mfc-lbl-returns">Returns Processed</div>
+          <div class="kpi-value" id="mfc-kpi-returns">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-kpi-returns-sub">Return rate: —</div>
+        </div>
+      </div>
+
 
     </div><!-- /m-fulfillment-cs -->
 
@@ -2759,7 +2764,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
         <div class="kpi-card">
-          <div class="kpi-label">Shipped Orders · Last 30 Days</div>
+          <div class="kpi-label">Shipped Website Orders · Last 30 Days</div>
           <div class="kpi-value" id="mx-mfc-kpi-shipped30">—</div>
         </div>
         <div class="kpi-card">
@@ -2784,33 +2789,15 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
 
       <div class="ppc-card">
-        <div class="ppc-card-title">Orders Shipped by Date · Last 30 Days</div>
+        <div class="ppc-card-title">Website Orders Shipped by Date · Last 30 Days</div>
         <div style="position:relative;height:200px;"><canvas id="mx-mfc-shipped-chart"></canvas></div>
         <div class="ppc-note" id="mx-mfc-chart-footer">Loading…</div>
       </div>
 
-      <div class="section-label" style="margin-top:4px;">Customer Service</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;margin-top:4px;">
-        <div class="kpi-card">
-          <div class="kpi-label">Reviews Requested</div>
-          <div class="kpi-value" id="mx-mfc-kpi-reviews">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Helium 10 Follow Up</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Compliance Cases Resolved</div>
-          <div class="kpi-value" id="mx-mfc-kpi-compliance">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mx-mfc-kpi-compliance-sub">Open Cases: —</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Returns Processed</div>
-          <div class="kpi-value" id="mx-mfc-kpi-returns">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mx-mfc-kpi-returns-sub">Return rate: —</div>
-        </div>
-      </div>
-
+      <!-- Map moved above Customer Service (2026-11-19 per Jaclyn). -->
       <div class="ppc-card">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div class="ppc-card-title" style="margin-bottom:0;">Orders by State · Last 30 Days</div>
+          <div class="ppc-card-title" style="margin-bottom:0;">Website Orders by State · Last 30 Days</div>
           <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);">
             <span>Fewer</span>
             <div style="width:80px;height:7px;border-radius:4px;background:linear-gradient(to right,#dce6f5,#001F60);"></div>
@@ -2837,6 +2824,26 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </table>
         </div>
       </div>
+
+      <div class="section-label" style="margin-top:4px;">Customer Service</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;margin-top:4px;">
+        <div class="kpi-card">
+          <div class="kpi-label">Reviews Requested</div>
+          <div class="kpi-value" id="mx-mfc-kpi-reviews">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Helium 10 Follow Up</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Compliance Cases Resolved</div>
+          <div class="kpi-value" id="mx-mfc-kpi-compliance">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mx-mfc-kpi-compliance-sub">Open Cases: —</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Returns Processed</div>
+          <div class="kpi-value" id="mx-mfc-kpi-returns">—</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mx-mfc-kpi-returns-sub">Return rate: —</div>
+        </div>
+      </div>
+
 
     </div><!-- /mx-fulfillment-cs -->
 
@@ -21241,7 +21248,7 @@ async function loadAuditResultsFromSheet() {
     // reason. Confirmed 2026-07-21 as the actual cause of KPI text getting
     // cut off at the page's right edge.
     const topKpis = [
-      { label: 'Shipped Orders (30d)', value: pdfxText('#mfc-kpi-shipped30') },
+      { label: 'Shipped Website Orders', value: pdfxText('#mfc-kpi-shipped30') },
       { label: 'Fulfillment Promise (7d)', value: '100%' },
       { label: 'Avg Processing Time (7d)', value: pdfxText('#mfc-kpi-proctime') },
       { label: 'Avg Shipping Cost (7d)', value: pdfxText('#mfc-kpi-shipcost') },
@@ -21321,19 +21328,17 @@ async function loadAuditResultsFromSheet() {
         '<div class="pdfx-inner" style="padding-bottom:0;">' +
           pdfxHeaderBand(monthYear, 'Fulfillment & Customer Service') +
           '<div class="pdfx-chlabel">Fulfillment Performance</div>' +
-          '<div class="pdfx-kpis" style="margin-top:6px;">' + topKpis.map(kpiCardPlain).join('') + '</div>' +
+          '<div class="pdfx-kpis pdfx-kpis-fit" style="margin-top:6px;">' + topKpis.map(kpiCardPlain).join('') + '</div>' +
           '<div class="pdfx-card" style="margin-top:14px;margin-bottom:0;">' +
-            '<div class="pdfx-card-title">Orders Shipped by Date · Last 30 Days</div>' +
+            '<div class="pdfx-card-title">Website Orders Shipped by Date · Last 30 Days</div>' +
             pdfxChartBlock('mfcShippedChartInstance', 'Chart not yet loaded — open this tab once on the dashboard, then re-export.') +
           '</div>' +
-          '<div class="pdfx-chlabel" style="margin-top:16px;">Customer Service</div>' +
-          '<div class="pdfx-kpis n3" style="margin-top:6px;">' + csKpis.map(kpiCardWithSub).join('') + '</div>' +
-          // Map card: no border/padding (perimeter removed per Jaclyn
-          // 2026-10-01) — keeps this page under 11in so the render service
-          // doesn't zoom it down (which is what caused side whitespace).
+          // Map card, moved above Customer Service (2026-11-19 per Jaclyn).
+          // No border/padding (perimeter removed per Jaclyn 2026-10-01) — keeps
+          // this page under 11in so the render service doesn't zoom it down.
           '<div class="pdfx-card" style="margin-top:14px;margin-bottom:0;border:none;padding:0;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;">' +
-              '<div class="pdfx-card-title" style="margin-bottom:0;">Orders by State · Last 30 Days</div>' +
+              '<div class="pdfx-card-title" style="margin-bottom:0;">Website Orders by State · Last 30 Days</div>' +
               '<div style="display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);">' +
                 '<span>Fewer</span>' +
                 '<div style="width:60px;height:6px;border-radius:3px;background:linear-gradient(to right,#dce6f5,#001F60);"></div>' +
@@ -21342,6 +21347,8 @@ async function loadAuditResultsFromSheet() {
             '</div>' +
             mapHtml +
           '</div>' +
+          '<div class="pdfx-chlabel" style="margin-top:16px;">Customer Service</div>' +
+          '<div class="pdfx-kpis n3" style="margin-top:6px;">' + csKpis.map(kpiCardWithSub).join('') + '</div>' +
         '</div>' +
       '</div>';
   }
